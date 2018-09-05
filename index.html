@@ -64,7 +64,7 @@
     <article id="post-hello-world" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2018/09/05/hello-world/" class="article-date">
-  <time datetime="2018-09-05T13:26:58.765Z" itemprop="datePublished">2018-09-05</time>
+  <time datetime="2018-09-05T14:12:58.309Z" itemprop="datePublished">2018-09-05</time>
 </a>
     
   </div>
@@ -88,7 +88,45 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/09/05/hello-world/" data-id="cjlp6futp0003hs79y3b0xvsk" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/09/05/hello-world/" data-id="cjlp8303p00035v79u0zd8y06" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="openstack-instroduce-openstack简介" class="article article-type-openstack-instroduce" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/09/05/openstack简介/" class="article-date">
+  <time datetime="2018-09-05T14:08:38.000Z" itemprop="datePublished">2018-09-05</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/09/05/openstack简介/">openstack简介</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <img src="/2018/09/05/openstack简介/introduce.png" alt="introduce" title="introduce">
+<p>Openstack由美国国家航空航天局和Rackspace公司合作研发，目前已经占据市场主导地位。它致力于提供规模化、灵活扩展易部署且功能丰富的全开源模式平台，协助运营商、企业、ISP/CP、科研机构等搭建并实现满足自身需求的公共云和私有云服务，有力的推动了云计算的创新发展。<br>  Openstack的主要组件包括：计算（nova）、对象存储（swift）、镜像（glance）、认证（keystone）<br>、web控制台（horizon）以及网络（neutron）。其中Horizon提供了一个Web前端到Openstack其他服务的界面；nova组件主要负责管理虚拟机，存储和检索虚拟磁盘（Image）和Image上相关的元数据（Glance），并提供管理和维护系统镜像服务；网络组件（neutron）提供构建与管理虚拟网路的功能，他将网络连接作为服务；块存储服务服务组件（cinder）提供存储功能；Image（Glance）在对象存储（swift）上能够完成虚拟磁盘文件的存储，该组件提供pb级别、安全可靠的对象存储服务；所有的服务均需要利用keystone进行身份认证。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/09/05/openstack简介/" data-id="cjlp8304000085v79pirqjiln" class="article-share-link">Share</a>
       
       
     </footer>
@@ -123,13 +161,24 @@
         <p>本文主要着重介绍openstack neutron vxlan网络模式下的原理和体系架构。<br>名词解释：<br>东西向网络流量：vm内网流量<br>南北向网络流量：vm通过浮动ip与外网产生的流量<br>veth设备：成对出现，往往用于跨namespace通信，如下图所示：<br><img src="/2017/05/01/openstack-neutron/veth.png" alt="veth device" title="veth device"><br>tap设备：虚拟网络接口<br>fdb表：作用于数据链路层（二层网络），mac+vxlan和port的对应关系。<br>arp协议和arp表：<br>Arp协议是三层协议，主机发送网络包的时候会先广播到网络上的所有主机，如果接收到返回，就放到arp表中缓存。<br>Arp表存放ip和mac地址的对应关系<br>vxlan:Vxlan是 一种overlay网络，是一种隧道技术。<br><img src="/2017/05/01/openstack-neutron/vxlan.png" alt="vxlan network" title="vxlan network"></p>
 <p>openstack vxlan 网络模式简介</p>
 <p>东西向流量(虚拟机之间的网络流向)<br><img src="/2017/05/01/openstack-neutron/eastWest.png" alt="eastwest" title="eastwest"></p>
-<p>南北向流量流向（虚拟机与外网之间的网络流向）</p>
+<p>东西流量示例讲解：<br>计算节点网络：<br><img src="/2017/05/01/openstack-neutron/vm_network.png" alt="eastwest" title="eastwest"></p>
+<img src="/2017/05/01/openstack-neutron/port.png" alt="eastwest" title="eastwest">
+<p>网桥的命名规则是取networks的id前12位<br><img src="/2017/05/01/openstack-neutron/portid.png" alt="eastwest" title="eastwest"><br>tap设备的命名规则是取portid的前12位<br><img src="/2017/05/01/openstack-neutron/portDB.png" alt="port" title="port"><br>给一个安全组添加ssh（22端口）访问权限后的计算节点iptables：</p>
+<img src="/2017/05/01/openstack-neutron/5.png" alt="iptables" title="iptables">
+<p>网络节点：<br><img src="/2017/05/01/openstack-neutron/4.png" alt="iptables" title="iptables"></p>
+<img src="/2017/05/01/openstack-neutron/2.png" alt="iptables" title="iptables">
+<img src="/2017/05/01/openstack-neutron/3.png" alt="iptables" title="iptables">
+<img src="/2017/05/01/openstack-neutron/1.png" alt="iptables" title="iptables">
+<p>另外负载均衡器也在网络节点上。<br>南北向流量流向（虚拟机与外网之间的网络流向）</p>
 <img src="/2017/05/01/openstack-neutron/nanbei.png" alt="northsouth" title="northsouth">
+<img src="/2017/05/01/openstack-neutron/6.png" alt="iptables" title="iptables">
+<img src="/2017/05/01/openstack-neutron/7.png" alt="iptables" title="iptables">
+<img src="/2017/05/01/openstack-neutron/8.png" alt="iptables" title="iptables">
 
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/05/01/openstack-neutron/" data-id="cjlp6futv0004hs7989ydz67x" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/05/01/openstack-neutron/" data-id="cjlp8303u00045v79cfq3glhi" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/openstack-neutron/">openstack neutron</a></li></ul>
@@ -168,7 +217,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/05/01/spring-cloud/" data-id="cjlp6fuu50008hs79cknck48t" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/05/01/spring-cloud/" data-id="cjlp8304100095v791ykdprs2" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spring/">spring</a></li></ul>
@@ -207,7 +256,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/05/01/frame/" data-id="cjlp6futg0000hs79tjl1wizq" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/05/01/frame/" data-id="cjlp8303f00005v79x0sq4mqz" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spring/">spring</a></li></ul>
@@ -247,7 +296,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2016/12/12/openstack-newton-mysql-config/" data-id="cjlp6fuu20007hs79h5d4bfd1" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2016/12/12/openstack-newton-mysql-config/" data-id="cjlp8303x00075v79g653u9oq" class="article-share-link">Share</a>
       
       
     </footer>
@@ -285,7 +334,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2016/11/29/如何在virtualbox中安装ubuntu16/" data-id="cjlp6fuug000bhs79tc9gkds1" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2016/11/29/如何在virtualbox中安装ubuntu16/" data-id="cjlp8304a000c5v79ycbga9ns" class="article-share-link">Share</a>
       
       
     </footer>
@@ -317,12 +366,12 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>  大学有云：物有本末事有终始，知所先后，则近道矣。接触云计算行业已经有2、3年了，始终无法沉淀下来，或者说心静不下来，太浮躁。无法做到心如明镜，视万物如明镜现诸色相。如今已近而立之年，回首审视自觉髀里肉生，却无半点建树。<br>  思来想去不若开个blog，把自己想要学的东西系统的总结起来。打算做五个系列：零基础学容器之k8s，零基础学容器之docker三剑客，零基础学容器之mesos ，零基础学sdn 和 零基础学openstack。<br>  希望30岁前能搞定～也算给自己个交代。<br>  一周更两次，周三（四）一次，周末一次。</p>
+        <p>  大学有云：物有本末事有终始，知所先后，则近道矣。接触云计算行业已经有2、3年了，始终无法沉淀下来，或者说心静不下来，太浮躁。无法做到心如明镜，视万物如明镜现诸色相。如今已近而立之年，回首审视自觉髀里肉生，却无半点建树。<br>  思来想去不若开个blog，把自己想要学的东西系统的总结起来。</p>
 
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2016/11/24/写给自己/" data-id="cjlp6fuud000ahs79801gp5em" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2016/11/24/写给自己/" data-id="cjlp83048000b5v79ayxeaqyn" class="article-share-link">Share</a>
       
       
     </footer>
@@ -380,6 +429,10 @@
           </li>
         
           <li>
+            <a href="/2018/09/05/openstack简介/">openstack简介</a>
+          </li>
+        
+          <li>
             <a href="/2017/05/01/openstack-neutron/">openstack_neutron</a>
           </li>
         
@@ -389,10 +442,6 @@
         
           <li>
             <a href="/2017/05/01/frame/">spring frame</a>
-          </li>
-        
-          <li>
-            <a href="/2016/12/12/openstack-newton-mysql-config/">openstack新版本（newton）初始化sql报长度太长的解决方法</a>
           </li>
         
       </ul>

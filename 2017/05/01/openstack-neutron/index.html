@@ -14,8 +14,20 @@
 <meta property="og:image" content="http://yoursite.com/2017/05/01/openstack-neutron/veth.png">
 <meta property="og:image" content="http://yoursite.com/2017/05/01/openstack-neutron/vxlan.png">
 <meta property="og:image" content="http://yoursite.com/2017/05/01/openstack-neutron/eastWest.png">
+<meta property="og:image" content="http://yoursite.com/2017/05/01/openstack-neutron/vm_network.png">
+<meta property="og:image" content="http://yoursite.com/2017/05/01/openstack-neutron/port.png">
+<meta property="og:image" content="http://yoursite.com/2017/05/01/openstack-neutron/portid.png">
+<meta property="og:image" content="http://yoursite.com/2017/05/01/openstack-neutron/portDB.png">
+<meta property="og:image" content="http://yoursite.com/2017/05/01/openstack-neutron/5.png">
+<meta property="og:image" content="http://yoursite.com/2017/05/01/openstack-neutron/4.png">
+<meta property="og:image" content="http://yoursite.com/2017/05/01/openstack-neutron/2.png">
+<meta property="og:image" content="http://yoursite.com/2017/05/01/openstack-neutron/3.png">
+<meta property="og:image" content="http://yoursite.com/2017/05/01/openstack-neutron/1.png">
 <meta property="og:image" content="http://yoursite.com/2017/05/01/openstack-neutron/nanbei.png">
-<meta property="og:updated_time" content="2018-09-05T13:19:25.000Z">
+<meta property="og:image" content="http://yoursite.com/2017/05/01/openstack-neutron/6.png">
+<meta property="og:image" content="http://yoursite.com/2017/05/01/openstack-neutron/7.png">
+<meta property="og:image" content="http://yoursite.com/2017/05/01/openstack-neutron/8.png">
+<meta property="og:updated_time" content="2018-09-05T14:07:36.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="openstack_neutron">
 <meta name="twitter:description" content="本文主要着重介绍openstack neutron vxlan网络模式下的原理和体系架构。名词解释：东西向网络流量：vm内网流量南北向网络流量：vm通过浮动ip与外网产生的流量veth设备：成对出现，往往用于跨namespace通信，如下图所示：tap设备：虚拟网络接口fdb表：作用于数据链路层（二层网络），mac+vxlan和port的对应关系。arp协议和arp表：Arp协议是三层协议，主机发">
@@ -93,13 +105,24 @@
         <p>本文主要着重介绍openstack neutron vxlan网络模式下的原理和体系架构。<br>名词解释：<br>东西向网络流量：vm内网流量<br>南北向网络流量：vm通过浮动ip与外网产生的流量<br>veth设备：成对出现，往往用于跨namespace通信，如下图所示：<br><img src="/2017/05/01/openstack-neutron/veth.png" alt="veth device" title="veth device"><br>tap设备：虚拟网络接口<br>fdb表：作用于数据链路层（二层网络），mac+vxlan和port的对应关系。<br>arp协议和arp表：<br>Arp协议是三层协议，主机发送网络包的时候会先广播到网络上的所有主机，如果接收到返回，就放到arp表中缓存。<br>Arp表存放ip和mac地址的对应关系<br>vxlan:Vxlan是 一种overlay网络，是一种隧道技术。<br><img src="/2017/05/01/openstack-neutron/vxlan.png" alt="vxlan network" title="vxlan network"></p>
 <p>openstack vxlan 网络模式简介</p>
 <p>东西向流量(虚拟机之间的网络流向)<br><img src="/2017/05/01/openstack-neutron/eastWest.png" alt="eastwest" title="eastwest"></p>
-<p>南北向流量流向（虚拟机与外网之间的网络流向）</p>
+<p>东西流量示例讲解：<br>计算节点网络：<br><img src="/2017/05/01/openstack-neutron/vm_network.png" alt="eastwest" title="eastwest"></p>
+<img src="/2017/05/01/openstack-neutron/port.png" alt="eastwest" title="eastwest">
+<p>网桥的命名规则是取networks的id前12位<br><img src="/2017/05/01/openstack-neutron/portid.png" alt="eastwest" title="eastwest"><br>tap设备的命名规则是取portid的前12位<br><img src="/2017/05/01/openstack-neutron/portDB.png" alt="port" title="port"><br>给一个安全组添加ssh（22端口）访问权限后的计算节点iptables：</p>
+<img src="/2017/05/01/openstack-neutron/5.png" alt="iptables" title="iptables">
+<p>网络节点：<br><img src="/2017/05/01/openstack-neutron/4.png" alt="iptables" title="iptables"></p>
+<img src="/2017/05/01/openstack-neutron/2.png" alt="iptables" title="iptables">
+<img src="/2017/05/01/openstack-neutron/3.png" alt="iptables" title="iptables">
+<img src="/2017/05/01/openstack-neutron/1.png" alt="iptables" title="iptables">
+<p>另外负载均衡器也在网络节点上。<br>南北向流量流向（虚拟机与外网之间的网络流向）</p>
 <img src="/2017/05/01/openstack-neutron/nanbei.png" alt="northsouth" title="northsouth">
+<img src="/2017/05/01/openstack-neutron/6.png" alt="iptables" title="iptables">
+<img src="/2017/05/01/openstack-neutron/7.png" alt="iptables" title="iptables">
+<img src="/2017/05/01/openstack-neutron/8.png" alt="iptables" title="iptables">
 
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/05/01/openstack-neutron/" data-id="cjlp6futv0004hs7989ydz67x" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/05/01/openstack-neutron/" data-id="cjlp8303u00045v79cfq3glhi" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/openstack-neutron/">openstack neutron</a></li></ul>
@@ -110,11 +133,11 @@
     
 <nav id="article-nav">
   
-    <a href="/2018/09/05/hello-world/" id="article-nav-newer" class="article-nav-link-wrap">
+    <a href="/2018/09/05/openstack简介/" id="article-nav-newer" class="article-nav-link-wrap">
       <strong class="article-nav-caption">Newer</strong>
       <div class="article-nav-title">
         
-          如何搭建新版本hexo
+          openstack简介
         
       </div>
     </a>
@@ -177,6 +200,10 @@
           </li>
         
           <li>
+            <a href="/2018/09/05/openstack简介/">openstack简介</a>
+          </li>
+        
+          <li>
             <a href="/2017/05/01/openstack-neutron/">openstack_neutron</a>
           </li>
         
@@ -186,10 +213,6 @@
         
           <li>
             <a href="/2017/05/01/frame/">spring frame</a>
-          </li>
-        
-          <li>
-            <a href="/2016/12/12/openstack-newton-mysql-config/">openstack新版本（newton）初始化sql报长度太长的解决方法</a>
           </li>
         
       </ul>
