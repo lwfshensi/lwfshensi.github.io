@@ -3,20 +3,23 @@
 <head>
   <meta charset="utf-8">
   
-  <title>spring_cloud | 肆叔的酱油</title>
+  <title>openstack_neutron | 肆叔的酱油</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="spring cloud所有项目总结如下：">
+  <meta name="description" content="本文主要着重介绍openstack neutron vxlan网络模式下的原理和体系架构。名词解释：东西向网络流量：vm内网流量南北向网络流量：vm通过浮动ip与外网产生的流量veth设备：成对出现，往往用于跨namespace通信，如下图所示：tap设备：虚拟网络接口fdb表：作用于数据链路层（二层网络），mac+vxlan和port的对应关系。arp协议和arp表：Arp协议是三层协议，主机发">
 <meta property="og:type" content="article">
-<meta property="og:title" content="spring_cloud">
-<meta property="og:url" content="http://yoursite.com/2017/05/01/spring-cloud/index.html">
+<meta property="og:title" content="openstack_neutron">
+<meta property="og:url" content="http://yoursite.com/2017/05/01/openstack-neutron/index.html">
 <meta property="og:site_name" content="肆叔的酱油">
-<meta property="og:description" content="spring cloud所有项目总结如下：">
-<meta property="og:image" content="http://yoursite.com/2017/05/01/spring-cloud/spring_cloud.png">
-<meta property="og:updated_time" content="2017-05-01T08:32:36.000Z">
+<meta property="og:description" content="本文主要着重介绍openstack neutron vxlan网络模式下的原理和体系架构。名词解释：东西向网络流量：vm内网流量南北向网络流量：vm通过浮动ip与外网产生的流量veth设备：成对出现，往往用于跨namespace通信，如下图所示：tap设备：虚拟网络接口fdb表：作用于数据链路层（二层网络），mac+vxlan和port的对应关系。arp协议和arp表：Arp协议是三层协议，主机发">
+<meta property="og:image" content="http://yoursite.com/2017/05/01/openstack-neutron/veth.png">
+<meta property="og:image" content="http://yoursite.com/2017/05/01/openstack-neutron/vxlan.png">
+<meta property="og:image" content="http://yoursite.com/2017/05/01/openstack-neutron/eastWest.png">
+<meta property="og:image" content="http://yoursite.com/2017/05/01/openstack-neutron/nanbei.png">
+<meta property="og:updated_time" content="2018-09-05T13:19:25.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="spring_cloud">
-<meta name="twitter:description" content="spring cloud所有项目总结如下：">
-<meta name="twitter:image" content="http://yoursite.com/2017/05/01/spring-cloud/spring_cloud.png">
+<meta name="twitter:title" content="openstack_neutron">
+<meta name="twitter:description" content="本文主要着重介绍openstack neutron vxlan网络模式下的原理和体系架构。名词解释：东西向网络流量：vm内网流量南北向网络流量：vm通过浮动ip与外网产生的流量veth设备：成对出现，往往用于跨namespace通信，如下图所示：tap设备：虚拟网络接口fdb表：作用于数据链路层（二层网络），mac+vxlan和port的对应关系。arp协议和arp表：Arp协议是三层协议，主机发">
+<meta name="twitter:image" content="http://yoursite.com/2017/05/01/openstack-neutron/veth.png">
   
     <link rel="alternate" href="/atom.xml" title="肆叔的酱油" type="application/atom+xml">
   
@@ -65,10 +68,10 @@
   </div>
 </header>
       <div class="outer">
-        <section id="main"><article id="post-spring-cloud" class="article article-type-post" itemscope itemprop="blogPost">
+        <section id="main"><article id="post-openstack-neutron" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
-    <a href="/2017/05/01/spring-cloud/" class="article-date">
-  <time datetime="2017-05-01T08:09:13.000Z" itemprop="datePublished">2017-05-01</time>
+    <a href="/2017/05/01/openstack-neutron/" class="article-date">
+  <time datetime="2017-05-01T08:36:25.000Z" itemprop="datePublished">2017-05-01</time>
 </a>
     
   </div>
@@ -79,7 +82,7 @@
         
   
     <h1 class="article-title" itemprop="name">
-      spring_cloud
+      openstack_neutron
     </h1>
   
 
@@ -87,15 +90,19 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>spring cloud所有项目总结如下：<br><img src="/2017/05/01/spring-cloud/spring_cloud.png" alt="This is an example image" title="This is an example image"></p>
+        <p>本文主要着重介绍openstack neutron vxlan网络模式下的原理和体系架构。<br>名词解释：<br>东西向网络流量：vm内网流量<br>南北向网络流量：vm通过浮动ip与外网产生的流量<br>veth设备：成对出现，往往用于跨namespace通信，如下图所示：<br><img src="/2017/05/01/openstack-neutron/veth.png" alt="veth device" title="veth device"><br>tap设备：虚拟网络接口<br>fdb表：作用于数据链路层（二层网络），mac+vxlan和port的对应关系。<br>arp协议和arp表：<br>Arp协议是三层协议，主机发送网络包的时候会先广播到网络上的所有主机，如果接收到返回，就放到arp表中缓存。<br>Arp表存放ip和mac地址的对应关系<br>vxlan:Vxlan是 一种overlay网络，是一种隧道技术。<br><img src="/2017/05/01/openstack-neutron/vxlan.png" alt="vxlan network" title="vxlan network"></p>
+<p>openstack vxlan 网络模式简介</p>
+<p>东西向流量(虚拟机之间的网络流向)<br><img src="/2017/05/01/openstack-neutron/eastWest.png" alt="eastwest" title="eastwest"></p>
+<p>南北向流量流向（虚拟机与外网之间的网络流向）</p>
+<img src="/2017/05/01/openstack-neutron/nanbei.png" alt="northsouth" title="northsouth">
 
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/05/01/spring-cloud/" data-id="cjlp6fuu50008hs79cknck48t" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/05/01/openstack-neutron/" data-id="cjlp6futv0004hs7989ydz67x" class="article-share-link">Share</a>
       
       
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spring/">spring</a></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/openstack-neutron/">openstack neutron</a></li></ul>
 
     </footer>
   </div>
@@ -103,19 +110,19 @@
     
 <nav id="article-nav">
   
-    <a href="/2017/05/01/openstack-neutron/" id="article-nav-newer" class="article-nav-link-wrap">
+    <a href="/2018/09/05/hello-world/" id="article-nav-newer" class="article-nav-link-wrap">
       <strong class="article-nav-caption">Newer</strong>
       <div class="article-nav-title">
         
-          openstack_neutron
+          如何搭建新版本hexo
         
       </div>
     </a>
   
   
-    <a href="/2017/05/01/frame/" id="article-nav-older" class="article-nav-link-wrap">
+    <a href="/2017/05/01/spring-cloud/" id="article-nav-older" class="article-nav-link-wrap">
       <strong class="article-nav-caption">Older</strong>
-      <div class="article-nav-title">spring frame</div>
+      <div class="article-nav-title">spring_cloud</div>
     </a>
   
 </nav>
