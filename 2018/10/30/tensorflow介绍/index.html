@@ -17,6 +17,7 @@
 <meta property="og:image" content="http://yoursite.com/2018/10/30/tensorflow介绍/mnist.jpg">
 <meta property="og:image" content="http://yoursite.com/2018/10/30/tensorflow介绍/tens.jpg">
 <meta property="og:image" content="http://yoursite.com/2018/10/30/tensorflow介绍/demo1.jpg">
+<meta property="og:image" content="http://yoursite.com/2018/10/30/tensorflow介绍/1.jpg">
 <meta property="og:image" content="http://yoursite.com/2018/10/30/tensorflow介绍/xianxingfenleiqi.jpg">
 <meta property="og:image" content="http://yoursite.com/2018/10/30/tensorflow介绍/xianxingfenlei1.jpg">
 <meta property="og:image" content="http://yoursite.com/2018/10/30/tensorflow介绍/tanhx.png">
@@ -29,7 +30,7 @@
 <meta property="og:image" content="http://yoursite.com/2018/10/30/tensorflow介绍/softmax2.jpg">
 <meta property="og:image" content="http://yoursite.com/2018/10/30/tensorflow介绍/gd5.png">
 <meta property="og:image" content="http://yoursite.com/2018/10/30/tensorflow介绍/youhuaqi.png">
-<meta property="og:updated_time" content="2018-11-05T07:36:38.000Z">
+<meta property="og:updated_time" content="2018-11-05T08:01:11.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="图像识别与tensorflow">
 <meta name="twitter:description" content="1、图像识别基本流程：a、输入:    我们的给定K个类别的N张图片，作为计算机学习的训练集b、学习:    让计算机逐张图片地『观察』和『学习』c、 评估:    就像我们上学学了东西要考试检测一样，我们也得考 考计算机学得如何，于是我们给定一些计算机不知道 类别的图片让它判别，然后再比对我们已知的正确答案。举个例子：教小孩认识水果。  看！这是橘子！再看看这个还认识不？2、tensorflow">
@@ -106,6 +107,7 @@
       
         <p>1、图像识别基本流程：<br>a、输入:<br>    我们的给定K个类别的N张图片，作为计算机学习的训练集<br>b、学习:<br>    让计算机逐张图片地『观察』和『学习』<br>c、 评估:<br>    就像我们上学学了东西要考试检测一样，我们也得考 考计算机学得如何，于是我们给定一些计算机不知道 类别的图片让它判别，然后再比对我们已知的正确答案。<br>举个例子：<br>教小孩认识水果。<br><img src="/2018/10/30/tensorflow介绍/boy.jpg" alt="xianxingfenlei" title="xianxingfenlei"><br>  <img src="/2018/10/30/tensorflow介绍/juzi.jpg" alt="xianxingfenlei" title="xianxingfenlei"><br>看！这是橘子！<br>再看看这个还认识不？<br><img src="/2018/10/30/tensorflow介绍/chengzi.jpg" alt="xianxingfenlei" title="xianxingfenlei"><br>2、tensorflow入门例子：<br>tensorflow是google的亲儿子。<br>从名字可以看出tensorflow=tensor+flow。就是张量加图<br>tensorflow的输入就是张量，以mnist数据集为例：<br>mnist每个图片是28*28像素，将图片按像素展开为数组得到784纬向量空间中的点。<br>而mnist训练集中更有55000张图，就是一个[55000，784]的张量。<br>第一维是图片索引，第二维是像素索引。<br><img src="/2018/10/30/tensorflow介绍/mnist.jpg" alt="xianxingfen" title="xianxingfen"><br><img src="/2018/10/30/tensorflow介绍/tens.jpg" alt="xianxingfen" title="xianxingfen"></p>
 <img src="/2018/10/30/tensorflow介绍/demo1.jpg" alt="xianxingfen" title="xianxingfen">
+<img src="/2018/10/30/tensorflow介绍/1.jpg" alt="xianxingfen" title="xianxingfen">
 <p>tensorflow的处理流程可以这样</p>
 <p>从线性分类器开始说起<br>2、线性分类器：<br><img src="/2018/10/30/tensorflow介绍/xianxingfenleiqi.jpg" alt="xianxingfenlei" title="xianxingfenlei"><br>具体计算过程：<br><img src="/2018/10/30/tensorflow介绍/xianxingfenlei1.jpg" alt="xianxingfenlei1" title="xianxingfenlei1"><br>W的每一行可以看做是其中一个类别的模板<br>每类得分，实际上是像素点和模板匹配度<br>模板匹配的方式是内积计算</p>
 <p>4、激励函数：<br>常见激励函数：<br>4.1.sigmoid函数<br>S(x)=1/(1+exp(-x))<br>导数为：S(x)*(1-S(x))。<br>4.2 tanh函数<br><img src="/2018/10/30/tensorflow介绍/tanhx.png" alt="softmax" title="softmax"><br>导数为<br><img src="/2018/10/30/tensorflow介绍/tanhx1.png" alt="softmax" title="softmax"><br>4.3 elu函数：<br><img src="/2018/10/30/tensorflow介绍/elu.png" alt="softmax" title="softmax"><br>4.4 softplus函数：<br>f(x)=ln(1+ex)<br>导数为：<br>f′(x)=ex1+ex=11+e−x<br>4.5 softsign函数：<br><img src="/2018/10/30/tensorflow介绍/softsign.png" alt="softmax" title="softmax"><br>4.6 relu函数<br>f(x) = max(0, x)<br>4.7 relu6函数<br>f(x) = max(0,6,x)<br><img src="/2018/10/30/tensorflow介绍/1204043-20170722004859120-1107549120.png" alt="link_fun" title="link_fun"><br>如何选择：<br>神经网络层次很少，可以随意尝试记录函数组合，<br>卷积神经网络用relu<br>循环神经网络推荐relu或者tanh</p>
