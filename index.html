@@ -132,9 +132,7 @@
 <p>Adam 就是在 RMSprop 的基础上加了 bias-correction 和 momentum，</p>
 <p>随着梯度变的稀疏，Adam 比 RMSprop 效果会好。</p>
 <p>整体来讲，Adam 是最好的选择。</p>
-<p>5、人工神经网络：</p>
-<p>6、卷积神经网络</p>
-<p>8、tensorflow卷积神经网络实例</p>
+<p>5、人工神经网络：<br><img src="/2018/10/30/tensorflow介绍/shenjingwangluo.png" alt="神经网络" title="神经网络"><br>神经网络由神经元构成，每一个神经元都有各自的权重，代表一种特征。<br>神经元的“与或”运算达到了非线性切分目的。<br>“正向传播”求损失，“反向传播”回传误差<br>根据误差信号修正每层的权重<br>神经元：<br><img src="/2018/10/30/tensorflow介绍/shenjingyuan.png" alt="神经元" title="神经元"><br>6、卷积神经网络<br>卷积神经网络是神经网络的一种，他解决了图片处理的一个大问题就是特征向量提取的问题。<br><img src="/2018/10/30/tensorflow介绍/juanji1.png" alt="神经元" title="神经元"><br>卷积神经网络层级分为:输入层、卷积层、激励层、池化层和全联接层<br>卷积层：<br>固定每个神经元连接权重，可以看做模板 每个神经元只关注一个特性<br>参数共享机制:假设每个神经元连接数据窗的权重是固定的<br>一组固定的权重和不同窗口内数据做内积: 卷积<br><img src="/2018/10/30/tensorflow介绍/juanji2.png" alt="卷积神经网络" title="卷积神经网络"><br>激励层：<br>把卷积层输出结果做非线性映射<br><img src="/2018/10/30/tensorflow介绍/jili.png" alt="卷积神经网络" title="卷积神经网络"><br>夹在连续的卷积层中间<br>压缩数据和参数的量，减小过拟合<br>这个与数据量的大小也有关系，过多的池化会把数据压没，不做池化也有可能造成过拟合。<br><img src="/2018/10/30/tensorflow介绍/pooling.png" alt="卷积神经网络" title="卷积神经网络"><br>卷积神经网络的构成<br><img src="/2018/10/30/tensorflow介绍/cnn.png" alt="卷积神经网络" title="卷积神经网络"><br>CNN的优点：<br>共享卷积核，对高维数据处理无压力<br>无需手动选取特征，训练好权重，即得特征<br>分类效果好<br>缺点：<br>需要调参，需要大样本量，训练最好要GPU<br><img src="/2018/10/30/tensorflow介绍/shenjingyuan.png" alt="神经元" title="神经元"><br>8、tensorflow卷积神经网络实例</p>
 <p>9、opencv与tensorflow</p>
 <p>参考资料：<br>softmax函数详解 <a href="https://www.cnblogs.com/alexanderkun/p/8098781.html" target="_blank" rel="external">https://www.cnblogs.com/alexanderkun/p/8098781.html</a><br>交叉熵  <a href="https://blog.csdn.net/tsyccnh/article/details/79163834" target="_blank" rel="external">https://blog.csdn.net/tsyccnh/article/details/79163834</a><br>优化器选择  <a href="https://blog.csdn.net/tiankongtiankong01/article/details/80570729" target="_blank" rel="external">https://blog.csdn.net/tiankongtiankong01/article/details/80570729</a><br>tensorflow建议教程 <a href="https://morvanzhou.github.io/tutorials/machine-learning/tensorflow/1-1-A-ANN-and-NN/" target="_blank" rel="external">https://morvanzhou.github.io/tutorials/machine-learning/tensorflow/1-1-A-ANN-and-NN/</a></p>
 
