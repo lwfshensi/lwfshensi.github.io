@@ -3,14 +3,32 @@
 <head>
   <meta charset="utf-8">
   
-  <title>Tag: spring | 肆叔的酱油</title>
+  <title>spark-sql-count-as-issue | 肆叔的酱油</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="website">
-<meta property="og:title" content="肆叔的酱油">
-<meta property="og:url" content="http://yoursite.com/tags/spring/index.html">
+  <meta name="description" content="今天遇到了一个奇怪的问题，就是用as的时候，如果别名全部为数字，那么会报错，具体说明如下：准备的数据如下：如果设置成2或者2-2，那么会报如下错误。如果是’2’效果一样如果设置成2_2，则查询正常
+用的spark和spark sql为2.3.1，pom如下：
+&amp;lt;dependency&amp;gt;
+    &amp;lt;groupId&amp;gt;org.apache.spark&amp;lt;/groupId&amp;gt;">
+<meta property="og:type" content="article">
+<meta property="og:title" content="spark-sql-count-as-issue">
+<meta property="og:url" content="http://yoursite.com/2018/12/13/spark-sql-count-as-issue/index.html">
 <meta property="og:site_name" content="肆叔的酱油">
+<meta property="og:description" content="今天遇到了一个奇怪的问题，就是用as的时候，如果别名全部为数字，那么会报错，具体说明如下：准备的数据如下：如果设置成2或者2-2，那么会报如下错误。如果是’2’效果一样如果设置成2_2，则查询正常
+用的spark和spark sql为2.3.1，pom如下：
+&amp;lt;dependency&amp;gt;
+    &amp;lt;groupId&amp;gt;org.apache.spark&amp;lt;/groupId&amp;gt;">
+<meta property="og:image" content="http://yoursite.com/2018/12/13/spark-sql-count-as-issue/4.png">
+<meta property="og:image" content="http://yoursite.com/2018/12/13/spark-sql-count-as-issue/2.png">
+<meta property="og:image" content="http://yoursite.com/2018/12/13/spark-sql-count-as-issue/3.png">
+<meta property="og:image" content="http://yoursite.com/2018/12/13/spark-sql-count-as-issue/1.png">
+<meta property="og:updated_time" content="2018-12-13T15:37:33.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="肆叔的酱油">
+<meta name="twitter:title" content="spark-sql-count-as-issue">
+<meta name="twitter:description" content="今天遇到了一个奇怪的问题，就是用as的时候，如果别名全部为数字，那么会报错，具体说明如下：准备的数据如下：如果设置成2或者2-2，那么会报如下错误。如果是’2’效果一样如果设置成2_2，则查询正常
+用的spark和spark sql为2.3.1，pom如下：
+&amp;lt;dependency&amp;gt;
+    &amp;lt;groupId&amp;gt;org.apache.spark&amp;lt;/groupId&amp;gt;">
+<meta name="twitter:image" content="http://yoursite.com/2018/12/13/spark-sql-count-as-issue/4.png">
   
     <link rel="alternate" href="/atom.xml" title="肆叔的酱油" type="application/atom+xml">
   
@@ -59,58 +77,76 @@
   </div>
 </header>
       <div class="outer">
-        <section id="main">
-  
-  
-    
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2017" class="archive-year">2017</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/2017/05/01/spring-cloud/" class="archive-article-date">
-  <time datetime="2017-05-01T08:09:13.000Z" itemprop="datePublished">May 1</time>
+        <section id="main"><article id="post-spark-sql-count-as-issue" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/12/13/spark-sql-count-as-issue/" class="article-date">
+  <time datetime="2018-12-13T15:25:33.000Z" itemprop="datePublished">2018-12-13</time>
 </a>
-      
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/05/01/spring-cloud/">spring_cloud</a>
+    <h1 class="article-title" itemprop="name">
+      spark-sql-count-as-issue
     </h1>
   
 
-    </header>
-  </div>
-</article>
-  
+      </header>
     
-    
-    <article class="archive-article archive-type-spring">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/2017/05/01/frame/" class="archive-article-date">
-  <time datetime="2017-05-01T07:56:04.000Z" itemprop="datePublished">May 1</time>
-</a>
+    <div class="article-entry" itemprop="articleBody">
       
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/05/01/frame/">spring frame</a>
-    </h1>
-  
+        <p>今天遇到了一个奇怪的问题，就是用as的时候，如果别名全部为数字，那么会报错，具体说明如下：<br>准备的数据如下：<br><img src="/2018/12/13/spark-sql-count-as-issue/4.png" alt="data" title="data"><br>如果设置成2或者2-2，那么会报如下错误。如果是’2’效果一样<br><img src="/2018/12/13/spark-sql-count-as-issue/2.png" alt="wrong" title="wrong"><br><img src="/2018/12/13/spark-sql-count-as-issue/3.png" alt="exception" title="exception"><br>如果设置成2_2，则查询正常<br><img src="/2018/12/13/spark-sql-count-as-issue/1.png" alt="right" title="right"></p>
+<p>用的spark和spark sql为2.3.1，pom如下：</p>
+<pre><code>&lt;dependency&gt;
+    &lt;groupId&gt;org.apache.spark&lt;/groupId&gt;
+    &lt;artifactId&gt;spark-core_2.11&lt;/artifactId&gt;
+    &lt;version&gt;2.3.1&lt;/version&gt;
+    &lt;scope&gt;${spark.scope}&lt;/scope&gt;
+&lt;/dependency&gt;
 
-    </header>
+&lt;dependency&gt;
+    &lt;groupId&gt;org.apache.spark&lt;/groupId&gt;
+    &lt;artifactId&gt;spark-sql_2.11&lt;/artifactId&gt;
+    &lt;version&gt;2.3.1&lt;/version&gt;
+    &lt;scope&gt;${spark.scope}&lt;/scope&gt;
+&lt;/dependency&gt;
+</code></pre><p>暂时先用’_’，还没有具体的解决办法</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/12/13/spark-sql-count-as-issue/" data-id="cjpmrlmly000bet79yew088sb" class="article-share-link">Share</a>
+      
+      
+    </footer>
   </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2018/12/13/hello-world/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          如何搭建新版本hexo
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2018/12/13/spark-classloader-cannot-find-classdef-in-the-jar/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">spark找不到jar里有定义的class</div>
+    </a>
+  
+</nav>
+
+  
 </article>
-  
-  
-    </div></section>
-  
 
 </section>
         

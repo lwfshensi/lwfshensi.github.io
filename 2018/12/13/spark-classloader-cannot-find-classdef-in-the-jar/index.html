@@ -3,14 +3,18 @@
 <head>
   <meta charset="utf-8">
   
-  <title>Tag: spring | 肆叔的酱油</title>
+  <title>spark找不到jar里有定义的class | 肆叔的酱油</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="website">
-<meta property="og:title" content="肆叔的酱油">
-<meta property="og:url" content="http://yoursite.com/tags/spring/index.html">
+  <meta name="description" content="今天遇到了一个奇怪的问题：明明打包的时候把class文件打进去了，但是却报classnotfound！相同的程序如果在本地以local形式运行是可以的，但是如果submit到远程就会报classnotfound。开始猜测是classloader的问题。终于在stackoverflow上找到了类似的问题。加上参数–driver-class-path 将jar包自己放到这个参数后面，问题解决。连接如下">
+<meta property="og:type" content="article">
+<meta property="og:title" content="spark找不到jar里有定义的class">
+<meta property="og:url" content="http://yoursite.com/2018/12/13/spark-classloader-cannot-find-classdef-in-the-jar/index.html">
 <meta property="og:site_name" content="肆叔的酱油">
+<meta property="og:description" content="今天遇到了一个奇怪的问题：明明打包的时候把class文件打进去了，但是却报classnotfound！相同的程序如果在本地以local形式运行是可以的，但是如果submit到远程就会报classnotfound。开始猜测是classloader的问题。终于在stackoverflow上找到了类似的问题。加上参数–driver-class-path 将jar包自己放到这个参数后面，问题解决。连接如下">
+<meta property="og:updated_time" content="2018-12-13T14:53:53.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="肆叔的酱油">
+<meta name="twitter:title" content="spark找不到jar里有定义的class">
+<meta name="twitter:description" content="今天遇到了一个奇怪的问题：明明打包的时候把class文件打进去了，但是却报classnotfound！相同的程序如果在本地以local形式运行是可以的，但是如果submit到远程就会报classnotfound。开始猜测是classloader的问题。终于在stackoverflow上找到了类似的问题。加上参数–driver-class-path 将jar包自己放到这个参数后面，问题解决。连接如下">
   
     <link rel="alternate" href="/atom.xml" title="肆叔的酱油" type="application/atom+xml">
   
@@ -59,58 +63,63 @@
   </div>
 </header>
       <div class="outer">
-        <section id="main">
-  
-  
-    
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2017" class="archive-year">2017</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/2017/05/01/spring-cloud/" class="archive-article-date">
-  <time datetime="2017-05-01T08:09:13.000Z" itemprop="datePublished">May 1</time>
+        <section id="main"><article id="post-spark-classloader-cannot-find-classdef-in-the-jar" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/12/13/spark-classloader-cannot-find-classdef-in-the-jar/" class="article-date">
+  <time datetime="2018-12-13T14:47:35.000Z" itemprop="datePublished">2018-12-13</time>
 </a>
-      
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/05/01/spring-cloud/">spring_cloud</a>
+    <h1 class="article-title" itemprop="name">
+      spark找不到jar里有定义的class
     </h1>
   
 
-    </header>
-  </div>
-</article>
-  
+      </header>
     
-    
-    <article class="archive-article archive-type-spring">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/2017/05/01/frame/" class="archive-article-date">
-  <time datetime="2017-05-01T07:56:04.000Z" itemprop="datePublished">May 1</time>
-</a>
+    <div class="article-entry" itemprop="articleBody">
       
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/05/01/frame/">spring frame</a>
-    </h1>
-  
+        <p>今天遇到了一个奇怪的问题：明明打包的时候把class文件打进去了，但是却报classnotfound！<br>相同的程序如果在本地以local形式运行是可以的，但是如果submit到远程就会报classnotfound。<br>开始猜测是classloader的问题。<br>终于在stackoverflow上找到了类似的问题。<br>加上参数–driver-class-path 将jar包自己放到这个参数后面，问题解决。<br>连接如下：<br><a href="https://stackoverflow.com/questions/30426245/apache-spark-classloader-cannot-find-classdef-in-the-jar" target="_blank" rel="external">https://stackoverflow.com/questions/30426245/apache-spark-classloader-cannot-find-classdef-in-the-jar</a></p>
 
-    </header>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/12/13/spark-classloader-cannot-find-classdef-in-the-jar/" data-id="cjpmrlmlq0008et79otb51hkj" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spark-classload-ClassNotFound/">spark classload ClassNotFound</a></li></ul>
+
+    </footer>
   </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2018/12/13/spark-sql-count-as-issue/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          spark-sql-count-as-issue
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2018/10/30/tensorflow介绍/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">图像识别与tensorflow</div>
+    </a>
+  
+</nav>
+
+  
 </article>
-  
-  
-    </div></section>
-  
 
 </section>
         
