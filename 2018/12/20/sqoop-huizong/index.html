@@ -3,18 +3,23 @@
 <head>
   <meta charset="utf-8">
   
-  <title>openstack新版本（newton）初始化sql报长度太长的解决方法 | 肆叔的酱油</title>
+  <title>sqoop-huizong | 肆叔的酱油</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="今天想安装一下最新的os，结果又tm各种新问题。遇到一个记录一个吧。这次遇到的是数据库问题，错误信息如下：2016-12-12 22:15:28.991 4450 ERROR keystone     self._affected_rows = self._read_query_result(unbuffered=unbuffered)2016-12-12 22:15:28.991 4450 ER">
+  <meta name="description" content="sqoop最近遇到的问题在这里汇总一下
+先说环境阿里emr-3.12.0sqoop 1.4.71、字段类型问题首先遇到的一个问题是通过sqoop从mysql导入到hive的时候，如果不指定列的类型，到hive默认都是字符串。这样做日期计算的时候会稍微麻烦一些。解决办法：通过–map-column-java 和–map-column-hive 来指定类型参考资料：https://blog.csdn.">
 <meta property="og:type" content="article">
-<meta property="og:title" content="openstack新版本（newton）初始化sql报长度太长的解决方法">
-<meta property="og:url" content="http://yoursite.com/2016/12/12/openstack-newton-mysql-config/index.html">
+<meta property="og:title" content="sqoop-huizong">
+<meta property="og:url" content="http://yoursite.com/2018/12/20/sqoop-huizong/index.html">
 <meta property="og:site_name" content="肆叔的酱油">
-<meta property="og:description" content="今天想安装一下最新的os，结果又tm各种新问题。遇到一个记录一个吧。这次遇到的是数据库问题，错误信息如下：2016-12-12 22:15:28.991 4450 ERROR keystone     self._affected_rows = self._read_query_result(unbuffered=unbuffered)2016-12-12 22:15:28.991 4450 ER">
-<meta property="og:updated_time" content="2016-12-12T14:33:11.000Z">
+<meta property="og:description" content="sqoop最近遇到的问题在这里汇总一下
+先说环境阿里emr-3.12.0sqoop 1.4.71、字段类型问题首先遇到的一个问题是通过sqoop从mysql导入到hive的时候，如果不指定列的类型，到hive默认都是字符串。这样做日期计算的时候会稍微麻烦一些。解决办法：通过–map-column-java 和–map-column-hive 来指定类型参考资料：https://blog.csdn.">
+<meta property="og:image" content="http://yoursite.com/2018/12/20/sqoop-huizong/1.png">
+<meta property="og:updated_time" content="2018-12-20T15:55:28.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="openstack新版本（newton）初始化sql报长度太长的解决方法">
-<meta name="twitter:description" content="今天想安装一下最新的os，结果又tm各种新问题。遇到一个记录一个吧。这次遇到的是数据库问题，错误信息如下：2016-12-12 22:15:28.991 4450 ERROR keystone     self._affected_rows = self._read_query_result(unbuffered=unbuffered)2016-12-12 22:15:28.991 4450 ER">
+<meta name="twitter:title" content="sqoop-huizong">
+<meta name="twitter:description" content="sqoop最近遇到的问题在这里汇总一下
+先说环境阿里emr-3.12.0sqoop 1.4.71、字段类型问题首先遇到的一个问题是通过sqoop从mysql导入到hive的时候，如果不指定列的类型，到hive默认都是字符串。这样做日期计算的时候会稍微麻烦一些。解决办法：通过–map-column-java 和–map-column-hive 来指定类型参考资料：https://blog.csdn.">
+<meta name="twitter:image" content="http://yoursite.com/2018/12/20/sqoop-huizong/1.png">
   
     <link rel="alternate" href="/atom.xml" title="肆叔的酱油" type="application/atom+xml">
   
@@ -63,10 +68,10 @@
   </div>
 </header>
       <div class="outer">
-        <section id="main"><article id="post-openstack-newton-mysql-config" class="article article-type-post" itemscope itemprop="blogPost">
+        <section id="main"><article id="post-sqoop-huizong" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
-    <a href="/2016/12/12/openstack-newton-mysql-config/" class="article-date">
-  <time datetime="2016-12-12T14:26:55.000Z" itemprop="datePublished">2016-12-12</time>
+    <a href="/2018/12/20/sqoop-huizong/" class="article-date">
+  <time datetime="2018-12-20T15:38:06.000Z" itemprop="datePublished">2018-12-20</time>
 </a>
     
   </div>
@@ -77,7 +82,7 @@
         
   
     <h1 class="article-title" itemprop="name">
-      openstack新版本（newton）初始化sql报长度太长的解决方法
+      sqoop-huizong
     </h1>
   
 
@@ -85,13 +90,13 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>今天想安装一下最新的os，结果又tm各种新问题。遇到一个记录一个吧。<br>这次遇到的是数据库问题，错误信息如下：<br>2016-12-12 22:15:28.991 4450 ERROR keystone     self._affected_rows = self._read_query_result(unbuffered=unbuffered)<br>2016-12-12 22:15:28.991 4450 ERROR keystone   File “/usr/lib/python2.7/dist-packages/pymysql/connections.py”, line 1002, in _read_query_result<br>2016-12-12 22:15:28.991 4450 ERROR keystone     result.read()<br>2016-12-12 22:15:28.991 4450 ERROR keystone   File “/usr/lib/python2.7/dist-packages/pymysql/connections.py”, line 1285, in read<br>2016-12-12 22:15:28.991 4450 ERROR keystone     first_packet = self.connection._read_packet()<br>2016-12-12 22:15:28.991 4450 ERROR keystone   File “/usr/lib/python2.7/dist-packages/pymysql/connections.py”, line 966, in _read_packet<br>2016-12-12 22:15:28.991 4450 ERROR keystone     packet.check_error()<br>2016-12-12 22:15:28.991 4450 ERROR keystone   File “/usr/lib/python2.7/dist-packages/pymysql/connections.py”, line 394, in check_error<br>2016-12-12 22:15:28.991 4450 ERROR keystone     err.raise_mysql_exception(self._data)<br>2016-12-12 22:15:28.991 4450 ERROR keystone   File “/usr/lib/python2.7/dist-packages/pymysql/err.py”, line 120, in raise_mysql_exception<br>2016-12-12 22:15:28.991 4450 ERROR keystone     _check_mysql_exception(errinfo)<br>2016-12-12 22:15:28.991 4450 ERROR keystone   File “/usr/lib/python2.7/dist-packages/pymysql/err.py”, line 115, in _check_mysql_exception<br>2016-12-12 22:15:28.991 4450 ERROR keystone     raise InternalError(errno, errorvalue)<br>2016-12-12 22:15:28.991 4450 ERROR keystone DBError: (pymysql.err.InternalError) (1071, u’Specified key was too long; max key length is 767 bytes’) [SQL: u’\nCREATE TABLE migrate_version (\n\trepository_id VARCHAR(250) NOT NULL, \n\trepository_path TEXT, \n\tversion INTEGER, \n\tPRIMARY KEY (repository_id)\n)\n\n’]</p>
-<p>上网一查才知道跟字符集还有关系。utf8的要长点。导致的问题。<br>百思不得其姐，后来报着装大运的心态竟然给解决了。。。。。。<br>按照官网上的文档是这样初始化数据库的：<br>CREATE DATABASE keystone;<br>而实际上如果执行<br>CREATE SCHEMA <code>keystone</code> DEFAULT CHARACTER SET utf8 ;<br>再执行<br>su -s /bin/sh -c “keystone-manage db_sync” keystone<br>就能正常初始化了！！！！！！<br>太tm神奇了。</p>
+        <p>sqoop最近遇到的问题在这里汇总一下</p>
+<p>先说环境<br>阿里emr-3.12.0<br>sqoop 1.4.7<br>1、字段类型问题<br>首先遇到的一个问题是通过sqoop从mysql导入到hive的时候，如果不指定列的类型，到hive默认都是字符串。<br>这样做日期计算的时候会稍微麻烦一些。<br>解决办法：<br>通过–map-column-java 和–map-column-hive 来指定类型<br>参考资料：<br><a href="https://blog.csdn.net/xianjie0318/article/details/79300435" target="_blank" rel="external">https://blog.csdn.net/xianjie0318/article/details/79300435</a><br>2、mysql导入hive报GC overhead limit exceeded<br>解决方法：<br>mysql connection连接字符串加上：<br>?dontTrackOpenResources=true&amp;defaultFetchSize=1000&amp;useCursorFetch=true<br>参考资料：<br><a href="https://www.cnblogs.com/chwilliam85/p/9693276.html" target="_blank" rel="external">https://www.cnblogs.com/chwilliam85/p/9693276.html</a><br>3、通过sqoop增量地从mysql导入到hive<br>这个我一开始用–append 模式导入的，然后报错如下：<br>Append mode for hive imports is not  yet supported. Please remove the parameter –append-mode<br>我提了一个工单给阿里客服，<br>提供了一个参考链接：<br><a href="https://community.hortonworks.com/questions/11373/sqoop-incremental-import-in-hive-i-get-error-messa.html" target="_blank" rel="external">https://community.hortonworks.com/questions/11373/sqoop-incremental-import-in-hive-i-get-error-messa.html</a><br>这种方式是通过创建外部表，然后增量写入到hdfs来实现的。<br>这里有个注意的地方是要配合-check-column来使用，而这个字段可以是数值型的id，也可以是时间戳！<br>参考资料如下：<br><a href="https://stackoverflow.com/questions/41238887/sqoop-incremental-import-error-using-date-column" target="_blank" rel="external">https://stackoverflow.com/questions/41238887/sqoop-incremental-import-error-using-date-column</a><br>4、新版“数据开发”功能支持参数化<br>以前用老版的“作业调度”sqoop并不支持参数<br>用新版的“数据开发”<br><img src="/2018/12/20/sqoop-huizong/1.png" alt="参数化" title="参数化"></p>
 
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2016/12/12/openstack-newton-mysql-config/" data-id="cjpwsfihm00099779dez0c4gu" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/12/20/sqoop-huizong/" data-id="cjpwsfirb000h9779icpmau40" class="article-share-link">Share</a>
       
       
     </footer>
@@ -100,19 +105,19 @@
     
 <nav id="article-nav">
   
-    <a href="/2017/05/01/frame/" id="article-nav-newer" class="article-nav-link-wrap">
+    <a href="/2018/12/20/hello-world/" id="article-nav-newer" class="article-nav-link-wrap">
       <strong class="article-nav-caption">Newer</strong>
       <div class="article-nav-title">
         
-          spring frame
+          如何搭建新版本hexo
         
       </div>
     </a>
   
   
-    <a href="/2016/11/29/如何在virtualbox中安装ubuntu16/" id="article-nav-older" class="article-nav-link-wrap">
+    <a href="/2018/12/17/how-to-add-col-spark-dataframe/" id="article-nav-older" class="article-nav-link-wrap">
       <strong class="article-nav-caption">Older</strong>
-      <div class="article-nav-title">如何在virtualbox中安装ubuntu16</div>
+      <div class="article-nav-title">how-to-add-col-spark-dataframe</div>
     </a>
   
 </nav>

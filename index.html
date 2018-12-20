@@ -63,8 +63,8 @@
   
     <article id="post-hello-world" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
-    <a href="/2018/12/17/hello-world/" class="article-date">
-  <time datetime="2018-12-17T15:28:37.216Z" itemprop="datePublished">2018-12-17</time>
+    <a href="/2018/12/20/hello-world/" class="article-date">
+  <time datetime="2018-12-20T15:55:46.855Z" itemprop="datePublished">2018-12-20</time>
 </a>
     
   </div>
@@ -75,7 +75,7 @@
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2018/12/17/hello-world/">如何搭建新版本hexo</a>
+      <a class="article-title" href="/2018/12/20/hello-world/">如何搭建新版本hexo</a>
     </h1>
   
 
@@ -88,7 +88,45 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/12/17/hello-world/" data-id="cjpsh510g00057d79pvlpma0g" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/12/20/hello-world/" data-id="cjpwsfig8000397798s1cw7ek" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-sqoop-huizong" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/12/20/sqoop-huizong/" class="article-date">
+  <time datetime="2018-12-20T15:38:06.000Z" itemprop="datePublished">2018-12-20</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/12/20/sqoop-huizong/">sqoop-huizong</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>sqoop最近遇到的问题在这里汇总一下</p>
+<p>先说环境<br>阿里emr-3.12.0<br>sqoop 1.4.7<br>1、字段类型问题<br>首先遇到的一个问题是通过sqoop从mysql导入到hive的时候，如果不指定列的类型，到hive默认都是字符串。<br>这样做日期计算的时候会稍微麻烦一些。<br>解决办法：<br>通过–map-column-java 和–map-column-hive 来指定类型<br>参考资料：<br><a href="https://blog.csdn.net/xianjie0318/article/details/79300435" target="_blank" rel="external">https://blog.csdn.net/xianjie0318/article/details/79300435</a><br>2、mysql导入hive报GC overhead limit exceeded<br>解决方法：<br>mysql connection连接字符串加上：<br>?dontTrackOpenResources=true&amp;defaultFetchSize=1000&amp;useCursorFetch=true<br>参考资料：<br><a href="https://www.cnblogs.com/chwilliam85/p/9693276.html" target="_blank" rel="external">https://www.cnblogs.com/chwilliam85/p/9693276.html</a><br>3、通过sqoop增量地从mysql导入到hive<br>这个我一开始用–append 模式导入的，然后报错如下：<br>Append mode for hive imports is not  yet supported. Please remove the parameter –append-mode<br>我提了一个工单给阿里客服，<br>提供了一个参考链接：<br><a href="https://community.hortonworks.com/questions/11373/sqoop-incremental-import-in-hive-i-get-error-messa.html" target="_blank" rel="external">https://community.hortonworks.com/questions/11373/sqoop-incremental-import-in-hive-i-get-error-messa.html</a><br>这种方式是通过创建外部表，然后增量写入到hdfs来实现的。<br>这里有个注意的地方是要配合-check-column来使用，而这个字段可以是数值型的id，也可以是时间戳！<br>参考资料如下：<br><a href="https://stackoverflow.com/questions/41238887/sqoop-incremental-import-error-using-date-column" target="_blank" rel="external">https://stackoverflow.com/questions/41238887/sqoop-incremental-import-error-using-date-column</a><br>4、新版“数据开发”功能支持参数化<br>以前用老版的“作业调度”sqoop并不支持参数<br>用新版的“数据开发”<br><img src="/2018/12/20/sqoop-huizong/1.png" alt="参数化" title="参数化"></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/12/20/sqoop-huizong/" data-id="cjpwsfirb000h9779icpmau40" class="article-share-link">Share</a>
       
       
     </footer>
@@ -124,7 +162,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/12/17/how-to-add-col-spark-dataframe/" data-id="cjpsh50za00007d790efnohsy" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/12/17/how-to-add-col-spark-dataframe/" data-id="cjpwsfigb000497797avd3i34" class="article-share-link">Share</a>
       
       
     </footer>
@@ -162,7 +200,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/12/17/mysql-HOUR-OF-DAY-2-3/" data-id="cjpsh50zk00017d79gualrtoj" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/12/17/mysql-HOUR-OF-DAY-2-3/" data-id="cjpwsfigl00089779qiiajg1e" class="article-share-link">Share</a>
       
       
     </footer>
@@ -214,7 +252,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/12/13/spark-sql-count-as-issue/" data-id="cjpsh512w000e7d79zzgpurpp" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/12/13/spark-sql-count-as-issue/" data-id="cjpwsfinc000e9779fimrqojp" class="article-share-link">Share</a>
       
       
     </footer>
@@ -251,7 +289,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/12/13/spark-classloader-cannot-find-classdef-in-the-jar/" data-id="cjpsh512r000b7d79hc2qd0g4" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/12/13/spark-classloader-cannot-find-classdef-in-the-jar/" data-id="cjpwsfin6000b9779jwwfw3hh" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spark-classload-ClassNotFound/">spark classload ClassNotFound</a></li></ul>
@@ -307,7 +345,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/10/30/tensorflow介绍/" data-id="cjpsh5149000h7d79lzjhmmci" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/10/30/tensorflow介绍/" data-id="cjpwsfj2h000i9779heo4uswv" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/tensroflow/">tensroflow</a></li></ul>
@@ -347,7 +385,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/09/05/openstack简介/" data-id="cjpsh512o000a7d79kmrp5xk6" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/09/05/openstack简介/" data-id="cjpwsfihq000a9779srv1cgz9" class="article-share-link">Share</a>
       
       
     </footer>
@@ -399,7 +437,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/05/01/openstack-neutron/" data-id="cjpsh510q00067d79mv03ktyi" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/05/01/openstack-neutron/" data-id="cjpwsfige000597797karsyai" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/openstack-neutron/">openstack neutron</a></li></ul>
@@ -438,46 +476,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/05/01/spring-cloud/" data-id="cjpsh5131000f7d79xv3m5zsw" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spring/">spring</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="spring-frame" class="article article-type-spring" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2017/05/01/frame/" class="article-date">
-  <time datetime="2017-05-01T07:56:04.000Z" itemprop="datePublished">2017-05-01</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/05/01/frame/">spring frame</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>总结的spring 所有项目如下：<br><img src="/2017/05/01/frame/spring.png" alt="This is an example image" title="This is an example image"></p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/05/01/frame/" data-id="cjpsh510600027d79lkxp65td" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/05/01/spring-cloud/" data-id="cjpwsfinf000f97793esrdmf8" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spring/">spring</a></li></ul>
@@ -537,7 +536,11 @@
       <ul>
         
           <li>
-            <a href="/2018/12/17/hello-world/">如何搭建新版本hexo</a>
+            <a href="/2018/12/20/hello-world/">如何搭建新版本hexo</a>
+          </li>
+        
+          <li>
+            <a href="/2018/12/20/sqoop-huizong/">sqoop-huizong</a>
           </li>
         
           <li>
@@ -550,10 +553,6 @@
         
           <li>
             <a href="/2018/12/13/spark-sql-count-as-issue/">spark-sql-count-as-issue</a>
-          </li>
-        
-          <li>
-            <a href="/2018/12/13/spark-classloader-cannot-find-classdef-in-the-jar/">spark找不到jar里有定义的class</a>
           </li>
         
       </ul>
