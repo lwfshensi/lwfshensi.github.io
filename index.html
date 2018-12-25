@@ -121,7 +121,7 @@
     <div class="article-entry" itemprop="articleBody">
       
         <p>sqoop最近遇到的问题在这里汇总一下</p>
-<p>先说环境<br>阿里emr-3.12.0<br>sqoop 1.4.7<br>1、字段类型问题<br>首先遇到的一个问题是通过sqoop从mysql导入到hive的时候，如果不指定列的类型，到hive默认都是字符串。<br>这样做日期计算的时候会稍微麻烦一些。<br>解决办法：<br>通过–map-column-java 和–map-column-hive 来指定类型<br>参考资料：<br><a href="https://blog.csdn.net/xianjie0318/article/details/79300435" target="_blank" rel="external">https://blog.csdn.net/xianjie0318/article/details/79300435</a><br>2、mysql导入hive报GC overhead limit exceeded<br>解决方法：<br>mysql connection连接字符串加上：<br>?dontTrackOpenResources=true&amp;defaultFetchSize=1000&amp;useCursorFetch=true<br>参考资料：<br><a href="https://www.cnblogs.com/chwilliam85/p/9693276.html" target="_blank" rel="external">https://www.cnblogs.com/chwilliam85/p/9693276.html</a><br>3、通过sqoop增量地从mysql导入到hive<br>这个我一开始用–append 模式导入的，然后报错如下：<br>Append mode for hive imports is not  yet supported. Please remove the parameter –append-mode<br>我提了一个工单给阿里客服，<br>提供了一个参考链接：<br><a href="https://community.hortonworks.com/questions/11373/sqoop-incremental-import-in-hive-i-get-error-messa.html" target="_blank" rel="external">https://community.hortonworks.com/questions/11373/sqoop-incremental-import-in-hive-i-get-error-messa.html</a><br>这种方式是通过创建外部表，然后增量写入到hdfs来实现的。<br>这里有个注意的地方是要配合-check-column来使用，而这个字段可以是数值型的id，也可以是时间戳！<br>参考资料如下：<br><a href="https://stackoverflow.com/questions/41238887/sqoop-incremental-import-error-using-date-column" target="_blank" rel="external">https://stackoverflow.com/questions/41238887/sqoop-incremental-import-error-using-date-column</a><br>以时间戳为增量的sqoop基本设计流程如下：<br>首先创建外部表：<br>CREATE EXTERNAL TABLE test (id string,create_time timestamp,reservation1 string,reservation2 string,reservation3 string,reservation4 string,reservation5 string,reservation6 string,reservation7 string,reservation8 string,reservation9 string,reservation10 string) ROW FORMAT DELIMITED FIELDS TERMINATED BY ‘,’ STORED AS TEXTFILE location ‘/user/wfliu/test’ ;<br>因为hive表不能变更，所以这里预留了几个列。<br>然后全量导入mysql数据库表，如下：</p>
+<p>先说环境<br>阿里emr-3.12.0<br>sqoop 1.4.7<br>1、字段类型问题<br>首先遇到的一个问题是通过sqoop从mysql导入到hive的时候，如果不指定列的类型，到hive默认都是字符串。<br>这样做日期计算的时候会稍微麻烦一些。<br>解决办法：<br>通过–map-column-java 和–map-column-hive 来指定类型<br>参考资料：<br><a href="https://blog.csdn.net/xianjie0318/article/details/79300435" target="_blank" rel="external">https://blog.csdn.net/xianjie0318/article/details/79300435</a><br>2、mysql导入hive报GC overhead limit exceeded<br>解决方法：<br>mysql connection连接字符串加上：<br>?dontTrackOpenResources=true&amp;defaultFetchSize=1000&amp;useCursorFetch=true<br>参考资料：<br><a href="https://www.cnblogs.com/chwilliam85/p/9693276.html" target="_blank" rel="external">https://www.cnblogs.com/chwilliam85/p/9693276.html</a><br>3、通过sqoop增量地从mysql导入到hive<br>这个我一开始用–append 模式导入的，然后报错如下：<br>Append mode for hive imports is not  yet supported. Please remove the parameter –append-mode<br>我提了一个工单给阿里客服，<br>提供了一个参考链接：<br><a href="https://community.hortonworks.com/questions/11373/sqoop-incremental-import-in-hive-i-get-error-messa.html" target="_blank" rel="external">https://community.hortonworks.com/questions/11373/sqoop-incremental-import-in-hive-i-get-error-messa.html</a><br>这种方式是通过创建外部表，然后增量写入到hdfs来实现的。<br>这里有个注意的地方是要配合-check-column来使用，而这个字段可以是数值型的id，也可以是时间戳！<br>参考资料如下：<br><a href="https://stackoverflow.com/questions/41238887/sqoop-incremental-import-error-using-date-column" target="_blank" rel="external">https://stackoverflow.com/questions/41238887/sqoop-incremental-import-error-using-date-column</a><br>以时间戳为增量的sqoop基本设计流程如下：<br>首先创建外部表：<br>CREATE EXTERNAL TABLE test (id string,create_time timestamp,reservation1 string,reservation2 string,reservation3 string,reservation4 string,reservation5 string,reservation6 string,reservation7 string,reservation8 string,reservation9 string,reservation10 string) ROW FORMAT DELIMITED FIELDS TERMINATED BY ‘,’ STORED AS TEXTFILE location ‘/user/wfliu/test’ ;<br>然后全量导入mysql数据库表，如下：</p>
 <p>sqoop import -Dorg.apache.sqoop.splitter.allow_text_splitter=true –connect ‘jdbc:mysql://host:3306/test?useUnicode=true&amp;characterEncoding=utf-8&amp;zeroDateTimeBehavior=convertToNull&amp;dontTrackOpenResources=true&amp;defaultFetchSize=1000&amp;useCursorFetch=true’ –driver com.mysql.jdbc.Driver –username test –password xxx –incremental append –table test –target-dir /user/wfliu/test -check-column update_time -m 1 –hive-drop-import-delims –verbose -m 1<br>最后定一个定时执行增量的sqoop任务：<br>sqoop import -Dorg.apache.sqoop.splitter.allow_text_splitter=true –connect ‘jdbc:mysql://host:3306/test?useUnicode=true&amp;characterEncoding=utf-8&amp;zeroDateTimeBehavior=convertToNull&amp;dontTrackOpenResources=true&amp;defaultFetchSize=1000&amp;useCursorFetch=true’ –driver com.mysql.jdbc.Driver –username test –password xxx –table test –target-dir /user/wfliu/test –incremental lastmodified -check-column create_time -m 1 –last-value “${lastvalue}” –append –hive-drop-import-delims –verbose -m 1<br>其中lastvalue是emr中配置的参数可以为${yyyy-MM-dd 00:00:00-1d}。为增量导入截止到每天凌晨12点的数据。<br>4、新版“数据开发”功能支持参数化<br>以前用老版的“作业调度”sqoop并不支持参数<br>用新版的“数据开发”<br><img src="/2018/12/20/sqoop-huizong/1.png" alt="参数化" title="参数化"><br>5、如何删除外部表中的数据<br>今天遇到的问题是因为导入数据有错误想清空外部表的数据<br>一开始用<br>delete from xxx的方式，不行<br>然后用trancat table xxx 也不行<br>这两种都不能删除外部表的数据<br>那怎么办呢<br>答案：先把外部表变成内部表再删除<br>ALTER TABLE xxx SET TBLPROPERTIES(‘EXTERNAL’=’False’);<br>然后<br>truncate table xxx;<br>这样就可以啦！<br>参考资料：<br><a href="https://blog.csdn.net/tengxing007/article/details/81211500" target="_blank" rel="external">https://blog.csdn.net/tengxing007/article/details/81211500</a></p>
 <p>另外sqoop也是可以直接直接创建hive表的<br>sqoop create-hive-table<br>可以指定–hive-overwrite来覆盖表中原有数据<br>参考资料：<br><a href="https://segmentfault.com/a/1190000002532293" target="_blank" rel="external">https://segmentfault.com/a/1190000002532293</a></p>
 
@@ -152,7 +152,7 @@
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2018/12/17/how-to-add-col-spark-dataframe/">how-to-add-col-spark-dataframe</a>
+      <a class="article-title" href="/2018/12/17/how-to-add-col-spark-dataframe/">如何给spark表添加一列</a>
     </h1>
   
 
@@ -160,7 +160,82 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        
+        <p>刚开始接触spark的时候遇到一个特别中二的问题。<br>我从两张表里查数据，这两张表里都只有一行，如何把这两张表合并起来呢？？？？<br>然后我特缺心眼的从网上搜，spark添加列的方式。<br>好吧。。。前情交代完毕。<br>说说过程<br>解决方式特简单，用join就tm可以了。<br>好了<br>话题说到这里就结束哦了吗？？？？<br>那我还写个鸡毛！<br>之后我翻阅了一下我搜到的如何增加一列的问题！<br>首先先看如何增加一个常数列<br>代码如下：<br>val tempDataFrame = spark.createDataFrame(Seq(<br>            (1, “asf”),<br>            (2, “2143”),<br>            (3, “rfds”)<br>        )).toDF(“id”, “content”)<br>        val addColDataframe = tempDataFrame.withColumn(“col”, tempDataFrame(“id”)*2)<br>        addColDataframe.show(10,false)</p>
+<p>+—+——-+—+<br>|id |content|col|<br>+—+——-+—+<br>|1  |asf    |2  |<br>|2  |2143   |4  |<br>|3  |rfds   |6  |<br>+—+——-+—+</p>
+<p>然后用udf来实现一个复杂一些的：<br>import scala.util.Try<br>import org.apache.spark.sql.functions._<br>val tempDataFrame = spark.createDataFrame(Seq(<br>            (“1”, “2”),<br>            (“2”, “3”),<br>            (“3”, “1”)<br>        )).toDF(“content1”, “content2”)</p>
+<pre><code>val code = (arg1: String, arg2: String) =&gt; {
+    Try(if (arg1.toInt &gt; arg2.toInt) &quot;arg1&gt;arg2&quot; else &quot;arg1&lt;=arg2&quot;).getOrElse(&quot;error&quot;)
+}
+val compareUdf = udf(code)
+
+val addColDataframe = tempDataFrame.withColumn(&quot;compare&quot;, compareUdf(tempDataFrame(&quot;content1&quot;),tempDataFrame(&quot;content2&quot;)))
+addColDataframe.show(10, false)
+</code></pre><p>+——–+——–+———-+<br>|content1|content2|compare   |<br>+——–+——–+———-+<br>|1       |2       |arg1&lt;=arg2|<br>|2       |3       |arg1&lt;=arg2|<br>|3       |1       |arg1&gt;arg2 |<br>+——–+——–+———-+</p>
+<p>这样添加的一列就可以是比较复杂的了。<br>参考资料如下：<br><a href="http://www.cnblogs.com/TTyb/p/7169148.html" target="_blank" rel="external">http://www.cnblogs.com/TTyb/p/7169148.html</a></p>
+<p>让我们再深入一些！<br>如何添加唯一的一列，对！就是类似主键的那样<br>两种方式：<br>第一种 使用zipWithUniqueId获取id 并重建 DataFrame.<br>import spark.implicits._<br>        import org.apache.spark.sql.Row<br>        import org.apache.spark.sql.types.{StructType, StructField, LongType}</p>
+<pre><code>val df =Seq((&quot;a&quot;, -1.0), (&quot;b&quot;, -2.0), (&quot;c&quot;, -3.0)).toDF(&quot;foo&quot;, &quot;bar&quot;)
+// 获取df 的表头
+val s = df.schema
+
+// 将原表转换成带有rdd,
+//再转换成带有id的rdd,
+//再展开成Seq方便转化成 Dataframe
+val rows = df.rdd.zipWithUniqueId.map{case (r: Row, id: Long) =&gt; Row.fromSeq(id +: r.toSeq)}
+
+// 再由 row 根据原表头进行转换
+val dfWithPK = spark.createDataFrame( rows, StructType(StructField(&quot;id&quot;, LongType, false) +: s.fields))
+dfWithPK.show
+</code></pre><p>+—+—+—-+<br>| id|foo| bar|<br>+—+—+—-+<br>|  0|  a|-1.0|<br>|  1|  b|-2.0|<br>|  2|  c|-3.0|<br>+—+—+—-+</p>
+<p>以上可以实现自增列。<br>第二种：直接使用spark 自己的api,monotonicallyIncreasingId<br>val df =Seq((“a”, -1.0), (“b”, -2.0), (“c”, -3.0)).toDF(“foo”, “bar”)<br>        import org.apache.spark.sql.functions.monotonically_increasing_id<br>        df.withColumn(“id”, monotonically_increasing_id).show()</p>
+<p>+—+—-+—+<br>|foo| bar| id|<br>+—+—-+—+<br>|  a|-1.0|  0|<br>|  b|-2.0|  1|<br>|  c|-3.0|  2|<br>+—+—-+—+<br>注意这里也是自增列</p>
+<p>还有第三种：使用createDateFrame<br>val input =Seq((“a”, 100.0), (“b”, -2.0), (“c”, -3.0)).toDF(“foo”, “bar”)<br>        var critValueR = 0<br>        var critValueL = -10</p>
+<pre><code>val trdd = input.select(&quot;bar&quot;).rdd.map(x=&gt;{
+    if (x.get(0).toString().toDouble &gt; critValueR || x.get(0).toString().toDouble &lt; critValueL)
+        Row(x.get(0).toString().toDouble,&quot;F&quot;)
+    else Row(x.get(0).toString().toDouble,&quot;T&quot;)
+})
+val schema = input.select(&quot;bar&quot;).schema.add(&quot;flag&quot;, StringType, true)
+val sample3 = spark.createDataFrame(trdd, schema).distinct().withColumnRenamed(&quot;flag&quot;, &quot;idx&quot;)
+sample3.show
+</code></pre><p>+—–+—+<br>|  bar|idx|<br>+—–+—+<br>| -3.0|  T|<br>|100.0|  F|<br>| -2.0|  T|<br>+—–+—+</p>
+<p>觉得比较直观且开放性大的还是实用udf。</p>
+<p>参考资料：<br><a href="https://www.jianshu.com/p/7e6e406dd15b" target="_blank" rel="external">https://www.jianshu.com/p/7e6e406dd15b</a></p>
+<p>。。。。。。。。。。你以为这就完了？。。。。。。<br>那我还写个毛线。。。。。。<br>后来又发现了对列的拆分和合并</p>
+<p>1、如何合并列：<br> val df =Seq((“Ming”,20,”15552211521”), (“hong”,19,”13287994007”), (“zhi”,21,”15552211523”)).toDF(“name”,”age”, “phone”)<br>        val separator = “,”<br>        df.map(<em>.toSeq.foldLeft(“”)(</em> + separator + _).substring(1)).show()<br>+——————-+<br>|              value|<br>+——————-+<br>|Ming,20,15552211521|<br>|hong,19,13287994007|<br>| zhi,21,15552211523|<br>+——————-+<br>也可以使用concat<em>ws:<br>        import org.apache.spark.sql.functions.</em><br>        df.select(concat_ws(separator, $”name”, $”age”, $”phone”).cast(StringType).as(“value”)).show()</p>
+<p>结果一样<br>第三种实用udf！<br>def mergeCols(row: Row): String = {<br>            row.toSeq.foldLeft(“”)(<em> + separator + </em>).substring(1)<br>        }</p>
+<pre><code>val mergeColsUDF = udf(mergeCols _)
+df.select(mergeColsUDF(struct($&quot;name&quot;, $&quot;age&quot;, $&quot;phone&quot;)).as(&quot;value&quot;)).show()
+</code></pre><p>结果也是同上</p>
+<p>2、如何拆分列呢？<br>a、实用split<br> val df =Seq((“Ming,20,15552211521”), (“hong,19,13287994007”), (“zhi,21,15552211523”)).toDF(“value”)<br> val separator = “,”<br>    lazy val first = df.first()</p>
+<pre><code>val numAttrs = first.toString().split(separator).length
+val attrs = Array.tabulate(numAttrs)(n =&gt; &quot;col_&quot; + n)
+//按指定分隔符拆分value列，生成splitCols列
+var newDF = df.withColumn(&quot;splitCols&quot;, split($&quot;value&quot;, separator))
+attrs.zipWithIndex.foreach(x =&gt; {
+  newDF = newDF.withColumn(x._1, $&quot;splitCols&quot;.getItem(x._2))
+})
+newDF.show()
+</code></pre><p>+——————-+——————–+—–+—–+———–+<br>|              value|           splitCols|col_0|col_1|      col_2|<br>+——————-+——————–+—–+—–+———–+<br>|Ming,20,15552211521|[Ming, 20, 155522…| Ming|   20|15552211521|<br>|hong,19,13287994007|[hong, 19, 132879…| hong|   19|13287994007|<br>| zhi,21,15552211523|[zhi, 21, 1555221…|  zhi|   21|15552211523|<br>+——————-+——————–+—–+—–+———–+</p>
+<p>b实用udf：<br> import org.apache.spark.ml.attribute.{Attribute, NumericAttribute}</p>
+<pre><code>val df =Seq((&quot;Ming,20,15552211521&quot;), (&quot;hong,19,13287994007&quot;), (&quot;zhi,21,15552211523&quot;)).toDF(&quot;value&quot;)
+val separator = &quot;,&quot;
+lazy val first = df.first()
+val attributes: Array[Attribute] = {
+    val numAttrs = first.toString().split(separator).length
+    //生成attributes
+    Array.tabulate(numAttrs)(i =&gt; NumericAttribute.defaultAttr.withName(&quot;value&quot; + &quot;_&quot; + i))
+}
+//创建多列数据
+val fieldCols = attributes.zipWithIndex.map(x =&gt; {
+    val assembleFunc = udf {
+        str: String =&gt;
+            str.split(separator)(x._2)
+    }
+    assembleFunc(df(&quot;value&quot;).cast(StringType)).as(x._1.name.get, x._1.toMetadata())
+})
+//合并数据
+df.select(col(&quot;*&quot;) +: fieldCols: _*).show()
+</code></pre>
       
     </div>
     <footer class="article-footer">
@@ -546,7 +621,7 @@
           </li>
         
           <li>
-            <a href="/2018/12/17/how-to-add-col-spark-dataframe/">how-to-add-col-spark-dataframe</a>
+            <a href="/2018/12/17/how-to-add-col-spark-dataframe/">如何给spark表添加一列</a>
           </li>
         
           <li>
