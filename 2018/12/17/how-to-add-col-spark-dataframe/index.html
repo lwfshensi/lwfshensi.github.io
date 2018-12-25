@@ -11,7 +11,7 @@
 <meta property="og:url" content="http://yoursite.com/2018/12/17/how-to-add-col-spark-dataframe/index.html">
 <meta property="og:site_name" content="肆叔的酱油">
 <meta property="og:description" content="刚开始接触spark的时候遇到一个特别中二的问题。我从两张表里查数据，这两张表里都只有一行，如何把这两张表合并起来呢？？？？然后我特缺心眼的从网上搜，spark添加列的方式。好吧。。。前情交代完毕。说说过程解决方式特简单，用join就tm可以了。好了话题说到这里就结束哦了吗？？？？那我还写个鸡毛！之后我翻阅了一下我搜到的如何增加一列的问题！首先先看如何增加一个常数列代码如下：val tempDat">
-<meta property="og:updated_time" content="2018-12-25T15:58:09.000Z">
+<meta property="og:updated_time" content="2018-12-25T15:59:54.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="如何给spark表添加一列">
 <meta name="twitter:description" content="刚开始接触spark的时候遇到一个特别中二的问题。我从两张表里查数据，这两张表里都只有一行，如何把这两张表合并起来呢？？？？然后我特缺心眼的从网上搜，spark添加列的方式。好吧。。。前情交代完毕。说说过程解决方式特简单，用join就tm可以了。好了话题说到这里就结束哦了吗？？？？那我还写个鸡毛！之后我翻阅了一下我搜到的如何增加一列的问题！首先先看如何增加一个常数列代码如下：val tempDat">
@@ -160,7 +160,9 @@ val fieldCols = attributes.zipWithIndex.map(x =&gt; {
 })
 //合并数据
 df.select(col(&quot;*&quot;) +: fieldCols: _*).show()
-</code></pre>
+</code></pre><p>参考资料：<br><a href="http://www.cnblogs.com/itboys/p/9813934.html" target="_blank" rel="external">http://www.cnblogs.com/itboys/p/9813934.html</a></p>
+<p>综上所述，udf还是很牛逼的。</p>
+
       
     </div>
     <footer class="article-footer">
