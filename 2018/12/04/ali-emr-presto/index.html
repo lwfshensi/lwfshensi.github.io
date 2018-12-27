@@ -3,18 +3,18 @@
 <head>
   <meta charset="utf-8">
   
-  <title>如何搭建新版本hexo | 肆叔的酱油</title>
+  <title>ali_emr_presto | 肆叔的酱油</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="我先是在debian8.6上用官网的方式搭建的，失败～然后用aptget 的方式安装nodejs 再装hexo还是失败～最后我开了一个ubuntu14.04的vm，在里面执行apt-get install nodejs npmapt-get install nodejs-legacysudo npm install -g hexo-cli">
+  <meta name="description" content="初步实用阿里云的emr功能，在用sqoop和presto的时候就遇到了问题。遇到问题初步汇总如下：实用presto确实查询速度会很快。但是对于语法要求严苛。如果一个字段是bool类型的，那么在等值判断的时候就必须实用TRUE或者FALSE，不能用0/1.因为它不会自动转型。另外在时间处理上也要注意：1、使用sqoop从mysql导入到hive的时候，如果不通过–map-column-java和–m">
 <meta property="og:type" content="article">
-<meta property="og:title" content="如何搭建新版本hexo">
-<meta property="og:url" content="http://yoursite.com/2018/12/20/hello-world/index.html">
+<meta property="og:title" content="ali_emr_presto">
+<meta property="og:url" content="http://yoursite.com/2018/12/04/ali-emr-presto/index.html">
 <meta property="og:site_name" content="肆叔的酱油">
-<meta property="og:description" content="我先是在debian8.6上用官网的方式搭建的，失败～然后用aptget 的方式安装nodejs 再装hexo还是失败～最后我开了一个ubuntu14.04的vm，在里面执行apt-get install nodejs npmapt-get install nodejs-legacysudo npm install -g hexo-cli">
-<meta property="og:updated_time" content="2016-11-24T13:35:06.000Z">
+<meta property="og:description" content="初步实用阿里云的emr功能，在用sqoop和presto的时候就遇到了问题。遇到问题初步汇总如下：实用presto确实查询速度会很快。但是对于语法要求严苛。如果一个字段是bool类型的，那么在等值判断的时候就必须实用TRUE或者FALSE，不能用0/1.因为它不会自动转型。另外在时间处理上也要注意：1、使用sqoop从mysql导入到hive的时候，如果不通过–map-column-java和–m">
+<meta property="og:updated_time" content="2018-12-27T08:23:01.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="如何搭建新版本hexo">
-<meta name="twitter:description" content="我先是在debian8.6上用官网的方式搭建的，失败～然后用aptget 的方式安装nodejs 再装hexo还是失败～最后我开了一个ubuntu14.04的vm，在里面执行apt-get install nodejs npmapt-get install nodejs-legacysudo npm install -g hexo-cli">
+<meta name="twitter:title" content="ali_emr_presto">
+<meta name="twitter:description" content="初步实用阿里云的emr功能，在用sqoop和presto的时候就遇到了问题。遇到问题初步汇总如下：实用presto确实查询速度会很快。但是对于语法要求严苛。如果一个字段是bool类型的，那么在等值判断的时候就必须实用TRUE或者FALSE，不能用0/1.因为它不会自动转型。另外在时间处理上也要注意：1、使用sqoop从mysql导入到hive的时候，如果不通过–map-column-java和–m">
   
     <link rel="alternate" href="/atom.xml" title="肆叔的酱油" type="application/atom+xml">
   
@@ -63,10 +63,10 @@
   </div>
 </header>
       <div class="outer">
-        <section id="main"><article id="post-hello-world" class="article article-type-post" itemscope itemprop="blogPost">
+        <section id="main"><article id="post-ali-emr-presto" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
-    <a href="/2018/12/20/hello-world/" class="article-date">
-  <time datetime="2018-12-20T15:55:46.855Z" itemprop="datePublished">2018-12-20</time>
+    <a href="/2018/12/04/ali-emr-presto/" class="article-date">
+  <time datetime="2018-12-04T15:25:45.000Z" itemprop="datePublished">2018-12-04</time>
 </a>
     
   </div>
@@ -77,7 +77,7 @@
         
   
     <h1 class="article-title" itemprop="name">
-      如何搭建新版本hexo
+      ali_emr_presto
     </h1>
   
 
@@ -85,24 +85,41 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>我先是在debian8.6上用官网的方式搭建的，失败～<br>然后用aptget 的方式安装nodejs 再装hexo还是失败～<br>最后我开了一个ubuntu14.04的vm，在里面执行<br>apt-get install nodejs npm<br>apt-get install nodejs-legacy<br>sudo npm install -g hexo-cli</p>
+        <p>初步实用阿里云的emr功能，在用sqoop和presto的时候就遇到了问题。遇到问题初步汇总如下：<br>实用presto确实查询速度会很快。但是对于语法要求严苛。<br>如果一个字段是bool类型的，那么在等值判断的时候就必须实用TRUE或者FALSE，不能用0/1.因为它不会自动转型。<br>另外在时间处理上也要注意：<br>1、使用sqoop从mysql导入到hive的时候，如果不通过–map-column-java和–map-column-hive 指定列的类型，默认会导入成字符<br>2、阿里云对雨presto的支持似乎不够全面，在对日期进行类型转换的时候，比如： date_parse(‘2018-10-01 00:00:00.0’,’%Y-%m-%d %H:%i:%s’)<br>会报错：failed: Could not initialize class com.facebook.presto.util.DateTimeZoneIndex<br>这个问题已经提工单了 看后续如何处理。<br>最近跟进使用DATE_FORMAT也会有相同的问题。<br>问题解决了：<br>是老版本emr与presto不兼容的问题<br>解决方式如下：<br>0.188 presto，EMR-3.12.1 之前的stack，有个jar包冲突导致这个问题，解决方案如下：</p>
+<ol>
+<li><p>所有节点执行下下面的操作：<br>rm -rf /usr/lib/presto-current/lib/joda-time-2.10.jar<br>rm -rf /usr/lib/presto-current/lib/plugin/hive-hadoop2/joda-time-2.10.jar</p>
+</li>
+<li><p>然后重启presto；<br>注意：我们实用的emr版本为： EMR-3.12.0</p>
+</li>
+</ol>
 
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/12/20/hello-world/" data-id="cjpwsfig8000397798s1cw7ek" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/12/04/ali-emr-presto/" data-id="cjq6cclkp00002q79h0qt3gcp" class="article-share-link">Share</a>
       
       
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/阿里云-sgoop-presto/">阿里云 sgoop presto</a></li></ul>
+
     </footer>
   </div>
   
     
 <nav id="article-nav">
   
+    <a href="/2018/12/13/spark-classloader-cannot-find-classdef-in-the-jar/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          spark找不到jar里有定义的class
+        
+      </div>
+    </a>
   
-    <a href="/2018/12/20/sqoop-huizong/" id="article-nav-older" class="article-nav-link-wrap">
+  
+    <a href="/2018/10/30/tensorflow介绍/" id="article-nav-older" class="article-nav-link-wrap">
       <strong class="article-nav-caption">Older</strong>
-      <div class="article-nav-title">sqoop问题汇总</div>
+      <div class="article-nav-title">图像识别与tensorflow</div>
     </a>
   
 </nav>
