@@ -5,16 +5,16 @@
   
   <title>如何给spark表添加一列 | 肆叔的酱油</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="刚开始接触spark的时候遇到一个特别中二的问题。我从两张表里查数据，这两张表里都只有一行，如何把这两张表合并起来呢？？？？然后我特缺心眼的从网上搜，spark添加列的方式。好吧。。。前情交代完毕。说说过程解决方式特简单，用join就tm可以了。好了话题说到这里就结束哦了吗？？？？那我还写个鸡毛！之后我翻阅了一下我搜到的如何增加一列的问题！首先先看如何增加一个常数列代码如下：val tempDat">
+  <meta name="description" content="刚开始接触spark的时候遇到一个特别中二的问题。我从两张表里查数据，这两张表里都只有一行，如何把这两张表合并起来呢？？？？然后我特缺心眼的从网上搜，spark添加列的方式。好吧。。。前情交代完毕。说说过程解决方式特简单，用join就tm可以了。好了话题说到这里就结束哦了吗？？？？那我还写个鸡毛！之后我翻阅了一下我搜到的如何增加一列的问题！首先先看如何增加一个常数列代码如下：        val">
 <meta property="og:type" content="article">
 <meta property="og:title" content="如何给spark表添加一列">
 <meta property="og:url" content="http://yoursite.com/2018/12/17/how-to-add-col-spark-dataframe/index.html">
 <meta property="og:site_name" content="肆叔的酱油">
-<meta property="og:description" content="刚开始接触spark的时候遇到一个特别中二的问题。我从两张表里查数据，这两张表里都只有一行，如何把这两张表合并起来呢？？？？然后我特缺心眼的从网上搜，spark添加列的方式。好吧。。。前情交代完毕。说说过程解决方式特简单，用join就tm可以了。好了话题说到这里就结束哦了吗？？？？那我还写个鸡毛！之后我翻阅了一下我搜到的如何增加一列的问题！首先先看如何增加一个常数列代码如下：val tempDat">
-<meta property="og:updated_time" content="2018-12-27T02:23:06.000Z">
+<meta property="og:description" content="刚开始接触spark的时候遇到一个特别中二的问题。我从两张表里查数据，这两张表里都只有一行，如何把这两张表合并起来呢？？？？然后我特缺心眼的从网上搜，spark添加列的方式。好吧。。。前情交代完毕。说说过程解决方式特简单，用join就tm可以了。好了话题说到这里就结束哦了吗？？？？那我还写个鸡毛！之后我翻阅了一下我搜到的如何增加一列的问题！首先先看如何增加一个常数列代码如下：        val">
+<meta property="og:updated_time" content="2018-12-27T02:28:47.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="如何给spark表添加一列">
-<meta name="twitter:description" content="刚开始接触spark的时候遇到一个特别中二的问题。我从两张表里查数据，这两张表里都只有一行，如何把这两张表合并起来呢？？？？然后我特缺心眼的从网上搜，spark添加列的方式。好吧。。。前情交代完毕。说说过程解决方式特简单，用join就tm可以了。好了话题说到这里就结束哦了吗？？？？那我还写个鸡毛！之后我翻阅了一下我搜到的如何增加一列的问题！首先先看如何增加一个常数列代码如下：val tempDat">
+<meta name="twitter:description" content="刚开始接触spark的时候遇到一个特别中二的问题。我从两张表里查数据，这两张表里都只有一行，如何把这两张表合并起来呢？？？？然后我特缺心眼的从网上搜，spark添加列的方式。好吧。。。前情交代完毕。说说过程解决方式特简单，用join就tm可以了。好了话题说到这里就结束哦了吗？？？？那我还写个鸡毛！之后我翻阅了一下我搜到的如何增加一列的问题！首先先看如何增加一个常数列代码如下：        val">
   
     <link rel="alternate" href="/atom.xml" title="肆叔的酱油" type="application/atom+xml">
   
@@ -85,9 +85,9 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>刚开始接触spark的时候遇到一个特别中二的问题。<br>我从两张表里查数据，这两张表里都只有一行，如何把这两张表合并起来呢？？？？<br>然后我特缺心眼的从网上搜，spark添加列的方式。<br>好吧。。。前情交代完毕。<br>说说过程<br>解决方式特简单，用join就tm可以了。<br>好了<br>话题说到这里就结束哦了吗？？？？<br>那我还写个鸡毛！<br>之后我翻阅了一下我搜到的如何增加一列的问题！<br>首先先看如何增加一个常数列<br>代码如下：<br>val tempDataFrame = spark.createDataFrame(Seq(<br>            (1, “asf”),<br>            (2, “2143”),<br>            (3, “rfds”)<br>        )).toDF(“id”, “content”)<br>        val addColDataframe = tempDataFrame.withColumn(“col”, tempDataFrame(“id”)*2)<br>        addColDataframe.show(10,false)</p>
+        <p>刚开始接触spark的时候遇到一个特别中二的问题。<br>我从两张表里查数据，这两张表里都只有一行，如何把这两张表合并起来呢？？？？<br>然后我特缺心眼的从网上搜，spark添加列的方式。<br>好吧。。。前情交代完毕。<br>说说过程<br>解决方式特简单，用join就tm可以了。<br>好了<br>话题说到这里就结束哦了吗？？？？<br>那我还写个鸡毛！<br>之后我翻阅了一下我搜到的如何增加一列的问题！<br>首先先看如何增加一个常数列<br>代码如下：<br>        val tempDataFrame = spark.createDataFrame(Seq(<br>            (1, “asf”),<br>            (2, “2143”),<br>            (3, “rfds”)<br>        )).toDF(“id”, “content”)<br>        val addColDataframe = tempDataFrame.withColumn(“col”, tempDataFrame(“id”)*2)<br>        addColDataframe.show(10,false)</p>
 <p>+—+——-+—+<br>|id |content|col|<br>+—+——-+—+<br>|1  |asf    |2  |<br>|2  |2143   |4  |<br>|3  |rfds   |6  |<br>+—+——-+—+</p>
-<p>然后用udf来实现一个复杂一些的：<br>import scala.util.Try<br>import org.apache.spark.sql.functions._<br>val tempDataFrame = spark.createDataFrame(Seq(<br>            (“1”, “2”),<br>            (“2”, “3”),<br>            (“3”, “1”)<br>        )).toDF(“content1”, “content2”)</p>
+<p>然后用udf来实现一个复杂一些的：<br>        import scala.util.Try<br>        import org.apache.spark.sql.functions._<br>        val tempDataFrame = spark.createDataFrame(Seq(<br>            (“1”, “2”),<br>            (“2”, “3”),<br>            (“3”, “1”)<br>        )).toDF(“content1”, “content2”)</p>
 <pre><code>val code = (arg1: String, arg2: String) =&gt; {
     Try(if (arg1.toInt &gt; arg2.toInt) &quot;arg1&gt;arg2&quot; else &quot;arg1&lt;=arg2&quot;).getOrElse(&quot;error&quot;)
 }
@@ -97,7 +97,7 @@ val addColDataframe = tempDataFrame.withColumn(&quot;compare&quot;, compareUdf(t
 addColDataframe.show(10, false)
 </code></pre><p>+——–+——–+———-+<br>|content1|content2|compare   |<br>+——–+——–+———-+<br>|1       |2       |arg1&lt;=arg2|<br>|2       |3       |arg1&lt;=arg2|<br>|3       |1       |arg1&gt;arg2 |<br>+——–+——–+———-+</p>
 <p>这样添加的一列就可以是比较复杂的了。<br>参考资料如下：<br><a href="http://www.cnblogs.com/TTyb/p/7169148.html" target="_blank" rel="external">http://www.cnblogs.com/TTyb/p/7169148.html</a></p>
-<p>让我们再深入一些！<br>如何添加唯一的一列，对！就是类似主键的那样<br>两种方式：<br>第一种 使用zipWithUniqueId获取id 并重建 DataFrame.<br>import spark.implicits._<br>        import org.apache.spark.sql.Row<br>        import org.apache.spark.sql.types.{StructType, StructField, LongType}</p>
+<p>让我们再深入一些！<br>如何添加唯一的一列，对！就是类似主键的那样<br>两种方式：<br>第一种 使用zipWithUniqueId获取id 并重建 DataFrame.<br>        import spark.implicits._<br>        import org.apache.spark.sql.Row<br>        import org.apache.spark.sql.types.{StructType, StructField, LongType}</p>
 <pre><code>val df =Seq((&quot;a&quot;, -1.0), (&quot;b&quot;, -2.0), (&quot;c&quot;, -3.0)).toDF(&quot;foo&quot;, &quot;bar&quot;)
 // 获取df 的表头
 val s = df.schema
@@ -111,9 +111,9 @@ val rows = df.rdd.zipWithUniqueId.map{case (r: Row, id: Long) =&gt; Row.fromSeq(
 val dfWithPK = spark.createDataFrame( rows, StructType(StructField(&quot;id&quot;, LongType, false) +: s.fields))
 dfWithPK.show
 </code></pre><p>+—+—+—-+<br>| id|foo| bar|<br>+—+—+—-+<br>|  0|  a|-1.0|<br>|  1|  b|-2.0|<br>|  2|  c|-3.0|<br>+—+—+—-+</p>
-<p>以上可以实现自增列。<br>第二种：直接使用spark 自己的api,monotonicallyIncreasingId<br>val df =Seq((“a”, -1.0), (“b”, -2.0), (“c”, -3.0)).toDF(“foo”, “bar”)<br>        import org.apache.spark.sql.functions.monotonically_increasing_id<br>        df.withColumn(“id”, monotonically_increasing_id).show()</p>
+<p>以上可以实现自增列。<br>第二种：直接使用spark 自己的api,monotonicallyIncreasingId<br>        val df =Seq((“a”, -1.0), (“b”, -2.0), (“c”, -3.0)).toDF(“foo”, “bar”)<br>        import org.apache.spark.sql.functions.monotonically_increasing_id<br>        df.withColumn(“id”, monotonically_increasing_id).show()</p>
 <p>+—+—-+—+<br>|foo| bar| id|<br>+—+—-+—+<br>|  a|-1.0|  0|<br>|  b|-2.0|  1|<br>|  c|-3.0|  2|<br>+—+—-+—+<br>注意这里也是自增列</p>
-<p>还有第三种：使用createDateFrame<br>val input =Seq((“a”, 100.0), (“b”, -2.0), (“c”, -3.0)).toDF(“foo”, “bar”)<br>        var critValueR = 0<br>        var critValueL = -10</p>
+<p>还有第三种：使用createDateFrame<br>        val input =Seq((“a”, 100.0), (“b”, -2.0), (“c”, -3.0)).toDF(“foo”, “bar”)<br>        var critValueR = 0<br>        var critValueL = -10</p>
 <pre><code>val trdd = input.select(&quot;bar&quot;).rdd.map(x=&gt;{
     if (x.get(0).toString().toDouble &gt; critValueR || x.get(0).toString().toDouble &lt; critValueL)
         Row(x.get(0).toString().toDouble,&quot;F&quot;)
@@ -126,12 +126,12 @@ sample3.show
 <p>觉得比较直观且开放性大的还是实用udf。</p>
 <p>参考资料：<br><a href="https://www.jianshu.com/p/7e6e406dd15b" target="_blank" rel="external">https://www.jianshu.com/p/7e6e406dd15b</a></p>
 <p>。。。。。。。。。。你以为这就完了？。。。。。。<br>那我还写个毛线。。。。。。<br>后来又发现了对列的拆分和合并</p>
-<p>1、如何合并列：<br> val df =Seq((“Ming”,20,”15552211521”), (“hong”,19,”13287994007”), (“zhi”,21,”15552211523”)).toDF(“name”,”age”, “phone”)<br>        val separator = “,”<br>        df.map(<em>.toSeq.foldLeft(“”)(</em> + separator + _).substring(1)).show()<br>+——————-+<br>|              value|<br>+——————-+<br>|Ming,20,15552211521|<br>|hong,19,13287994007|<br>| zhi,21,15552211523|<br>+——————-+<br>也可以使用concat<em>ws:<br>        import org.apache.spark.sql.functions.</em><br>        df.select(concat_ws(separator, $”name”, $”age”, $”phone”).cast(StringType).as(“value”)).show()</p>
-<p>结果一样<br>第三种实用udf！<br>def mergeCols(row: Row): String = {<br>            row.toSeq.foldLeft(“”)(<em> + separator + </em>).substring(1)<br>        }</p>
+<p>1、如何合并列：<br>        val df =Seq((“Ming”,20,”15552211521”), (“hong”,19,”13287994007”), (“zhi”,21,”15552211523”)).toDF(“name”,”age”, “phone”)<br>        val separator = “,”<br>        df.map(<em>.toSeq.foldLeft(“”)(</em> + separator + _).substring(1)).show()<br>+——————-+<br>|              value|<br>+——————-+<br>|Ming,20,15552211521|<br>|hong,19,13287994007|<br>| zhi,21,15552211523|<br>+——————-+<br>也可以使用concat<em>ws:<br>        import org.apache.spark.sql.functions.</em><br>        df.select(concat_ws(separator, $”name”, $”age”, $”phone”).cast(StringType).as(“value”)).show()</p>
+<p>结果一样<br>第三种实用udf！<br>       def mergeCols(row: Row): String = {<br>            row.toSeq.foldLeft(“”)(<em> + separator + </em>).substring(1)<br>        }</p>
 <pre><code>val mergeColsUDF = udf(mergeCols _)
 df.select(mergeColsUDF(struct($&quot;name&quot;, $&quot;age&quot;, $&quot;phone&quot;)).as(&quot;value&quot;)).show()
 </code></pre><p>结果也是同上</p>
-<p>2、如何拆分列呢？<br>a、实用split<br> val df =Seq((“Ming,20,15552211521”), (“hong,19,13287994007”), (“zhi,21,15552211523”)).toDF(“value”)<br> val separator = “,”<br>    lazy val first = df.first()</p>
+<p>2、如何拆分列呢？<br>a、实用split<br>    val df =Seq((“Ming,20,15552211521”), (“hong,19,13287994007”), (“zhi,21,15552211523”)).toDF(“value”)<br>    val separator = “,”<br>    lazy val first = df.first()</p>
 <pre><code>val numAttrs = first.toString().split(separator).length
 val attrs = Array.tabulate(numAttrs)(n =&gt; &quot;col_&quot; + n)
 //按指定分隔符拆分value列，生成splitCols列
@@ -141,7 +141,7 @@ attrs.zipWithIndex.foreach(x =&gt; {
 })
 newDF.show()
 </code></pre><p>+——————-+——————–+—–+—–+———–+<br>|              value|           splitCols|col_0|col_1|      col_2|<br>+——————-+——————–+—–+—–+———–+<br>|Ming,20,15552211521|[Ming, 20, 155522…| Ming|   20|15552211521|<br>|hong,19,13287994007|[hong, 19, 132879…| hong|   19|13287994007|<br>| zhi,21,15552211523|[zhi, 21, 1555221…|  zhi|   21|15552211523|<br>+——————-+——————–+—–+—–+———–+</p>
-<p>b实用udf：<br> import org.apache.spark.ml.attribute.{Attribute, NumericAttribute}</p>
+<p>b、实用udf：<br>        import org.apache.spark.ml.attribute.{Attribute, NumericAttribute}</p>
 <pre><code>val df =Seq((&quot;Ming,20,15552211521&quot;), (&quot;hong,19,13287994007&quot;), (&quot;zhi,21,15552211523&quot;)).toDF(&quot;value&quot;)
 val separator = &quot;,&quot;
 lazy val first = df.first()
