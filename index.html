@@ -235,7 +235,7 @@ val fieldCols = attributes.zipWithIndex.map(x =&gt; {
 })
 //合并数据
 df.select(col(&quot;*&quot;) +: fieldCols: _*).show()
-</code></pre><p>参考资料：<br><a href="http://www.cnblogs.com/itboys/p/9813934.html" target="_blank" rel="external">http://www.cnblogs.com/itboys/p/9813934.html</a></p>
+</code></pre><p>+——————-+——————–+—–+—–+———–+<br>|              value|           splitCols|col_0|col_1|      col_2|<br>+——————-+——————–+—–+—–+———–+<br>|Ming,20,15552211521|[Ming, 20, 155522…| Ming|   20|15552211521|<br>|hong,19,13287994007|[hong, 19, 132879…| hong|   19|13287994007|<br>| zhi,21,15552211523|[zhi, 21, 1555221…|  zhi|   21|15552211523|<br>+——————-+——————–+—–+—–+———–+<br>参考资料：<br><a href="http://www.cnblogs.com/itboys/p/9813934.html" target="_blank" rel="external">http://www.cnblogs.com/itboys/p/9813934.html</a></p>
 <p>综上所述，udf还是很牛逼的。</p>
 
       
