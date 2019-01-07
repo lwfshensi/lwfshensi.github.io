@@ -61,6 +61,60 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-openstack-neutron" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/05/01/openstack-neutron/" class="article-date">
+  <time datetime="2017-05-01T08:36:25.000Z" itemprop="datePublished">2017-05-01</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/05/01/openstack-neutron/">openstack_neutron</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>本文主要着重介绍openstack neutron vxlan网络模式下的原理和体系架构。<br>名词解释：<br>东西向网络流量：vm内网流量<br>南北向网络流量：vm通过浮动ip与外网产生的流量<br>veth设备：成对出现，往往用于跨namespace通信，如下图所示：<br><img src="/2017/05/01/openstack-neutron/veth.png" alt="veth device" title="veth device"><br>tap设备：虚拟网络接口<br>fdb表：作用于数据链路层（二层网络），mac+vxlan和port的对应关系。<br>arp协议和arp表：<br>Arp协议是三层协议，主机发送网络包的时候会先广播到网络上的所有主机，如果接收到返回，就放到arp表中缓存。<br>Arp表存放ip和mac地址的对应关系<br>vxlan:Vxlan是 一种overlay网络，是一种隧道技术。<br><img src="/2017/05/01/openstack-neutron/vxlan.png" alt="vxlan network" title="vxlan network"></p>
+<p>openstack vxlan 网络模式简介</p>
+<p>东西向流量(虚拟机之间的网络流向)<br><img src="/2017/05/01/openstack-neutron/eastWest.png" alt="eastwest" title="eastwest"></p>
+<p>东西流量示例讲解：<br>计算节点网络：<br><img src="/2017/05/01/openstack-neutron/vm_network.png" alt="eastwest" title="eastwest"></p>
+<img src="/2017/05/01/openstack-neutron/port.png" alt="eastwest" title="eastwest">
+<p>网桥的命名规则是取networks的id前12位<br><img src="/2017/05/01/openstack-neutron/portid.png" alt="eastwest" title="eastwest"><br>tap设备的命名规则是取portid的前12位<br><img src="/2017/05/01/openstack-neutron/portDB.png" alt="port" title="port"><br>给一个安全组添加ssh（22端口）访问权限后的计算节点iptables：</p>
+<img src="/2017/05/01/openstack-neutron/5.png" alt="iptables" title="iptables">
+<p>网络节点：<br><img src="/2017/05/01/openstack-neutron/4.png" alt="iptables" title="iptables"></p>
+<img src="/2017/05/01/openstack-neutron/2.png" alt="iptables" title="iptables">
+<img src="/2017/05/01/openstack-neutron/3.png" alt="iptables" title="iptables">
+<img src="/2017/05/01/openstack-neutron/1.png" alt="iptables" title="iptables">
+<p>另外负载均衡器也在网络节点上。<br>南北向流量流向（虚拟机与外网之间的网络流向）</p>
+<img src="/2017/05/01/openstack-neutron/nanbei.png" alt="northsouth" title="northsouth">
+<img src="/2017/05/01/openstack-neutron/6.png" alt="iptables" title="iptables">
+<img src="/2017/05/01/openstack-neutron/7.png" alt="iptables" title="iptables">
+<img src="/2017/05/01/openstack-neutron/8.png" alt="iptables" title="iptables">
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2017/05/01/openstack-neutron/" data-id="cjqmhj24d0006em799vr8p0dv" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/openstack-neutron/">openstack neutron</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
     <article id="post-spring-cloud" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2017/05/01/spring-cloud/" class="article-date">
@@ -88,7 +142,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/05/01/spring-cloud/" data-id="cjpwsfinf000f97793esrdmf8" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/05/01/spring-cloud/" data-id="cjqmhj2qk000jem79fpx67k1m" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spring/">spring</a></li></ul>
@@ -127,7 +181,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/05/01/frame/" data-id="cjpwsfif000009779x6rgrkgz" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/05/01/frame/" data-id="cjqmhj2410003em7903ign9dc" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spring/">spring</a></li></ul>
@@ -167,7 +221,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2016/12/12/openstack-newton-mysql-config/" data-id="cjpwsfihm00099779dez0c4gu" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2016/12/12/openstack-newton-mysql-config/" data-id="cjqmhj2dr000dem79sk6l5mb6" class="article-share-link">Share</a>
       
       
     </footer>
@@ -205,7 +259,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2016/11/29/如何在virtualbox中安装ubuntu16/" data-id="cjpwsfj2r000m9779vci2ixtr" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2016/11/29/如何在virtualbox中安装ubuntu16/" data-id="cjqmhj2sk000qem79e7padnh7" class="article-share-link">Share</a>
       
       
     </footer>
@@ -242,7 +296,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2016/11/24/写给自己/" data-id="cjpwsfj2m000l97791nvqussj" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2016/11/24/写给自己/" data-id="cjqmhj2rw000pem79fcu0h0ae" class="article-share-link">Share</a>
       
       
     </footer>
@@ -287,7 +341,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Archives</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">December 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">October 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">September 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">December 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">November 2016</a></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">January 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">December 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">October 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">September 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">December 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">November 2016</a></li></ul>
     </div>
   </div>
 
@@ -300,7 +354,11 @@
       <ul>
         
           <li>
-            <a href="/2018/12/20/hello-world/">如何搭建新版本hexo</a>
+            <a href="/2019/01/07/hello-world/">如何搭建新版本hexo</a>
+          </li>
+        
+          <li>
+            <a href="/2019/01/07/presto-source-code/">码林啄木之presto阅读理解</a>
           </li>
         
           <li>
@@ -315,10 +373,6 @@
             <a href="/2018/12/17/mysql-HOUR-OF-DAY-2-3/">mysql-HOUR_OF_DAY-2-3</a>
           </li>
         
-          <li>
-            <a href="/2018/12/13/spark-sql-count-as-issue/">spark-sql-count-as-issue</a>
-          </li>
-        
       </ul>
     </div>
   </div>
@@ -331,7 +385,7 @@
   
   <div class="outer">
     <div id="footer-info" class="inner">
-      &copy; 2018 wfliu<br>
+      &copy; 2019 wfliu<br>
       Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
     </div>
   </div>

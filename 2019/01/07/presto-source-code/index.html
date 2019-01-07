@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>码林啄木之presto阅读理解 | 肆叔的酱油</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="Day 1:一般来讲，我们要阅读一个项目的源代码，首先要从网上找一下有没有读过该项目，次之去官网上找文档，最后再读细节。我们第一天先讲讲presto的启动命令、架构以及代码架构。首先祭出架构图：摘自官网也就是说presto主要有如下几个部分组成：CLI：就是命令行，用于提交查询，通俗点的理解就是发起rest请求服务器端有两种节点：coordinators和worker。一下简称C节点和W节点首先来">
+<meta property="og:type" content="article">
+<meta property="og:title" content="码林啄木之presto阅读理解">
+<meta property="og:url" content="http://yoursite.com/2019/01/07/presto-source-code/index.html">
+<meta property="og:site_name" content="肆叔的酱油">
+<meta property="og:description" content="Day 1:一般来讲，我们要阅读一个项目的源代码，首先要从网上找一下有没有读过该项目，次之去官网上找文档，最后再读细节。我们第一天先讲讲presto的启动命令、架构以及代码架构。首先祭出架构图：摘自官网也就是说presto主要有如下几个部分组成：CLI：就是命令行，用于提交查询，通俗点的理解就是发起rest请求服务器端有两种节点：coordinators和worker。一下简称C节点和W节点首先来">
+<meta property="og:image" content="http://yoursite.com/2019/01/07/presto-source-code/presto-overview.png">
+<meta property="og:updated_time" content="2019-01-07T15:32:08.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="码林啄木之presto阅读理解">
+<meta name="twitter:description" content="Day 1:一般来讲，我们要阅读一个项目的源代码，首先要从网上找一下有没有读过该项目，次之去官网上找文档，最后再读细节。我们第一天先讲讲presto的启动命令、架构以及代码架构。首先祭出架构图：摘自官网也就是说presto主要有如下几个部分组成：CLI：就是命令行，用于提交查询，通俗点的理解就是发起rest请求服务器端有两种节点：coordinators和worker。一下简称C节点和W节点首先来">
+<meta name="twitter:image" content="http://yoursite.com/2019/01/07/presto-source-code/presto-overview.png">
+  
+    <link rel="alternate" href="/atom.xml" title="肆叔的酱油" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">肆叔的酱油</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" results="0" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-presto-source-code" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/01/07/presto-source-code/" class="article-date">
+  <time datetime="2019-01-07T14:40:06.000Z" itemprop="datePublished">2019-01-07</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      码林啄木之presto阅读理解
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>Day 1:<br>一般来讲，我们要阅读一个项目的源代码，首先要从网上找一下有没有读过该项目，次之去官网上找文档，最后再读细节。<br>我们第一天先讲讲presto的启动命令、架构以及代码架构。<br>首先祭出架构图：摘自官网<br><img src="/2019/01/07/presto-source-code/presto-overview.png" alt="overview" title="overview"><br>也就是说presto主要有如下几个部分组成：<br>CLI：就是命令行，用于提交查询，通俗点的理解就是发起rest请求<br>服务器端有两种节点：coordinators和worker。一下简称C节点和W节点<br>首先来看C节点：<br>C节点主要用于解析语句，生成请求接话，管理W节点。<br>W节点用于执行请求计划，处理数据，W节点从连接器读取数据并彼此交换数据。<br>C节点与W节点通过rest API来通信。<br>以上就是这个overview图的最直白简洁。<br>然鹅还有一些关键概念。<br>一、presto链接数据源的时候需要什么参数？<br>1、Connector连接器，连接器顾名思义，作用相当于jdbc中的driver。<br>2、Catalog，一个数据源就是catalog，可以是mysql，可以是hive等等<br>3、Schema，类似mysql中的database，一个catalog可以有多个schema<br>4、Table，就是表！<br>二、presto的查询模型<br>1、statement<br>语句，就是sql语句。是一个静态的概念。<br>2、query<br>查询，通过语句生成的query，是一个动态的执行。<br>3、stage<br>一个stage代表查询执行计划的一个部分。<br>stage有四种类型：<br>Coordinator_Only:<br>用于执行DDM或者DDL表的创建与更改<br>Single:<br>这种类型用于聚合子Stage的输出数据<br>Fixed:<br>用于接受其子Stage产生的数据并在集群中对这些数据进行分布式的聚合或者分组计算。<br>Source:<br>用于直接链接数据源，从数据源读取数据，在读取数据的时候，该阶段也会根据presto对查询执行计划的优化完成相关的断言下发和条件过滤等<br>Exchange：<br>交换，stage之间用于数据交换用的。场景包括下游从上游读取数据。<br>Task:<br>就是stage切分出来运行在W节点上的具体任务。<br>Split：<br>就是数据集上的子集。下文说道的driver就是在split上做操作<br>Driver：<br>一个task包括一个或者多个Driver。就是一个split的一系列operator集合。<br>Page是presto中处理的最小数据单元。一个Page对象包含多个Block对象，而每个Block对象是一个字节数组，存储一个字段的若干行。多个block横切的一行是真实的一行数据。</p>
+<p>以上，就是我们对于presto源码阅读理解的重点喽</p>
+<p>再来看看presto的启动命令吧<br>首先是C节点：<br>-Dnode.data-dir=/mnt/disk1/log/presto -Dnode.id=xxxxxxxxxxx -Dnode.environment=production -Dlog.enable-console=false -Dlog.levels-file=/etc/ecm/presto-conf-0.188/log.properties -Dconfig=/etc/ecm/presto-conf-0.188/config.properties com.facebook.presto.server.PrestoServer<br>然后是W节点<br>-Dnode.data-dir=/mnt/disk1/log/presto -Dnode.id=xxxxxxx -Dnode.environment=production -Dlog.enable-console=false -Dlog.levels-file=/etc/ecm/presto-conf-0.188/log.properties -Dconfig=/etc/ecm/presto-conf-0.188/config.properties com.facebook.presto.server.PrestoServer<br>命令是一样滴哦，惊不惊喜，意不意外！<br>差别就在properties里了<br>里面有个coordinator属性为true则为C节点，false为W节点</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2019/01/07/presto-source-code/" data-id="cjqmhj2b2000bem794fj9bu7b" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2019/01/07/hello-world/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          如何搭建新版本hexo
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2018/12/20/sqoop-huizong/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">sqoop问题汇总</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack-neutron/">openstack neutron</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spark-classload-ClassNotFound/">spark classload ClassNotFound</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring/">spring</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tensroflow/">tensroflow</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/阿里云-sgoop-presto/">阿里云 sgoop presto</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/openstack-neutron/" style="font-size: 10px;">openstack neutron</a> <a href="/tags/spark-classload-ClassNotFound/" style="font-size: 10px;">spark classload ClassNotFound</a> <a href="/tags/spring/" style="font-size: 20px;">spring</a> <a href="/tags/tensroflow/" style="font-size: 10px;">tensroflow</a> <a href="/tags/阿里云-sgoop-presto/" style="font-size: 10px;">阿里云 sgoop presto</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">January 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">December 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">October 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">September 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">December 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">November 2016</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2019/01/07/hello-world/">如何搭建新版本hexo</a>
+          </li>
+        
+          <li>
+            <a href="/2019/01/07/presto-source-code/">码林啄木之presto阅读理解</a>
+          </li>
+        
+          <li>
+            <a href="/2018/12/20/sqoop-huizong/">sqoop问题汇总</a>
+          </li>
+        
+          <li>
+            <a href="/2018/12/17/how-to-add-col-spark-dataframe/">如何给spark表添加一列</a>
+          </li>
+        
+          <li>
+            <a href="/2018/12/17/mysql-HOUR-OF-DAY-2-3/">mysql-HOUR_OF_DAY-2-3</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2019 wfliu<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>
