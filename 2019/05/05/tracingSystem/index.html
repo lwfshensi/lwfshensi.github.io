@@ -5,21 +5,21 @@
   
   <title>链路追踪系统之选型篇 | 肆叔的酱油</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="本篇是对近期链路跟踪系统选型的汇总。主要选型对象有如下几个：zipkin、skywalking、CAT和pinpoint。CAT的代码侵入性最大，并且过于臃肿可以reject，不过CAT的分析系统做的不错，可以借鉴一下。pinpoint是naver出产的，团队规模小，并且需要hbase，韩国出品，所以也reject。这里主要讨论zipkin与skywalkingzipkin架构图如下：在这里解读一">
+  <meta name="description" content="Distributed Tracing最早起源于google的一片论文（链接见文末），之后各家都退出了自己的监控系统但是数据格式并不统一，所以发起了open tracing标准，现在skywalking、zipkin和jaeger都遵循这一协议。本篇是对近期链路跟踪系统选型的汇总。主要选型对象有如下几个：zipkin、skywalking、CAT和pinpoint。CAT的代码侵入性最大，并且过于">
 <meta property="og:type" content="article">
 <meta property="og:title" content="链路追踪系统之选型篇">
 <meta property="og:url" content="http://yoursite.com/2019/05/05/tracingSystem/index.html">
 <meta property="og:site_name" content="肆叔的酱油">
-<meta property="og:description" content="本篇是对近期链路跟踪系统选型的汇总。主要选型对象有如下几个：zipkin、skywalking、CAT和pinpoint。CAT的代码侵入性最大，并且过于臃肿可以reject，不过CAT的分析系统做的不错，可以借鉴一下。pinpoint是naver出产的，团队规模小，并且需要hbase，韩国出品，所以也reject。这里主要讨论zipkin与skywalkingzipkin架构图如下：在这里解读一">
+<meta property="og:description" content="Distributed Tracing最早起源于google的一片论文（链接见文末），之后各家都退出了自己的监控系统但是数据格式并不统一，所以发起了open tracing标准，现在skywalking、zipkin和jaeger都遵循这一协议。本篇是对近期链路跟踪系统选型的汇总。主要选型对象有如下几个：zipkin、skywalking、CAT和pinpoint。CAT的代码侵入性最大，并且过于">
 <meta property="og:image" content="http://yoursite.com/2019/05/05/tracingSystem/zipkin_architecture.png">
 <meta property="og:image" content="http://yoursite.com/2019/05/05/tracingSystem/zipkin_instrument.png">
 <meta property="og:image" content="http://yoursite.com/2019/05/05/tracingSystem/skywalking.jpeg">
 <meta property="og:image" content="http://yoursite.com/2019/05/05/tracingSystem/skywalking_plugin1.png">
 <meta property="og:image" content="http://yoursite.com/2019/05/05/tracingSystem/skywalking_plugin2.png">
-<meta property="og:updated_time" content="2019-05-05T13:11:39.000Z">
+<meta property="og:updated_time" content="2019-05-05T13:25:49.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="链路追踪系统之选型篇">
-<meta name="twitter:description" content="本篇是对近期链路跟踪系统选型的汇总。主要选型对象有如下几个：zipkin、skywalking、CAT和pinpoint。CAT的代码侵入性最大，并且过于臃肿可以reject，不过CAT的分析系统做的不错，可以借鉴一下。pinpoint是naver出产的，团队规模小，并且需要hbase，韩国出品，所以也reject。这里主要讨论zipkin与skywalkingzipkin架构图如下：在这里解读一">
+<meta name="twitter:description" content="Distributed Tracing最早起源于google的一片论文（链接见文末），之后各家都退出了自己的监控系统但是数据格式并不统一，所以发起了open tracing标准，现在skywalking、zipkin和jaeger都遵循这一协议。本篇是对近期链路跟踪系统选型的汇总。主要选型对象有如下几个：zipkin、skywalking、CAT和pinpoint。CAT的代码侵入性最大，并且过于">
 <meta name="twitter:image" content="http://yoursite.com/2019/05/05/tracingSystem/zipkin_architecture.png">
   
     <link rel="alternate" href="/atom.xml" title="肆叔的酱油" type="application/atom+xml">
@@ -91,7 +91,7 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>本篇是对近期链路跟踪系统选型的汇总。<br>主要选型对象有如下几个：zipkin、skywalking、CAT和pinpoint。<br>CAT的代码侵入性最大，并且过于臃肿可以reject，不过CAT的分析系统做的不错，可以借鉴一下。<br>pinpoint是naver出产的，团队规模小，并且需要hbase，韩国出品，所以也reject。<br>这里主要讨论zipkin与skywalking<br>zipkin架构图如下：<br><img src="/2019/05/05/tracingSystem/zipkin_architecture.png" alt="zipkin_overview" title="zipkin_overview"><br>在这里解读一下上图各个部分。<br>首先instrumented client 表示是经过扩展的客户端<br>Non-instrumented client 表示未经过扩展的客户端<br>instrumented client的一个请求叫做Span，一个完整调用链叫trace。<br>上图首先从instrumented client发送一个span到transport然后到collect，最后落盘存储用于ui展示。<br>发送到Non-instrumented client 并不会给collect发送记录存储。</p>
+        <p>Distributed Tracing最早起源于google的一片论文（链接见文末），之后各家都退出了自己的监控系统<br>但是数据格式并不统一，所以发起了open tracing标准，现在skywalking、zipkin和jaeger都遵循这一协议。<br>本篇是对近期链路跟踪系统选型的汇总。<br>主要选型对象有如下几个：zipkin、skywalking、CAT和pinpoint。<br>CAT的代码侵入性最大，并且过于臃肿可以reject，不过CAT的分析系统做的不错，可以借鉴一下。<br>pinpoint是naver出产的，团队规模小，并且需要hbase，韩国出品，所以也reject。<br>这里主要讨论zipkin与skywalking<br>zipkin架构图如下：<br><img src="/2019/05/05/tracingSystem/zipkin_architecture.png" alt="zipkin_overview" title="zipkin_overview"><br>在这里解读一下上图各个部分。<br>首先instrumented client 表示是经过扩展的客户端<br>Non-instrumented client 表示未经过扩展的客户端<br>instrumented client的一个请求叫做Span，一个完整调用链叫trace。<br>上图首先从instrumented client发送一个span到transport然后到collect，最后落盘存储用于ui展示。<br>发送到Non-instrumented client 并不会给collect发送记录存储。</p>
 <p>zipkin主要有两个工程：<br><a href="https://github.com/openzipkin/brave" target="_blank" rel="external">https://github.com/openzipkin/brave</a><br><a href="https://github.com/apache/incubator-zipkin" target="_blank" rel="external">https://github.com/apache/incubator-zipkin</a><br>brave主要是zipkin的外围扩展。<br>现在主要支持一下扩展：<br><img src="/2019/05/05/tracingSystem/zipkin_instrument.png" alt="zipkin_instrument" title="zipkin_instrument"></p>
 <p>ncubator-zipkin是zipkin的服务端。<br>包含如下部分：<br>server：服务端程序。<br>lens：web ui<br>storage：将数据存盘，现在支持mysql、cassandra和es<br>collect：收集器，包括三种收集模式：rest、kafka和rabbitmq。<br>正常来说应该使用mq异步的collect这样对程序本身性能影响最小。<br>zipkin的扩展是通过有针对性的埋点来实现的。<br>比如对于rest的扩展是通过spring的resttemplate拦截器在header里传traceid和spanid来实现的。<br>对于kafka消息的扩展也是在header里加参数来实现的。<br>所以zipkin本身依赖于第三方目标服务是否具有扩展性。<br>侵入性来说需要添加配置。</p>
 <p>下面说说skywalking<br><img src="/2019/05/05/tracingSystem/skywalking.jpeg" alt="skywalking" title="skywalking"><br>首先tracing（跟踪）也好，Metric（指标）也罢，都是通过http或者grpc将采集起来的数据传送到服务器端的。<br>其数据存储包括mysql、es、tidb、h2和sharding<br>因为skywalking是通过AOP的方式动态织入代码的，所以并不受限于api扩展。<br>以下是已有的扩展：<br><img src="/2019/05/05/tracingSystem/skywalking_plugin1.png" alt="skywalking_plu1" title="skywalking_plu1"><br>&amp;<br><img src="/2019/05/05/tracingSystem/skywalking_plugin2.png" alt="skywalking plu2" title="skywalking plu2"><br>而且skywalking对于代码完全没有任何侵入性。<br>缺点是与我司运维人员了解到有两个问题：<br>1、存在es中的数据无法删除<br>2、如果es重启的话，必须所有agent都重启完毕，skywalking的监控上才会有数值。<br>这个要跟一下具体问题。</p>
