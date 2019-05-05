@@ -50,7 +50,7 @@
         
           <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
         
-        <a id="nav-search-btn" class="nav-icon" title="Zoeken"></a>
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
       </nav>
       <div id="search-form-wrap">
         <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" results="0" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
@@ -63,8 +63,8 @@
   
     <article id="post-hello-world" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
-    <a href="/2019/01/07/hello-world/" class="article-date">
-  <time datetime="2019-01-07T15:32:37.238Z" itemprop="datePublished">2019-01-07</time>
+    <a href="/2019/05/05/hello-world/" class="article-date">
+  <time datetime="2019-05-05T12:58:32.725Z" itemprop="datePublished">2019-05-05</time>
 </a>
     
   </div>
@@ -75,7 +75,7 @@
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2019/01/07/hello-world/">如何搭建新版本hexo</a>
+      <a class="article-title" href="/2019/05/05/hello-world/">如何搭建新版本hexo</a>
     </h1>
   
 
@@ -88,7 +88,49 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/01/07/hello-world/" data-id="cjqmhj27s0009em79jaflhkn8" class="article-share-link">Delen</a>
+      <a data-url="http://yoursite.com/2019/05/05/hello-world/" data-id="cjvaxzfrq0006lo79apskzxu9" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-tracingSystem" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/05/05/tracingSystem/" class="article-date">
+  <time datetime="2019-05-05T11:29:34.000Z" itemprop="datePublished">2019-05-05</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/05/05/tracingSystem/">tracingSystem</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>本篇是对近期链路跟踪系统选型的汇总。<br>主要选型对象有如下几个：zipkin、skywalking、CAT和pinpoint。<br>CAT的代码侵入性最大，并且过于臃肿可以reject，不过CAT的分析系统做的不错，可以借鉴一下。<br>pinpoint是naver出产的，团队规模小，并且需要hbase，韩国出品，所以也reject。<br>这里主要讨论zipkin与skywalking<br>zipkin架构图如下：<br><img src="/2019/05/05/tracingSystem/zipkin_architecture.png" alt="zipkin_overview" title="zipkin_overview"><br>在这里解读一下上图各个部分。<br>首先instrumented client 表示是经过扩展的客户端<br>Non-instrumented client 表示未经过扩展的客户端<br>instrumented client的一个请求叫做Span，一个完整调用链叫trace。<br>上图首先从instrumented client发送一个span到transport然后到collect，最后落盘存储用于ui展示。<br>发送到Non-instrumented client 并不会给collect发送记录存储。</p>
+<p>zipkin主要有两个工程：<br><a href="https://github.com/openzipkin/brave" target="_blank" rel="external">https://github.com/openzipkin/brave</a><br><a href="https://github.com/apache/incubator-zipkin" target="_blank" rel="external">https://github.com/apache/incubator-zipkin</a><br>brave主要是zipkin的外围扩展。<br>现在主要支持一下扩展：<br><img src="/2019/05/05/tracingSystem/zipkin_instrument.png" alt="zipkin_instrument" title="zipkin_instrument"></p>
+<p>ncubator-zipkin是zipkin的服务端。<br>包含如下部分：<br>server：服务端程序。<br>lens：web ui<br>storage：将数据存盘，现在支持mysql、cassandra和es<br>collect：收集器，包括三种收集模式：rest、kafka和rabbitmq。<br>正常来说应该使用mq异步的collect这样对程序本身性能影响最小。<br>zipkin的扩展是通过有针对性的埋点来实现的。<br>比如对于rest的扩展是通过spring的resttemplate拦截器在header里传traceid和spanid来实现的。<br>对于kafka消息的扩展也是在header里加参数来实现的。<br>所以zipkin本身依赖于第三方目标服务是否具有扩展性。<br>侵入性来说需要添加配置。</p>
+<p>下面说说skywalking<br><img src="/2019/05/05/tracingSystem/skywalking.jpeg" alt="skywalking" title="skywalking"><br>首先tracing（跟踪）也好，Metric（指标）也罢，都是通过http或者grpc将采集起来的数据传送到服务器端的。<br>其数据存储包括mysql、es、tidb、h2和sharding<br>因为skywalking是通过AOP的方式动态织入代码的，所以并不受限于api扩展。<br>以下是已有的扩展：<br><img src="/2019/05/05/tracingSystem/skywalking_plugin1.png" alt="skywalking_plu1" title="skywalking_plu1"><br>&amp;<br><img src="/2019/05/05/tracingSystem/skywalking_plugin2.png" alt="skywalking plu2" title="skywalking plu2"><br>而且skywalking对于代码完全没有任何侵入性。<br>缺点是与我司运维人员了解到有两个问题：<br>1、存在es中的数据无法删除<br>2、如果es重启的话，必须所有agent都重启完毕，skywalking的监控上才会有数值。<br>这个要跟一下具体问题。</p>
+<p>另外，从代码可读性上讲，zipkin要更直观一些。</p>
+<p>相关zipkin与skywalking的理论基础如下：<br><a href="https://bigbully.github.io/Dapper-translation/" target="_blank" rel="external">https://bigbully.github.io/Dapper-translation/</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2019/05/05/tracingSystem/" data-id="cjvaxzfun000plo79leg0gour" class="article-share-link">Share</a>
       
       
     </footer>
@@ -127,7 +169,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/01/07/presto-source-code/" data-id="cjqmhj2b2000bem794fj9bu7b" class="article-share-link">Delen</a>
+      <a data-url="http://yoursite.com/2019/01/07/presto-source-code/" data-id="cjvaxzfst000elo79p8z5oroh" class="article-share-link">Share</a>
       
       
     </footer>
@@ -167,7 +209,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/12/20/sqoop-huizong/" data-id="cjqmhj2qn000lem79zq14ig2i" class="article-share-link">Delen</a>
+      <a data-url="http://yoursite.com/2018/12/20/sqoop-huizong/" data-id="cjvaxzft6000llo79krk1hd67" class="article-share-link">Share</a>
       
       
     </footer>
@@ -280,7 +322,7 @@ df.select(col(&quot;*&quot;) +: fieldCols: _*).show()
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/12/17/how-to-add-col-spark-dataframe/" data-id="cjqmhj29a000aem79jl7spc79" class="article-share-link">Delen</a>
+      <a data-url="http://yoursite.com/2018/12/17/how-to-add-col-spark-dataframe/" data-id="cjvaxzfrt0007lo79r83079v1" class="article-share-link">Share</a>
       
       
     </footer>
@@ -318,7 +360,7 @@ df.select(col(&quot;*&quot;) +: fieldCols: _*).show()
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/12/17/mysql-HOUR-OF-DAY-2-3/" data-id="cjqmhj2dd000cem79ptgwb9do" class="article-share-link">Delen</a>
+      <a data-url="http://yoursite.com/2018/12/17/mysql-HOUR-OF-DAY-2-3/" data-id="cjvaxzfs00008lo797lwg2iaf" class="article-share-link">Share</a>
       
       
     </footer>
@@ -370,7 +412,7 @@ df.select(col(&quot;*&quot;) +: fieldCols: _*).show()
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/12/13/spark-sql-count-as-issue/" data-id="cjqmhj2fj000iem79qdc372ds" class="article-share-link">Delen</a>
+      <a data-url="http://yoursite.com/2018/12/13/spark-sql-count-as-issue/" data-id="cjvaxzft2000ilo79fcs1p24e" class="article-share-link">Share</a>
       
       
     </footer>
@@ -407,7 +449,7 @@ df.select(col(&quot;*&quot;) +: fieldCols: _*).show()
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/12/13/spark-classloader-cannot-find-classdef-in-the-jar/" data-id="cjqmhj2ez000fem7933gsss03" class="article-share-link">Delen</a>
+      <a data-url="http://yoursite.com/2018/12/13/spark-classloader-cannot-find-classdef-in-the-jar/" data-id="cjvaxzfsx000flo79vxsojf48" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spark-classload-ClassNotFound/">spark classload ClassNotFound</a></li></ul>
@@ -452,7 +494,7 @@ df.select(col(&quot;*&quot;) +: fieldCols: _*).show()
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/12/04/ali-emr-presto/" data-id="cjqmhj1yc0000em79ad5u9v87" class="article-share-link">Delen</a>
+      <a data-url="http://yoursite.com/2018/12/04/ali-emr-presto/" data-id="cjvaxzfr50000lo790kyum371" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/阿里云-sgoop-presto/">阿里云 sgoop presto</a></li></ul>
@@ -508,49 +550,11 @@ df.select(col(&quot;*&quot;) +: fieldCols: _*).show()
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/10/30/tensorflow介绍/" data-id="cjqmhj2ro000mem79ei4thscd" class="article-share-link">Delen</a>
+      <a data-url="http://yoursite.com/2018/10/30/tensorflow介绍/" data-id="cjvaxzfuk000mlo79o79hxuxb" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/tensroflow/">tensroflow</a></li></ul>
 
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="openstack-instroduce-openstack简介" class="article article-type-openstack-instroduce" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/09/05/openstack简介/" class="article-date">
-  <time datetime="2018-09-05T14:08:38.000Z" itemprop="datePublished">2018-09-05</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/09/05/openstack简介/">openstack简介</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <img src="/2018/09/05/openstack简介/introduce.png" alt="introduce" title="introduce">
-<p>Openstack由美国国家航空航天局和Rackspace公司合作研发，目前已经占据市场主导地位。它致力于提供规模化、灵活扩展易部署且功能丰富的全开源模式平台，协助运营商、企业、ISP/CP、科研机构等搭建并实现满足自身需求的公共云和私有云服务，有力的推动了云计算的创新发展。<br>  Openstack的主要组件包括：计算（nova）、对象存储（swift）、镜像（glance）、认证（keystone）<br>、web控制台（horizon）以及网络（neutron）。其中Horizon提供了一个Web前端到Openstack其他服务的界面；nova组件主要负责管理虚拟机，存储和检索虚拟磁盘（Image）和Image上相关的元数据（Glance），并提供管理和维护系统镜像服务；网络组件（neutron）提供构建与管理虚拟网路的功能，他将网络连接作为服务；块存储服务服务组件（cinder）提供存储功能；Image（Glance）在对象存储（swift）上能够完成虚拟磁盘文件的存储，该组件提供pb级别、安全可靠的对象存储服务；所有的服务均需要利用keystone进行身份认证。</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/09/05/openstack简介/" data-id="cjqmhj2e0000eem79r3l45u4m" class="article-share-link">Delen</a>
-      
-      
     </footer>
   </div>
   
@@ -572,7 +576,7 @@ df.select(col(&quot;*&quot;) +: fieldCols: _*).show()
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Labels</h3>
+    <h3 class="widget-title">Tags</h3>
     <div class="widget">
       <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack-neutron/">openstack neutron</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spark-classload-ClassNotFound/">spark classload ClassNotFound</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring/">spring</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tensroflow/">tensroflow</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/阿里云-sgoop-presto/">阿里云 sgoop presto</a></li></ul>
     </div>
@@ -591,9 +595,9 @@ df.select(col(&quot;*&quot;) +: fieldCols: _*).show()
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Archieven</h3>
+    <h3 class="widget-title">Archives</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">January 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">December 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">October 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">September 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">December 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">November 2016</a></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/05/">May 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">January 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">December 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">October 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">September 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">December 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">November 2016</a></li></ul>
     </div>
   </div>
 
@@ -601,12 +605,16 @@ df.select(col(&quot;*&quot;) +: fieldCols: _*).show()
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Recente berichten</h3>
+    <h3 class="widget-title">Recent Posts</h3>
     <div class="widget">
       <ul>
         
           <li>
-            <a href="/2019/01/07/hello-world/">如何搭建新版本hexo</a>
+            <a href="/2019/05/05/hello-world/">如何搭建新版本hexo</a>
+          </li>
+        
+          <li>
+            <a href="/2019/05/05/tracingSystem/">tracingSystem</a>
           </li>
         
           <li>
@@ -619,10 +627,6 @@ df.select(col(&quot;*&quot;) +: fieldCols: _*).show()
         
           <li>
             <a href="/2018/12/17/how-to-add-col-spark-dataframe/">如何给spark表添加一列</a>
-          </li>
-        
-          <li>
-            <a href="/2018/12/17/mysql-HOUR-OF-DAY-2-3/">mysql-HOUR_OF_DAY-2-3</a>
           </li>
         
       </ul>
