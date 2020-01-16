@@ -63,8 +63,8 @@
   
     <article id="post-hello-world" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
-    <a href="/2019/11/11/hello-world/" class="article-date">
-  <time datetime="2019-11-11T13:48:59.273Z" itemprop="datePublished">2019-11-11</time>
+    <a href="/2020/01/16/hello-world/" class="article-date">
+  <time datetime="2020-01-16T15:59:54.977Z" itemprop="datePublished">2020-01-16</time>
 </a>
     
   </div>
@@ -75,7 +75,7 @@
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2019/11/11/hello-world/">如何搭建新版本hexo</a>
+      <a class="article-title" href="/2020/01/16/hello-world/">如何搭建新版本hexo</a>
     </h1>
   
 
@@ -88,7 +88,62 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/11/11/hello-world/" data-id="ck2uhg5qh0006a179uftv209a" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2020/01/16/hello-world/" data-id="ck5gx6r8h0006c179i9y6vij3" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-how-to-deploy-logstash-plugin-env" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2020/01/15/how-to-deploy-logstash-plugin-env/" class="article-date">
+  <time datetime="2020-01-15T15:21:19.000Z" itemprop="datePublished">2020-01-15</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2020/01/15/how-to-deploy-logstash-plugin-env/">logstash jdbc plugin 优化</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>本文主要讲logstash 插件环境搭建<br>起因是我需要把mysql里一张1000w条数据的表导入到es中,于是采用了logstash数据泵导入到es.<br>logstash是有jdbc插件的,因为数据量巨大,一次性载入内存耗费太大,16g内存机器吃不消.所以采用分页的方式来搞.<br>配置如下:<br>input {<br>jdbc {<br>    jdbc_driver_library =&gt; “/opt/logstash-7.5.1/lib/mysql-connector-java-5.1.44.jar”<br>    jdbc_driver_class =&gt; “com.mysql.jdbc.Driver”<br>    jdbc_connection_string =&gt; “jdbc:mysql://xxxxxxx:33063/xxxxxx?autoReconnect=true&amp;failOverReadOnly=false&amp;maxReconnects=10”<br>    jdbc_user =&gt; “xxxxxx”<br>    jdbc_password =&gt; “xxx”<br>    jdbc_page_size =&gt; 1000<br>    jdbc_validate_connection =&gt; true<br>    jdbc_pool_timeout =&gt; 5<br>    jdbc_validation_timeout =&gt; 10<br>    jdbc_fetch_size =&gt; 1000<br>    connection_retry_attempts_wait_time =&gt; 5<br>    jdbc_paging_enabled =&gt; true<br>    statement =&gt; “SELECT * from a”<br>}<br>}<br>output {<br>  elasticsearch {<br>    index =&gt; “g2park_inout_record_his”<br>    hosts =&gt; [“localhost:9200”]<br>  }<br>  stdout { codec =&gt; rubydebug }<br>}</p>
+<p>然后开始报错:<br>[2020-01-09T22:02:19,614][ERROR][logstash.inputs.jdbc     ][main] Java::ComMysqlJdbcExceptionsJdbc4::CommunicationsException: Communications link failure</p>
+<p>The last packet successfully received from the server was 60,296 milliseconds ago.  The last packet sent successfully to the server was 60,108 milliseconds ago.: SELECT count(*) AS <code>count</code> FROM (SELECT inout_id,vehicle_no,create_time from a) AS <code>t1</code> LIMIT 1<br>[2020-01-09T22:02:19,666][WARN ][logstash.inputs.jdbc     ][main] Exception when executing JDBC query {:exception=&gt;#&lt;Sequel::DatabaseDisconnectError: Java::ComMysqlJdbcExceptionsJdbc4::CommunicationsException: Communications link failure</p>
+<p>The last packet successfully received from the server was 60,296 milliseconds ago.  The last packet sent successfully to the server was 60,108 milliseconds ago.&gt;}<br>[2020-01-09T22:02:20,206][INFO ][logstash.runner          ] Logstash shut down.</p>
+<p>一开始以为是参数设置问题,加上各种timeout设置也不起作用.<br>这里有个重点是分页logstash默认走的是子查询查到一个总和,如下所示:<br>select count(<em>) as <code>count</code> from (select </em> from a)<br>但是这要求把全部数据先查一遍.怀疑这里造成性能损耗太大.<br>于是换了个思路,改一下logstash-jdbc源码把……加个专门查总数查询的配置.<br>那因为logstash是juby的,那咱就先装ruby.<br>先安装rvm:<br>curl -sSL <a href="https://get.rvm.io" target="_blank" rel="external">https://get.rvm.io</a> | bash -s stable<br>logstash 必须安装jruby!!<br>安装jruby:<br>rvm install jruby<br>使用rvm的时候要先执行<br>source /etc/profile.d/rvm.sh<br>安装 bundle:<br>gem install bundler<br>这里有至少两个坑:<br>1、安装bundler的时候要注意给/usr/local/rvm以ruby当前用户的权限 chown和chgrp 要不然权限会有问题.<br>另外要随时跟进安装错误日志<br>比如期间遇到过git clone jruby hang住了,那就手动先git clone 到指定目录再执行 安装jruby.</p>
+<p>2、网络!<br>装的时候有时需要走ss代理,有时不需要.需要多试试<br>比如步骤1的时候手动clone jruby然后 mvn build的时候,可以用ss代理提速<br>3、安装jruby的时候报错:<br>root@slave-node:~/logstash-input-jdbc# rvm install jruby<br>jruby-9.2.6.0 - #removing src/jruby-9.2.6.0..<br>Searching for binary rubies, this might take some time.<br>Found remote file <a href="https://repo1.maven.org/maven2/org/jruby/jruby-dist/9.2.6.0/jruby-dist-9.2.6.0-bin.tar.gz" target="_blank" rel="external">https://repo1.maven.org/maven2/org/jruby/jruby-dist/9.2.6.0/jruby-dist-9.2.6.0-bin.tar.gz</a><br>Checking requirements for ubuntu.<br>Requirements installation successful.<br>jruby-9.2.6.0 - #configure<br>jruby-9.2.6.0 - #download<br>  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current<br>                                 Dload  Upload   Total   Spent    Left  Speed<br>100 22.9M  100 22.9M    0     0  24821      0  0:16:09  0:16:09 –:–:– 25820<br>No checksum for downloaded archive, recording checksum in user configuration.<br>jruby-9.2.6.0 - #validate archive<br>jruby-9.2.6.0 - #extract<br>jruby-9.2.6.0 - #validate binary<br>jruby-9.2.6.0 - #setup<br>jruby-9.2.6.0 - #gemset created /usr/local/rvm/gems/jruby-9.2.6.0@global<br>jruby-9.2.6.0 - #importing gemset /usr/local/rvm/gemsets/jruby/global.gems.<br>Error running ‘gemset_import_list jruby-openssl jruby-launcher gem-wrappers rubygems-bundler rake rvm bundler’,<br>please read /usr/local/rvm/log/1578889834_jruby-9.2.6.0/gemsets.import.global.log<br>打开本地日志文件如下:<br>java.lang.LayerInstantiationException: Package jdk.internal.jrtfs in both module jrt.fs and module java.base<br>本人用的是jdk13,把jdk13下的jrt-fs.jar删掉后解决<br>4、安装jury的时候,报如下错误:<br>ERROR:  While executing gem … (Gem::Exception)<br>    Failed to find gems [“”] &gt;= 0<br>++ _failed+=(“${_gem} –version ${_version}”)<br>++ read _gem _version _platforms<br>++ ((  1 &gt; 0  ))<br>++ rvm_error ‘\n’\’’command gem pristine –extensions  –version ‘\’’ failed, you need to fix these gems manually.’<br>++ rvm_pretty_print stderr<br>++ case “${rvm_pretty_print_flag:=auto}” in<br>++ case “${TERM:-dumb}” in<br>++ case “$1” in<br>++ [[ -t 2 ]]<br>++ return 1<br>++ printf %b ‘\n’\’’command gem pristine –extensions  –version ‘\’’ failed, you need to fix these gems manually.\n’<br>++ return 1<br>++ return 1</p>
+<p>不过我再次输入<br>rvm install jruby的时候提示我已经安装成功了,就没深究这个问题<br>5、删除本地插件的时候要注意执行命令的当前目录<br>必须在 logstash的主目录下!不能在bin下.要不然会报如下错误:<br>ERROR: Operation aborted, cannot remove plugin, message: The path <code>/opt/logstash-7.5.1/bin/logstash-core</code> does not exist.</p>
+<p>本地插件编译和安装的步骤如下:<br>1、cd 到jdbc插件的根目录<br>2、切换到ruby的用户,比如我这里是es<br>su -s es<br>4、souce /etc/profile.d/rvm.sh<br>5、项目安装依赖</p>
+<p>bundle install<br>这里安装依赖的时候 我忘了是不是要用ss代理了………<br>安装的时候如果有失败的情况会提示你做一些操作,比如:<br>URI::InvalidURIError: can not set user with opaque<br>An error occurred while installing rake (13.0.1), and Bundler<br>cannot continue.<br>Make sure that <code>gem install rake -v &#39;13.0.1&#39; --source &#39;https://rubygems.org/&#39;</code><br>succeeds before bundling.</p>
+<p>In Gemfile:<br>  logstash-devutils was resolved to 1.3.6, which depends on<br>    rake</p>
+<p>那就执行一下gem install rake -v ‘13.0.1’ –source ‘<a href="https://rubygems.org/" target="_blank" rel="external">https://rubygems.org/</a> 就好了<br>6、构建插件gem (在项目主目录下产生logstash-input-jdbc-4.3.19.gem文件)</p>
+<p>gem build logstash-input-jdbc.gemspec</p>
+<p>7、logstash卸载logstash-input-jdbc插件</p>
+<p>/bin/logstash-plugin uninstall logstash-input-jdbc<br>8、删除</p>
+<p>9、logstash安装本地插件 (先将构建成功的gem文件拷贝至logstash主目录的trade_gem文件夹中)</p>
+<p>/bin/logstash-plugin install –no-verify –local ../logstash-input-jdbc-4.3.19.gem</p>
+<p>参考资料:</p>
+<p><a href="https://www.jianshu.com/p/84e807e1a575" target="_blank" rel="external">https://www.jianshu.com/p/84e807e1a575</a><br>感谢前人无私的分享,新版本的logstash代码接口已经有变化了这里附上新版本的代码如下:<br><a href="/2020/01/15/how-to-deploy-logstash-plugin-env/statement_handler.rb" title="statement_handler.rb">statement_handler.rb</a><br><br>完整工程如下:</p>
+<a href="/2020/01/15/how-to-deploy-logstash-plugin-env/logstash-input-jdbc.zip" title="logstash-input-jdbc.zip">logstash-input-jdbc.zip</a>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2020/01/15/how-to-deploy-logstash-plugin-env/" data-id="ck5gx6r8k0007c179dk2yj3a0" class="article-share-link">Share</a>
       
       
     </footer>
@@ -125,7 +180,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/11/11/k8s-install/" data-id="ck2uhg5qr0008a1795e7u7p2j" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2019/11/11/k8s-install/" data-id="ck5gx6r8u0009c1796jqa6mvx" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/k8s/">k8s</a></li></ul>
@@ -169,7 +224,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/05/05/tracingSystem/" data-id="ck2uhg5uh000sa179w8vsbkmi" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2019/05/05/tracingSystem/" data-id="ck5gx6rc5000tc179td59o2l7" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/zipkin-skywalking-cat/">zipkin skywalking cat</a></li></ul>
@@ -210,7 +265,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/01/07/presto-source-code/" data-id="ck2uhg5s6000ha179ktitdeuf" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2019/01/07/presto-source-code/" data-id="ck5gx6r9v000ic1798u9nkzpk" class="article-share-link">Share</a>
       
       
     </footer>
@@ -250,7 +305,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/12/20/sqoop-huizong/" data-id="ck2uhg5sk000oa179d32mm2jh" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/12/20/sqoop-huizong/" data-id="ck5gx6rac000pc1791hph0ddy" class="article-share-link">Share</a>
       
       
     </footer>
@@ -363,7 +418,7 @@ df.select(col(&quot;*&quot;) +: fieldCols: _*).show()
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/12/17/how-to-add-col-spark-dataframe/" data-id="ck2uhg5qn0007a179czx3342p" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/12/17/how-to-add-col-spark-dataframe/" data-id="ck5gx6r8o0008c179i0u2kv7i" class="article-share-link">Share</a>
       
       
     </footer>
@@ -401,7 +456,7 @@ df.select(col(&quot;*&quot;) +: fieldCols: _*).show()
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/12/17/mysql-HOUR-OF-DAY-2-3/" data-id="ck2uhg5r4000ba179h179o5a1" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/12/17/mysql-HOUR-OF-DAY-2-3/" data-id="ck5gx6r90000cc179dwrdcwa8" class="article-share-link">Share</a>
       
       
     </footer>
@@ -453,7 +508,7 @@ df.select(col(&quot;*&quot;) +: fieldCols: _*).show()
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/12/13/spark-sql-count-as-issue/" data-id="ck2uhg5sc000la179s989n08v" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/12/13/spark-sql-count-as-issue/" data-id="ck5gx6ra3000mc179c4tlxipr" class="article-share-link">Share</a>
       
       
     </footer>
@@ -490,55 +545,10 @@ df.select(col(&quot;*&quot;) +: fieldCols: _*).show()
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/12/13/spark-classloader-cannot-find-classdef-in-the-jar/" data-id="ck2uhg5s8000ia179e8pti260" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/12/13/spark-classloader-cannot-find-classdef-in-the-jar/" data-id="ck5gx6r9y000jc1799im3z7qe" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spark-classload-ClassNotFound/">spark classload ClassNotFound</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-ali-emr-presto" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/12/04/ali-emr-presto/" class="article-date">
-  <time datetime="2018-12-04T15:25:45.000Z" itemprop="datePublished">2018-12-04</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/12/04/ali-emr-presto/">ali_emr_presto</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>初步实用阿里云的emr功能，在用sqoop和presto的时候就遇到了问题。遇到问题初步汇总如下：<br>实用presto确实查询速度会很快。但是对于语法要求严苛。<br>如果一个字段是bool类型的，那么在等值判断的时候就必须实用TRUE或者FALSE，不能用0/1.因为它不会自动转型。<br>另外在时间处理上也要注意：<br>1、使用sqoop从mysql导入到hive的时候，如果不通过–map-column-java和–map-column-hive 指定列的类型，默认会导入成字符<br>2、阿里云对雨presto的支持似乎不够全面，在对日期进行类型转换的时候，比如： date_parse(‘2018-10-01 00:00:00.0’,’%Y-%m-%d %H:%i:%s’)<br>会报错：failed: Could not initialize class com.facebook.presto.util.DateTimeZoneIndex<br>这个问题已经提工单了 看后续如何处理。<br>最近跟进使用DATE_FORMAT也会有相同的问题。<br>问题解决了：<br>是老版本emr与presto不兼容的问题<br>解决方式如下：<br>0.188 presto，EMR-3.12.1 之前的stack，有个jar包冲突导致这个问题，解决方案如下：</p>
-<ol>
-<li><p>所有节点执行下下面的操作：<br>rm -rf /usr/lib/presto-current/lib/joda-time-2.10.jar<br>rm -rf /usr/lib/presto-current/lib/plugin/hive-hadoop2/joda-time-2.10.jar</p>
-</li>
-<li><p>然后重启presto；<br>注意：我们实用的emr版本为： EMR-3.12.0</p>
-</li>
-</ol>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/12/04/ali-emr-presto/" data-id="ck2uhg5ps0000a1794mmr8l1v" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/阿里云-sgoop-presto/">阿里云 sgoop presto</a></li></ul>
 
     </footer>
   </div>
@@ -582,7 +592,7 @@ df.select(col(&quot;*&quot;) +: fieldCols: _*).show()
   <div class="widget-wrap">
     <h3 class="widget-title">Archives</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">November 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/05/">May 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">January 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">December 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">October 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">September 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">December 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">November 2016</a></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/01/">January 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">November 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/05/">May 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">January 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">December 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">October 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">September 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">December 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">November 2016</a></li></ul>
     </div>
   </div>
 
@@ -595,7 +605,11 @@ df.select(col(&quot;*&quot;) +: fieldCols: _*).show()
       <ul>
         
           <li>
-            <a href="/2019/11/11/hello-world/">如何搭建新版本hexo</a>
+            <a href="/2020/01/16/hello-world/">如何搭建新版本hexo</a>
+          </li>
+        
+          <li>
+            <a href="/2020/01/15/how-to-deploy-logstash-plugin-env/">logstash jdbc plugin 优化</a>
           </li>
         
           <li>
@@ -610,10 +624,6 @@ df.select(col(&quot;*&quot;) +: fieldCols: _*).show()
             <a href="/2019/01/07/presto-source-code/">码林啄木之presto阅读理解</a>
           </li>
         
-          <li>
-            <a href="/2018/12/20/sqoop-huizong/">sqoop问题汇总</a>
-          </li>
-        
       </ul>
     </div>
   </div>
@@ -626,7 +636,7 @@ df.select(col(&quot;*&quot;) +: fieldCols: _*).show()
   
   <div class="outer">
     <div id="footer-info" class="inner">
-      &copy; 2019 wfliu<br>
+      &copy; 2020 wfliu<br>
       Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
     </div>
   </div>
