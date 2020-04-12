@@ -3,18 +3,21 @@
 <head>
   <meta charset="utf-8">
   
-  <title>openstack新版本（newton）初始化sql报长度太长的解决方法 | 肆叔的酱油</title>
+  <title>如何安全优雅的把spring微服务从eureka上注销 | 肆叔的酱油</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="今天想安装一下最新的os，结果又tm各种新问题。遇到一个记录一个吧。这次遇到的是数据库问题，错误信息如下：2016-12-12 22:15:28.991 4450 ERROR keystone     self._affected_rows = self._read_query_result(unbuffered=unbuffered)2016-12-12 22:15:28.991 4450 ER">
+  <meta name="description" content="重启服务的方法有很多种.不推荐使用kill -9 ,粗暴的关闭会造成生产数据丢失.这里研究了一下actuator,使用actuator的/pause,可以让服务从eureka上注销但是服务本身还提供服务,也就是可以等30秒等待服务继续把未完成的工作做完,再kill -9 就可以了spring boot1.x与spring 2.x的配置有不一样的地方,举例如下:
+spring1.x这里以1.4.1.">
 <meta property="og:type" content="article">
-<meta property="og:title" content="openstack新版本（newton）初始化sql报长度太长的解决方法">
-<meta property="og:url" content="http://yoursite.com/2016/12/12/openstack-newton-mysql-config/index.html">
+<meta property="og:title" content="如何安全优雅的把spring微服务从eureka上注销">
+<meta property="og:url" content="http://yoursite.com/2020/04/13/how-to-unregister-service-from-eureka/index.html">
 <meta property="og:site_name" content="肆叔的酱油">
-<meta property="og:description" content="今天想安装一下最新的os，结果又tm各种新问题。遇到一个记录一个吧。这次遇到的是数据库问题，错误信息如下：2016-12-12 22:15:28.991 4450 ERROR keystone     self._affected_rows = self._read_query_result(unbuffered=unbuffered)2016-12-12 22:15:28.991 4450 ER">
-<meta property="og:updated_time" content="2016-12-12T14:33:11.000Z">
+<meta property="og:description" content="重启服务的方法有很多种.不推荐使用kill -9 ,粗暴的关闭会造成生产数据丢失.这里研究了一下actuator,使用actuator的/pause,可以让服务从eureka上注销但是服务本身还提供服务,也就是可以等30秒等待服务继续把未完成的工作做完,再kill -9 就可以了spring boot1.x与spring 2.x的配置有不一样的地方,举例如下:
+spring1.x这里以1.4.1.">
+<meta property="og:updated_time" content="2020-04-12T18:34:06.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="openstack新版本（newton）初始化sql报长度太长的解决方法">
-<meta name="twitter:description" content="今天想安装一下最新的os，结果又tm各种新问题。遇到一个记录一个吧。这次遇到的是数据库问题，错误信息如下：2016-12-12 22:15:28.991 4450 ERROR keystone     self._affected_rows = self._read_query_result(unbuffered=unbuffered)2016-12-12 22:15:28.991 4450 ER">
+<meta name="twitter:title" content="如何安全优雅的把spring微服务从eureka上注销">
+<meta name="twitter:description" content="重启服务的方法有很多种.不推荐使用kill -9 ,粗暴的关闭会造成生产数据丢失.这里研究了一下actuator,使用actuator的/pause,可以让服务从eureka上注销但是服务本身还提供服务,也就是可以等30秒等待服务继续把未完成的工作做完,再kill -9 就可以了spring boot1.x与spring 2.x的配置有不一样的地方,举例如下:
+spring1.x这里以1.4.1.">
   
     <link rel="alternate" href="/atom.xml" title="肆叔的酱油" type="application/atom+xml">
   
@@ -63,10 +66,10 @@
   </div>
 </header>
       <div class="outer">
-        <section id="main"><article id="post-openstack-newton-mysql-config" class="article article-type-post" itemscope itemprop="blogPost">
+        <section id="main"><article id="post-how-to-unregister-service-from-eureka" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
-    <a href="/2016/12/12/openstack-newton-mysql-config/" class="article-date">
-  <time datetime="2016-12-12T14:26:55.000Z" itemprop="datePublished">2016-12-12</time>
+    <a href="/2020/04/13/how-to-unregister-service-from-eureka/" class="article-date">
+  <time datetime="2020-04-12T17:40:04.000Z" itemprop="datePublished">2020-04-13</time>
 </a>
     
   </div>
@@ -77,7 +80,7 @@
         
   
     <h1 class="article-title" itemprop="name">
-      openstack新版本（newton）初始化sql报长度太长的解决方法
+      如何安全优雅的把spring微服务从eureka上注销
     </h1>
   
 
@@ -85,34 +88,56 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>今天想安装一下最新的os，结果又tm各种新问题。遇到一个记录一个吧。<br>这次遇到的是数据库问题，错误信息如下：<br>2016-12-12 22:15:28.991 4450 ERROR keystone     self._affected_rows = self._read_query_result(unbuffered=unbuffered)<br>2016-12-12 22:15:28.991 4450 ERROR keystone   File “/usr/lib/python2.7/dist-packages/pymysql/connections.py”, line 1002, in _read_query_result<br>2016-12-12 22:15:28.991 4450 ERROR keystone     result.read()<br>2016-12-12 22:15:28.991 4450 ERROR keystone   File “/usr/lib/python2.7/dist-packages/pymysql/connections.py”, line 1285, in read<br>2016-12-12 22:15:28.991 4450 ERROR keystone     first_packet = self.connection._read_packet()<br>2016-12-12 22:15:28.991 4450 ERROR keystone   File “/usr/lib/python2.7/dist-packages/pymysql/connections.py”, line 966, in _read_packet<br>2016-12-12 22:15:28.991 4450 ERROR keystone     packet.check_error()<br>2016-12-12 22:15:28.991 4450 ERROR keystone   File “/usr/lib/python2.7/dist-packages/pymysql/connections.py”, line 394, in check_error<br>2016-12-12 22:15:28.991 4450 ERROR keystone     err.raise_mysql_exception(self._data)<br>2016-12-12 22:15:28.991 4450 ERROR keystone   File “/usr/lib/python2.7/dist-packages/pymysql/err.py”, line 120, in raise_mysql_exception<br>2016-12-12 22:15:28.991 4450 ERROR keystone     _check_mysql_exception(errinfo)<br>2016-12-12 22:15:28.991 4450 ERROR keystone   File “/usr/lib/python2.7/dist-packages/pymysql/err.py”, line 115, in _check_mysql_exception<br>2016-12-12 22:15:28.991 4450 ERROR keystone     raise InternalError(errno, errorvalue)<br>2016-12-12 22:15:28.991 4450 ERROR keystone DBError: (pymysql.err.InternalError) (1071, u’Specified key was too long; max key length is 767 bytes’) [SQL: u’\nCREATE TABLE migrate_version (\n\trepository_id VARCHAR(250) NOT NULL, \n\trepository_path TEXT, \n\tversion INTEGER, \n\tPRIMARY KEY (repository_id)\n)\n\n’]</p>
-<p>上网一查才知道跟字符集还有关系。utf8的要长点。导致的问题。<br>百思不得其姐，后来报着装大运的心态竟然给解决了。。。。。。<br>按照官网上的文档是这样初始化数据库的：<br>CREATE DATABASE keystone;<br>而实际上如果执行<br>CREATE SCHEMA <code>keystone</code> DEFAULT CHARACTER SET utf8 ;<br>再执行<br>su -s /bin/sh -c “keystone-manage db_sync” keystone<br>就能正常初始化了！！！！！！<br>太tm神奇了。</p>
+        <p>重启服务的方法有很多种.<br>不推荐使用kill -9 ,粗暴的关闭会造成生产数据丢失.<br>这里研究了一下actuator,使用actuator的/pause,可以让服务从eureka上注销但是服务本身还提供服务,<br>也就是可以等30秒等待服务继续把未完成的工作做完,再kill -9 就可以了<br>spring boot1.x与spring 2.x的配置有不一样的地方,举例如下:</p>
+<p>spring1.x<br>这里以1.4.1.RELEASE为例子<br>1、在pom文件中加入:</p>
+<p> &lt;dependency&gt;<br>            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;<br>            &lt;artifactId&gt;spring-boot-starter-actuator&lt;/artifactId&gt;<br>            &lt;version&gt;1.4.1.RELEASE&lt;/version&gt;<br>        &lt;/dependency&gt;</p>
+<p>2、在application.yml中加入<br>endpoints:</p>
+<pre><code># 启用pause端点
+pause:
+  enabled: true
+# 启用restart端点，之所以要启用restart端点，是因为pause端点的启用依赖restart端点的启用
+restart:
+  enabled: true
+</code></pre><p>启动服务后直接调用<br><a href="http://127.0.0.1:{port}/pause" target="_blank" rel="external">http://127.0.0.1:{port}/pause</a><br>从eureka上就是down的状态了</p>
+<p>spring2.x:<br>1、在pom文件中加入:<br>       &lt;dependency&gt;<br>            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;<br>            &lt;artifactId&gt;spring-boot-starter-actuator&lt;/artifactId&gt;<br>            &lt;version&gt;2.1.0.RELEASE&lt;/version&gt;<br>        &lt;/dependency&gt;<br>2、在application.yms中加入:</p>
+<p>management:<br>  endpoint:</p>
+<pre><code># 启用pause端点
+pause:
+  enabled: true
+# 启用restart端点，之所以要启用restart端点，是因为pause端点的启用依赖restart端点的启用。详见：https://cloud.spring.io/spring-cloud-static/Finchley.SR2/single/spring-cloud.html#_endpoints
+restart:
+  enabled: true
+</code></pre><p>  endpoints:<br>    web:<br>      exposure:<br>        include: pause,restart</p>
+<p>启动服务后调用<br><a href="http://127.0.0.1:{port}/actuator/pause" target="_blank" rel="external">http://127.0.0.1:{port}/actuator/pause</a><br>从eureka上就是down的状态了</p>
+<p>最后也测试了一下加入kafka consumer不断消费的情况.<br>调用pause后也停止消费了.<br>但是如果实现了org.springframework.cloud.stream.annotation.StreamListener<br>会造成服务注销后再次变为up的情况.<br>说明应该还是有情况会造成程序变为up,需要再研究一下</p>
 
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2016/12/12/openstack-newton-mysql-config/" data-id="ck8xdtwyc000jbq79lctutr7l" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2020/04/13/how-to-unregister-service-from-eureka/" data-id="ck8xdtwxb0008bq79ilae58tq" class="article-share-link">Share</a>
       
       
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spring-eureka/">spring eureka</a></li></ul>
+
     </footer>
   </div>
   
     
 <nav id="article-nav">
   
-    <a href="/2017/05/01/frame/" id="article-nav-newer" class="article-nav-link-wrap">
+    <a href="/2020/04/13/hello-world/" id="article-nav-newer" class="article-nav-link-wrap">
       <strong class="article-nav-caption">Newer</strong>
       <div class="article-nav-title">
         
-          spring frame
+          如何搭建新版本hexo
         
       </div>
     </a>
   
   
-    <a href="/2016/11/29/如何在virtualbox中安装ubuntu16/" id="article-nav-older" class="article-nav-link-wrap">
+    <a href="/2020/01/15/how-to-deploy-logstash-plugin-env/" id="article-nav-older" class="article-nav-link-wrap">
       <strong class="article-nav-caption">Older</strong>
-      <div class="article-nav-title">如何在virtualbox中安装ubuntu16</div>
+      <div class="article-nav-title">logstash jdbc plugin 优化</div>
     </a>
   
 </nav>

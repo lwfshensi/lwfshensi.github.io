@@ -63,8 +63,8 @@
   
     <article id="post-hello-world" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
-    <a href="/2020/01/16/hello-world/" class="article-date">
-  <time datetime="2020-01-16T15:59:54.977Z" itemprop="datePublished">2020-01-16</time>
+    <a href="/2020/04/13/hello-world/" class="article-date">
+  <time datetime="2020-04-12T18:29:15.110Z" itemprop="datePublished">2020-04-13</time>
 </a>
     
   </div>
@@ -75,7 +75,7 @@
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2020/01/16/hello-world/">如何搭建新版本hexo</a>
+      <a class="article-title" href="/2020/04/13/hello-world/">如何搭建新版本hexo</a>
     </h1>
   
 
@@ -88,9 +88,69 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2020/01/16/hello-world/" data-id="ck5gx6r8h0006c179i9y6vij3" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2020/04/13/hello-world/" data-id="ck8xdtwx20007bq79u6vddtq8" class="article-share-link">Share</a>
       
       
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-how-to-unregister-service-from-eureka" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2020/04/13/how-to-unregister-service-from-eureka/" class="article-date">
+  <time datetime="2020-04-12T17:40:04.000Z" itemprop="datePublished">2020-04-13</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2020/04/13/how-to-unregister-service-from-eureka/">如何安全优雅的把spring微服务从eureka上注销</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>重启服务的方法有很多种.<br>不推荐使用kill -9 ,粗暴的关闭会造成生产数据丢失.<br>这里研究了一下actuator,使用actuator的/pause,可以让服务从eureka上注销但是服务本身还提供服务,<br>也就是可以等30秒等待服务继续把未完成的工作做完,再kill -9 就可以了<br>spring boot1.x与spring 2.x的配置有不一样的地方,举例如下:</p>
+<p>spring1.x<br>这里以1.4.1.RELEASE为例子<br>1、在pom文件中加入:</p>
+<p> &lt;dependency&gt;<br>            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;<br>            &lt;artifactId&gt;spring-boot-starter-actuator&lt;/artifactId&gt;<br>            &lt;version&gt;1.4.1.RELEASE&lt;/version&gt;<br>        &lt;/dependency&gt;</p>
+<p>2、在application.yml中加入<br>endpoints:</p>
+<pre><code># 启用pause端点
+pause:
+  enabled: true
+# 启用restart端点，之所以要启用restart端点，是因为pause端点的启用依赖restart端点的启用
+restart:
+  enabled: true
+</code></pre><p>启动服务后直接调用<br><a href="http://127.0.0.1:{port}/pause" target="_blank" rel="external">http://127.0.0.1:{port}/pause</a><br>从eureka上就是down的状态了</p>
+<p>spring2.x:<br>1、在pom文件中加入:<br>       &lt;dependency&gt;<br>            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;<br>            &lt;artifactId&gt;spring-boot-starter-actuator&lt;/artifactId&gt;<br>            &lt;version&gt;2.1.0.RELEASE&lt;/version&gt;<br>        &lt;/dependency&gt;<br>2、在application.yms中加入:</p>
+<p>management:<br>  endpoint:</p>
+<pre><code># 启用pause端点
+pause:
+  enabled: true
+# 启用restart端点，之所以要启用restart端点，是因为pause端点的启用依赖restart端点的启用。详见：https://cloud.spring.io/spring-cloud-static/Finchley.SR2/single/spring-cloud.html#_endpoints
+restart:
+  enabled: true
+</code></pre><p>  endpoints:<br>    web:<br>      exposure:<br>        include: pause,restart</p>
+<p>启动服务后调用<br><a href="http://127.0.0.1:{port}/actuator/pause" target="_blank" rel="external">http://127.0.0.1:{port}/actuator/pause</a><br>从eureka上就是down的状态了</p>
+<p>最后也测试了一下加入kafka consumer不断消费的情况.<br>调用pause后也停止消费了.<br>但是如果实现了org.springframework.cloud.stream.annotation.StreamListener<br>会造成服务注销后再次变为up的情况.<br>说明应该还是有情况会造成程序变为up,需要再研究一下</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2020/04/13/how-to-unregister-service-from-eureka/" data-id="ck8xdtwxb0008bq79ilae58tq" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spring-eureka/">spring eureka</a></li></ul>
+
     </footer>
   </div>
   
@@ -143,7 +203,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2020/01/15/how-to-deploy-logstash-plugin-env/" data-id="ck5gx6r8k0007c179dk2yj3a0" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2020/01/15/how-to-deploy-logstash-plugin-env/" data-id="ck8xdtwxg000bbq79j9ax1au5" class="article-share-link">Share</a>
       
       
     </footer>
@@ -180,7 +240,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/11/11/k8s-install/" data-id="ck5gx6r8u0009c1796jqa6mvx" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2019/11/11/k8s-install/" data-id="ck8xdtwxj000cbq79mxxm8mps" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/k8s/">k8s</a></li></ul>
@@ -224,7 +284,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/05/05/tracingSystem/" data-id="ck5gx6rc5000tc179td59o2l7" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2019/05/05/tracingSystem/" data-id="ck8xdtx0v000wbq794ebqxh0t" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/zipkin-skywalking-cat/">zipkin skywalking cat</a></li></ul>
@@ -265,7 +325,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/01/07/presto-source-code/" data-id="ck5gx6r9v000ic1798u9nkzpk" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2019/01/07/presto-source-code/" data-id="ck8xdtwyh000lbq79ozyzogfo" class="article-share-link">Share</a>
       
       
     </footer>
@@ -305,7 +365,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/12/20/sqoop-huizong/" data-id="ck5gx6rac000pc1791hph0ddy" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/12/20/sqoop-huizong/" data-id="ck8xdtwzf000sbq791jzti85d" class="article-share-link">Share</a>
       
       
     </footer>
@@ -418,7 +478,7 @@ df.select(col(&quot;*&quot;) +: fieldCols: _*).show()
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/12/17/how-to-add-col-spark-dataframe/" data-id="ck5gx6r8o0008c179i0u2kv7i" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/12/17/how-to-add-col-spark-dataframe/" data-id="ck8xdtww40000bq79zr5x1nqx" class="article-share-link">Share</a>
       
       
     </footer>
@@ -456,7 +516,7 @@ df.select(col(&quot;*&quot;) +: fieldCols: _*).show()
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/12/17/mysql-HOUR-OF-DAY-2-3/" data-id="ck5gx6r90000cc179dwrdcwa8" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/12/17/mysql-HOUR-OF-DAY-2-3/" data-id="ck8xdtwxo000fbq79eua6i71m" class="article-share-link">Share</a>
       
       
     </footer>
@@ -508,48 +568,9 @@ df.select(col(&quot;*&quot;) +: fieldCols: _*).show()
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/12/13/spark-sql-count-as-issue/" data-id="ck5gx6ra3000mc179c4tlxipr" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/12/13/spark-sql-count-as-issue/" data-id="ck8xdtwyu000pbq79bksnphwx" class="article-share-link">Share</a>
       
       
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-spark-classloader-cannot-find-classdef-in-the-jar" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/12/13/spark-classloader-cannot-find-classdef-in-the-jar/" class="article-date">
-  <time datetime="2018-12-13T14:47:35.000Z" itemprop="datePublished">2018-12-13</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/12/13/spark-classloader-cannot-find-classdef-in-the-jar/">spark找不到jar里有定义的class</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>今天遇到了一个奇怪的问题：明明打包的时候把class文件打进去了，但是却报classnotfound！<br>相同的程序如果在本地以local形式运行是可以的，但是如果submit到远程就会报classnotfound。<br>开始猜测是classloader的问题。<br>终于在stackoverflow上找到了类似的问题。<br>加上参数–driver-class-path 将jar包自己放到这个参数后面，问题解决。<br>连接如下：<br><a href="https://stackoverflow.com/questions/30426245/apache-spark-classloader-cannot-find-classdef-in-the-jar" target="_blank" rel="external">https://stackoverflow.com/questions/30426245/apache-spark-classloader-cannot-find-classdef-in-the-jar</a></p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/12/13/spark-classloader-cannot-find-classdef-in-the-jar/" data-id="ck5gx6r9y000jc1799im3z7qe" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spark-classload-ClassNotFound/">spark classload ClassNotFound</a></li></ul>
-
     </footer>
   </div>
   
@@ -573,7 +594,7 @@ df.select(col(&quot;*&quot;) +: fieldCols: _*).show()
   <div class="widget-wrap">
     <h3 class="widget-title">Tags</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/k8s/">k8s</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack-neutron/">openstack neutron</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spark-classload-ClassNotFound/">spark classload ClassNotFound</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring/">spring</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tensroflow/">tensroflow</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/zipkin-skywalking-cat/">zipkin skywalking cat</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/阿里云-sgoop-presto/">阿里云 sgoop presto</a></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/k8s/">k8s</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack-neutron/">openstack neutron</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spark-classload-ClassNotFound/">spark classload ClassNotFound</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring/">spring</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring-eureka/">spring eureka</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tensroflow/">tensroflow</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/zipkin-skywalking-cat/">zipkin skywalking cat</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/阿里云-sgoop-presto/">阿里云 sgoop presto</a></li></ul>
     </div>
   </div>
 
@@ -583,7 +604,7 @@ df.select(col(&quot;*&quot;) +: fieldCols: _*).show()
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/k8s/" style="font-size: 10px;">k8s</a> <a href="/tags/openstack-neutron/" style="font-size: 10px;">openstack neutron</a> <a href="/tags/spark-classload-ClassNotFound/" style="font-size: 10px;">spark classload ClassNotFound</a> <a href="/tags/spring/" style="font-size: 20px;">spring</a> <a href="/tags/tensroflow/" style="font-size: 10px;">tensroflow</a> <a href="/tags/zipkin-skywalking-cat/" style="font-size: 10px;">zipkin skywalking cat</a> <a href="/tags/阿里云-sgoop-presto/" style="font-size: 10px;">阿里云 sgoop presto</a>
+      <a href="/tags/k8s/" style="font-size: 10px;">k8s</a> <a href="/tags/openstack-neutron/" style="font-size: 10px;">openstack neutron</a> <a href="/tags/spark-classload-ClassNotFound/" style="font-size: 10px;">spark classload ClassNotFound</a> <a href="/tags/spring/" style="font-size: 20px;">spring</a> <a href="/tags/spring-eureka/" style="font-size: 10px;">spring eureka</a> <a href="/tags/tensroflow/" style="font-size: 10px;">tensroflow</a> <a href="/tags/zipkin-skywalking-cat/" style="font-size: 10px;">zipkin skywalking cat</a> <a href="/tags/阿里云-sgoop-presto/" style="font-size: 10px;">阿里云 sgoop presto</a>
     </div>
   </div>
 
@@ -592,7 +613,7 @@ df.select(col(&quot;*&quot;) +: fieldCols: _*).show()
   <div class="widget-wrap">
     <h3 class="widget-title">Archives</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/01/">January 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">November 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/05/">May 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">January 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">December 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">October 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">September 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">December 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">November 2016</a></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/04/">April 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/01/">January 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">November 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/05/">May 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">January 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">December 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">October 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">September 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">December 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">November 2016</a></li></ul>
     </div>
   </div>
 
@@ -605,7 +626,11 @@ df.select(col(&quot;*&quot;) +: fieldCols: _*).show()
       <ul>
         
           <li>
-            <a href="/2020/01/16/hello-world/">如何搭建新版本hexo</a>
+            <a href="/2020/04/13/hello-world/">如何搭建新版本hexo</a>
+          </li>
+        
+          <li>
+            <a href="/2020/04/13/how-to-unregister-service-from-eureka/">如何安全优雅的把spring微服务从eureka上注销</a>
           </li>
         
           <li>
@@ -618,10 +643,6 @@ df.select(col(&quot;*&quot;) +: fieldCols: _*).show()
         
           <li>
             <a href="/2019/05/05/tracingSystem/">链路追踪系统之选型篇</a>
-          </li>
-        
-          <li>
-            <a href="/2019/01/07/presto-source-code/">码林啄木之presto阅读理解</a>
           </li>
         
       </ul>

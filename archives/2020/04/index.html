@@ -3,18 +3,14 @@
 <head>
   <meta charset="utf-8">
   
-  <title>openstack新版本（newton）初始化sql报长度太长的解决方法 | 肆叔的酱油</title>
+  <title>Archives: 2020/4 | 肆叔的酱油</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="今天想安装一下最新的os，结果又tm各种新问题。遇到一个记录一个吧。这次遇到的是数据库问题，错误信息如下：2016-12-12 22:15:28.991 4450 ERROR keystone     self._affected_rows = self._read_query_result(unbuffered=unbuffered)2016-12-12 22:15:28.991 4450 ER">
-<meta property="og:type" content="article">
-<meta property="og:title" content="openstack新版本（newton）初始化sql报长度太长的解决方法">
-<meta property="og:url" content="http://yoursite.com/2016/12/12/openstack-newton-mysql-config/index.html">
+  <meta property="og:type" content="website">
+<meta property="og:title" content="肆叔的酱油">
+<meta property="og:url" content="http://yoursite.com/archives/2020/04/index.html">
 <meta property="og:site_name" content="肆叔的酱油">
-<meta property="og:description" content="今天想安装一下最新的os，结果又tm各种新问题。遇到一个记录一个吧。这次遇到的是数据库问题，错误信息如下：2016-12-12 22:15:28.991 4450 ERROR keystone     self._affected_rows = self._read_query_result(unbuffered=unbuffered)2016-12-12 22:15:28.991 4450 ER">
-<meta property="og:updated_time" content="2016-12-12T14:33:11.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="openstack新版本（newton）初始化sql报长度太长的解决方法">
-<meta name="twitter:description" content="今天想安装一下最新的os，结果又tm各种新问题。遇到一个记录一个吧。这次遇到的是数据库问题，错误信息如下：2016-12-12 22:15:28.991 4450 ERROR keystone     self._affected_rows = self._read_query_result(unbuffered=unbuffered)2016-12-12 22:15:28.991 4450 ER">
+<meta name="twitter:title" content="肆叔的酱油">
   
     <link rel="alternate" href="/atom.xml" title="肆叔的酱油" type="application/atom+xml">
   
@@ -63,62 +59,58 @@
   </div>
 </header>
       <div class="outer">
-        <section id="main"><article id="post-openstack-newton-mysql-config" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2016/12/12/openstack-newton-mysql-config/" class="article-date">
-  <time datetime="2016-12-12T14:26:55.000Z" itemprop="datePublished">2016-12-12</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
+        <section id="main">
   
-    <h1 class="article-title" itemprop="name">
-      openstack新版本（newton）初始化sql报长度太长的解决方法
+  
+    
+    
+      
+      
+      <section class="archives-wrap">
+        <div class="archive-year-wrap">
+          <a href="/archives/2020" class="archive-year">2020</a>
+        </div>
+        <div class="archives">
+    
+    <article class="archive-article archive-type-post">
+  <div class="archive-article-inner">
+    <header class="archive-article-header">
+      <a href="/2020/04/13/hello-world/" class="archive-article-date">
+  <time datetime="2020-04-12T18:29:15.110Z" itemprop="datePublished">Apr 13</time>
+</a>
+      
+  
+    <h1 itemprop="name">
+      <a class="archive-article-title" href="/2020/04/13/hello-world/">如何搭建新版本hexo</a>
     </h1>
   
 
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>今天想安装一下最新的os，结果又tm各种新问题。遇到一个记录一个吧。<br>这次遇到的是数据库问题，错误信息如下：<br>2016-12-12 22:15:28.991 4450 ERROR keystone     self._affected_rows = self._read_query_result(unbuffered=unbuffered)<br>2016-12-12 22:15:28.991 4450 ERROR keystone   File “/usr/lib/python2.7/dist-packages/pymysql/connections.py”, line 1002, in _read_query_result<br>2016-12-12 22:15:28.991 4450 ERROR keystone     result.read()<br>2016-12-12 22:15:28.991 4450 ERROR keystone   File “/usr/lib/python2.7/dist-packages/pymysql/connections.py”, line 1285, in read<br>2016-12-12 22:15:28.991 4450 ERROR keystone     first_packet = self.connection._read_packet()<br>2016-12-12 22:15:28.991 4450 ERROR keystone   File “/usr/lib/python2.7/dist-packages/pymysql/connections.py”, line 966, in _read_packet<br>2016-12-12 22:15:28.991 4450 ERROR keystone     packet.check_error()<br>2016-12-12 22:15:28.991 4450 ERROR keystone   File “/usr/lib/python2.7/dist-packages/pymysql/connections.py”, line 394, in check_error<br>2016-12-12 22:15:28.991 4450 ERROR keystone     err.raise_mysql_exception(self._data)<br>2016-12-12 22:15:28.991 4450 ERROR keystone   File “/usr/lib/python2.7/dist-packages/pymysql/err.py”, line 120, in raise_mysql_exception<br>2016-12-12 22:15:28.991 4450 ERROR keystone     _check_mysql_exception(errinfo)<br>2016-12-12 22:15:28.991 4450 ERROR keystone   File “/usr/lib/python2.7/dist-packages/pymysql/err.py”, line 115, in _check_mysql_exception<br>2016-12-12 22:15:28.991 4450 ERROR keystone     raise InternalError(errno, errorvalue)<br>2016-12-12 22:15:28.991 4450 ERROR keystone DBError: (pymysql.err.InternalError) (1071, u’Specified key was too long; max key length is 767 bytes’) [SQL: u’\nCREATE TABLE migrate_version (\n\trepository_id VARCHAR(250) NOT NULL, \n\trepository_path TEXT, \n\tversion INTEGER, \n\tPRIMARY KEY (repository_id)\n)\n\n’]</p>
-<p>上网一查才知道跟字符集还有关系。utf8的要长点。导致的问题。<br>百思不得其姐，后来报着装大运的心态竟然给解决了。。。。。。<br>按照官网上的文档是这样初始化数据库的：<br>CREATE DATABASE keystone;<br>而实际上如果执行<br>CREATE SCHEMA <code>keystone</code> DEFAULT CHARACTER SET utf8 ;<br>再执行<br>su -s /bin/sh -c “keystone-manage db_sync” keystone<br>就能正常初始化了！！！！！！<br>太tm神奇了。</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2016/12/12/openstack-newton-mysql-config/" data-id="ck8xdtwyc000jbq79lctutr7l" class="article-share-link">Share</a>
-      
-      
-    </footer>
+    </header>
   </div>
+</article>
   
     
-<nav id="article-nav">
+    
+    <article class="archive-article archive-type-post">
+  <div class="archive-article-inner">
+    <header class="archive-article-header">
+      <a href="/2020/04/13/how-to-unregister-service-from-eureka/" class="archive-article-date">
+  <time datetime="2020-04-12T17:40:04.000Z" itemprop="datePublished">Apr 13</time>
+</a>
+      
   
-    <a href="/2017/05/01/frame/" id="article-nav-newer" class="article-nav-link-wrap">
-      <strong class="article-nav-caption">Newer</strong>
-      <div class="article-nav-title">
-        
-          spring frame
-        
-      </div>
-    </a>
+    <h1 itemprop="name">
+      <a class="archive-article-title" href="/2020/04/13/how-to-unregister-service-from-eureka/">如何安全优雅的把spring微服务从eureka上注销</a>
+    </h1>
   
-  
-    <a href="/2016/11/29/如何在virtualbox中安装ubuntu16/" id="article-nav-older" class="article-nav-link-wrap">
-      <strong class="article-nav-caption">Older</strong>
-      <div class="article-nav-title">如何在virtualbox中安装ubuntu16</div>
-    </a>
-  
-</nav>
 
-  
+    </header>
+  </div>
 </article>
+  
+  
+    </div></section>
+  
 
 </section>
         
