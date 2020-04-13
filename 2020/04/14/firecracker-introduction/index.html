@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>firecracker介绍 | 肆叔的酱油</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="firecracker是aws开源的serverless计算框架.firecracker是基于kvm的micro vm技术,相对于容器隔离醒更好,同时性能更快.仅启动相对较新的 Linux 内核，并且仅启动使用特定配置选项集编译的内核（内核编译配置选项超过 1000 种）。此外，不支持任何类型的图形卡或加速器，不支持硬件透传，不支持（大多数）老旧设备。由于设备模型极简，内核加载过程也简单，可以实现">
+<meta property="og:type" content="article">
+<meta property="og:title" content="firecracker介绍">
+<meta property="og:url" content="http://yoursite.com/2020/04/14/firecracker-introduction/index.html">
+<meta property="og:site_name" content="肆叔的酱油">
+<meta property="og:description" content="firecracker是aws开源的serverless计算框架.firecracker是基于kvm的micro vm技术,相对于容器隔离醒更好,同时性能更快.仅启动相对较新的 Linux 内核，并且仅启动使用特定配置选项集编译的内核（内核编译配置选项超过 1000 种）。此外，不支持任何类型的图形卡或加速器，不支持硬件透传，不支持（大多数）老旧设备。由于设备模型极简，内核加载过程也简单，可以实现">
+<meta property="og:image" content="http://yoursite.com/2020/04/14/firecracker-introduction/host.png">
+<meta property="og:image" content="http://yoursite.com/2020/04/14/firecracker-introduction/org.png">
+<meta property="og:image" content="http://yoursite.com/2020/04/14/firecracker-introduction/work.png">
+<meta property="og:image" content="http://yoursite.com/2020/04/14/firecracker-introduction/login.png">
+<meta property="og:updated_time" content="2020-04-13T19:08:08.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="firecracker介绍">
+<meta name="twitter:description" content="firecracker是aws开源的serverless计算框架.firecracker是基于kvm的micro vm技术,相对于容器隔离醒更好,同时性能更快.仅启动相对较新的 Linux 内核，并且仅启动使用特定配置选项集编译的内核（内核编译配置选项超过 1000 种）。此外，不支持任何类型的图形卡或加速器，不支持硬件透传，不支持（大多数）老旧设备。由于设备模型极简，内核加载过程也简单，可以实现">
+<meta name="twitter:image" content="http://yoursite.com/2020/04/14/firecracker-introduction/host.png">
+  
+    <link rel="alternate" href="/atom.xml" title="肆叔的酱油" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">肆叔的酱油</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" results="0" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-firecracker-introduction" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2020/04/14/firecracker-introduction/" class="article-date">
+  <time datetime="2020-04-13T18:10:23.000Z" itemprop="datePublished">2020-04-14</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      firecracker介绍
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>firecracker是aws开源的serverless计算框架.<br>firecracker是基于kvm的micro vm技术,相对于容器隔离醒更好,同时性能更快.<br>仅启动相对较新的 Linux 内核，并且仅启动使用特定配置选项集编译的内核（内核编译配置选项超过 1000 种）。<br>此外，不支持任何类型的图形卡或加速器，不支持硬件透传，不支持（大多数）老旧设备。<br>由于设备模型极简，内核加载过程也简单，可以实现小于 125 ms 的启动时间和更少的内存占用。<br>Firecracker 目前支持 Intel CPU，并将于 2019 年开始支持 AMD 和 ARM，还将与 containerd 等流行的容器运行时集成。</p>
+<p>与宿主机的关系:<br><img src="/2020/04/14/firecracker-introduction/host.png" alt="introduce" title="introduce"><br>Firecracker 运行在 Linux 主机上，内核为4.14或更新内核，并且使用 Linux guest OSs (从这一点来说，称为 guest)。 启动该进程后，在发出 instanceart 命令之前，用户与 Firecracker API 交互以配置 microVM。</p>
+<p>Firecracker 内部架构<br><img src="/2020/04/14/firecracker-introduction/org.png" alt="introduce" title="introduce"><br>每个 Firecracker 进程封装一个且只有一个 microVM。 该进程运行以下线程: API、 VMM 和 vCPU。 Api 线程负责 Firecracker 的 API 服务器和相关的控制平面。 它永远不会在虚拟机的快速路径上。 Vmm 线程公开机器模型、最小遗留设备模型、 microVM 元数据服务(MMDS)和 VirtIO 设备仿真 Net 和 Block 设备，并提供 i / o 速率限制。 除此之外，还有一个或多个 vCPU 线程(每个客户 CPU 核心一个)。 它们是通过 KVM 创建的，并运行 KVM run 主循环。 它们在设备模型上执行同步 i / o 和存储器映射输入输出操作。</p>
+<p>Firecracker如何工作<br><img src="/2020/04/14/firecracker-introduction/work.png" alt="introduce" title="introduce"><br>Firecracker 在用户空间中运行，使用基于 Linux 内核的虚拟机（KVM）来创建 microVM。每个 microVM 的快速启动时间和低内存开销使你可将数千个 microVM 打包到同一台机器上。这意味着每个函数或容器组都可以使用虚拟机屏障进行封装，从而使不同用户的工作负载能在同一台计算机上运行，而无需在安全性和效率之间进行权衡。Firecracker 是 QEMU 的替代品，QEMU 是一个成熟的 VMM，具有通用和广泛的功能集，可以托管各种客户操作系统。</p>
+<p>可以通过 RESTful API 控制 Firecracker 进程，RESTful API 可以启用常见操作：例如配置 vCPU 数量或启动计算机。Firecracker 提供内置速率限制器，可精确控制同一台计算机上数千个 microVM 使用的网络和存储资源。你可以通过 Firecracker API 创建和配置速率限制器，并灵活定义速率限制器来支持突发情况或特定带宽 / 操作限制。Firecracker 还提供元数据服务，可在主机和客户机操作系统之间安全地共享配置信息。元数据服务可以使用 Firecracker API 设置。</p>
+<p>Firecracker入门实例<br>1、找个linux电脑并且安装依赖<br>sudo apt update<br>sudo apt install qemu qemu-kvm libvirt-bin bridge-utils virt-manager<br>2、开启cpu虚拟化<br>开机进入bios后<br>Configuratio &gt; Intel Virtual Technology &gt; Enabled<br>3、根据官网进行安装<br>latest=$(basename $(curl -fsSLI -o /dev/null -w  %{url_effective}  <a href="https://github.com/firecracker-microvm/firecracker/releases/latest" target="_blank" rel="external">https://github.com/firecracker-microvm/firecracker/releases/latest</a>))<br>curl -LOJ <a href="https://github.com/firecracker-microvm/firecracker/releases/download/${latest}/firecracker-${latest}-$(uname" target="_blank" rel="external">https://github.com/firecracker-microvm/firecracker/releases/download/${latest}/firecracker-${latest}-$(uname</a> -m)<br>mv firecracker-${latest}-$(uname -m) firecracker<br>chmod +x firecracker<br>至此完成安装步骤<br>4、启动服务<br>rm -f /tmp/firecracker.socket<br>./firecracker –api-sock /tmp/firecracker.socket</p>
+<p>5、再打开一个窗口进行vm配置工作<br>既然是基于kvm的vm那么一定需要rootfs和kernal.原始文件放在aws的s3存储上但是被墙了..<br>这里找到国内的源如下:<br>wget <a href="https://silenceshell-1255345740.cos.ap-shanghai.myqcloud.com/hello-vmlinux.bin" target="_blank" rel="external">https://silenceshell-1255345740.cos.ap-shanghai.myqcloud.com/hello-vmlinux.bin</a><br>wget <a href="https://silenceshell-1255345740.cos.ap-shanghai.myqcloud.com/hello-rootfs.ext4" target="_blank" rel="external">https://silenceshell-1255345740.cos.ap-shanghai.myqcloud.com/hello-rootfs.ext4</a></p>
+<p>通过api配置rootfs与kernal<br>sudo curl –unix-socket /tmp/firecracker.sock -i     -X PUT ‘<a href="http://localhost/boot-source" target="_blank" rel="external">http://localhost/boot-source</a>‘       -H ‘Accept: application/json’               -H ‘Content-Type: application/json’         -d ‘{<br>        “kernel_image_path”: “./hello-vmlinux.bin”,<br>        “boot_args”: “console=ttyS0 reboot=k panic=1 pci=off”<br>    }’</p>
+<p> sudo curl –unix-socket /tmp/firecracker.socket -i     -X PUT ‘<a href="http://localhost/drives/rootfs" target="_blank" rel="external">http://localhost/drives/rootfs</a>‘     -H ‘Accept: application/json’               -H ‘Content-Type: application/json’         -d ‘{<br>        “drive_id”: “rootfs”,<br>        “path_on_host”: “./hello-rootfs.ext4”,<br>        “is_root_device”: true,<br>        “is_read_only”: false<br>    }’<br>5、通过api启动vm<br>sudo curl –unix-socket /tmp/firecracker.socket -i     -X PUT ‘<a href="http://localhost/actions" target="_blank" rel="external">http://localhost/actions</a>‘           -H  ‘Accept: application/json’              -H  ‘Content-Type: application/json’        -d ‘{<br>        “action_type”: “InstanceStart”<br>     }’</p>
+<p>6、最后切换到启动服务的窗口,这时候应该有了登录窗口了,用户名密码默认是root/root<br><img src="/2020/04/14/firecracker-introduction/login.png" alt="introduce" title="introduce"></p>
+<p>firecreaker给我们提供了一种容器之外的解决方案,同时具备容器的轻量但实际上是vm.我们可以针对vm创建tap网络设备,而且由于是vm从而使其可以具有状态.<br>在物联网领域可以与规则引擎结合处理告警或者复杂逻辑运算.<br>在容器领域也可以与kata结合让容器运行在micro vm中,增强容器.</p>
+<p>参考资料:<br><a href="https://www.tuicool.com/articles/memqyaV" target="_blank" rel="external">https://www.tuicool.com/articles/memqyaV</a><br><a href="https://github.com/firecracker-microvm/firecracker/blob/master/docs/getting-started.md" target="_blank" rel="external">https://github.com/firecracker-microvm/firecracker/blob/master/docs/getting-started.md</a><br><a href="https://blog.csdn.net/wangzan18/article/details/104519333" target="_blank" rel="external">https://blog.csdn.net/wangzan18/article/details/104519333</a><br><a href="https://github.com/kata-containers/documentation/issues/351?spm=a2c4e.10696291.0.0.480319a44pfqoF" target="_blank" rel="external">https://github.com/kata-containers/documentation/issues/351?spm=a2c4e.10696291.0.0.480319a44pfqoF</a><br><a href="https://yq.aliyun.com/articles/692117" target="_blank" rel="external">https://yq.aliyun.com/articles/692117</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2020/04/14/firecracker-introduction/" data-id="ck8yulsg70000is79pk5050py" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2020/04/14/hello-world/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          如何搭建新版本hexo
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2020/04/13/how-to-unregister-service-from-eureka/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">如何安全优雅的把spring微服务从eureka上注销</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/k8s/">k8s</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack-neutron/">openstack neutron</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spark-classload-ClassNotFound/">spark classload ClassNotFound</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring/">spring</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring-eureka/">spring eureka</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tensroflow/">tensroflow</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/zipkin-skywalking-cat/">zipkin skywalking cat</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/阿里云-sgoop-presto/">阿里云 sgoop presto</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/k8s/" style="font-size: 10px;">k8s</a> <a href="/tags/openstack-neutron/" style="font-size: 10px;">openstack neutron</a> <a href="/tags/spark-classload-ClassNotFound/" style="font-size: 10px;">spark classload ClassNotFound</a> <a href="/tags/spring/" style="font-size: 20px;">spring</a> <a href="/tags/spring-eureka/" style="font-size: 10px;">spring eureka</a> <a href="/tags/tensroflow/" style="font-size: 10px;">tensroflow</a> <a href="/tags/zipkin-skywalking-cat/" style="font-size: 10px;">zipkin skywalking cat</a> <a href="/tags/阿里云-sgoop-presto/" style="font-size: 10px;">阿里云 sgoop presto</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/04/">April 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/01/">January 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">November 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/05/">May 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">January 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">December 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">October 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">September 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">December 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">November 2016</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2020/04/14/hello-world/">如何搭建新版本hexo</a>
+          </li>
+        
+          <li>
+            <a href="/2020/04/14/firecracker-introduction/">firecracker介绍</a>
+          </li>
+        
+          <li>
+            <a href="/2020/04/13/how-to-unregister-service-from-eureka/">如何安全优雅的把spring微服务从eureka上注销</a>
+          </li>
+        
+          <li>
+            <a href="/2020/01/15/how-to-deploy-logstash-plugin-env/">logstash jdbc plugin 优化</a>
+          </li>
+        
+          <li>
+            <a href="/2019/11/11/k8s-install/">k8s安装</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2020 wfliu<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>

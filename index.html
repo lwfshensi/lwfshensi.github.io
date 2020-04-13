@@ -63,8 +63,8 @@
   
     <article id="post-hello-world" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
-    <a href="/2020/04/13/hello-world/" class="article-date">
-  <time datetime="2020-04-12T18:29:15.110Z" itemprop="datePublished">2020-04-13</time>
+    <a href="/2020/04/14/hello-world/" class="article-date">
+  <time datetime="2020-04-13T19:06:35.750Z" itemprop="datePublished">2020-04-14</time>
 </a>
     
   </div>
@@ -75,7 +75,7 @@
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2020/04/13/hello-world/">如何搭建新版本hexo</a>
+      <a class="article-title" href="/2020/04/14/hello-world/">如何搭建新版本hexo</a>
     </h1>
   
 
@@ -88,7 +88,55 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2020/04/13/hello-world/" data-id="ck8xdtwx20007bq79u6vddtq8" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2020/04/14/hello-world/" data-id="ck8yulsh20007is793zsd72g5" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-firecracker-introduction" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2020/04/14/firecracker-introduction/" class="article-date">
+  <time datetime="2020-04-13T18:10:23.000Z" itemprop="datePublished">2020-04-14</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2020/04/14/firecracker-introduction/">firecracker介绍</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>firecracker是aws开源的serverless计算框架.<br>firecracker是基于kvm的micro vm技术,相对于容器隔离醒更好,同时性能更快.<br>仅启动相对较新的 Linux 内核，并且仅启动使用特定配置选项集编译的内核（内核编译配置选项超过 1000 种）。<br>此外，不支持任何类型的图形卡或加速器，不支持硬件透传，不支持（大多数）老旧设备。<br>由于设备模型极简，内核加载过程也简单，可以实现小于 125 ms 的启动时间和更少的内存占用。<br>Firecracker 目前支持 Intel CPU，并将于 2019 年开始支持 AMD 和 ARM，还将与 containerd 等流行的容器运行时集成。</p>
+<p>与宿主机的关系:<br><img src="/2020/04/14/firecracker-introduction/host.png" alt="introduce" title="introduce"><br>Firecracker 运行在 Linux 主机上，内核为4.14或更新内核，并且使用 Linux guest OSs (从这一点来说，称为 guest)。 启动该进程后，在发出 instanceart 命令之前，用户与 Firecracker API 交互以配置 microVM。</p>
+<p>Firecracker 内部架构<br><img src="/2020/04/14/firecracker-introduction/org.png" alt="introduce" title="introduce"><br>每个 Firecracker 进程封装一个且只有一个 microVM。 该进程运行以下线程: API、 VMM 和 vCPU。 Api 线程负责 Firecracker 的 API 服务器和相关的控制平面。 它永远不会在虚拟机的快速路径上。 Vmm 线程公开机器模型、最小遗留设备模型、 microVM 元数据服务(MMDS)和 VirtIO 设备仿真 Net 和 Block 设备，并提供 i / o 速率限制。 除此之外，还有一个或多个 vCPU 线程(每个客户 CPU 核心一个)。 它们是通过 KVM 创建的，并运行 KVM run 主循环。 它们在设备模型上执行同步 i / o 和存储器映射输入输出操作。</p>
+<p>Firecracker如何工作<br><img src="/2020/04/14/firecracker-introduction/work.png" alt="introduce" title="introduce"><br>Firecracker 在用户空间中运行，使用基于 Linux 内核的虚拟机（KVM）来创建 microVM。每个 microVM 的快速启动时间和低内存开销使你可将数千个 microVM 打包到同一台机器上。这意味着每个函数或容器组都可以使用虚拟机屏障进行封装，从而使不同用户的工作负载能在同一台计算机上运行，而无需在安全性和效率之间进行权衡。Firecracker 是 QEMU 的替代品，QEMU 是一个成熟的 VMM，具有通用和广泛的功能集，可以托管各种客户操作系统。</p>
+<p>可以通过 RESTful API 控制 Firecracker 进程，RESTful API 可以启用常见操作：例如配置 vCPU 数量或启动计算机。Firecracker 提供内置速率限制器，可精确控制同一台计算机上数千个 microVM 使用的网络和存储资源。你可以通过 Firecracker API 创建和配置速率限制器，并灵活定义速率限制器来支持突发情况或特定带宽 / 操作限制。Firecracker 还提供元数据服务，可在主机和客户机操作系统之间安全地共享配置信息。元数据服务可以使用 Firecracker API 设置。</p>
+<p>Firecracker入门实例<br>1、找个linux电脑并且安装依赖<br>sudo apt update<br>sudo apt install qemu qemu-kvm libvirt-bin bridge-utils virt-manager<br>2、开启cpu虚拟化<br>开机进入bios后<br>Configuratio &gt; Intel Virtual Technology &gt; Enabled<br>3、根据官网进行安装<br>latest=$(basename $(curl -fsSLI -o /dev/null -w  %{url_effective}  <a href="https://github.com/firecracker-microvm/firecracker/releases/latest" target="_blank" rel="external">https://github.com/firecracker-microvm/firecracker/releases/latest</a>))<br>curl -LOJ <a href="https://github.com/firecracker-microvm/firecracker/releases/download/${latest}/firecracker-${latest}-$(uname" target="_blank" rel="external">https://github.com/firecracker-microvm/firecracker/releases/download/${latest}/firecracker-${latest}-$(uname</a> -m)<br>mv firecracker-${latest}-$(uname -m) firecracker<br>chmod +x firecracker<br>至此完成安装步骤<br>4、启动服务<br>rm -f /tmp/firecracker.socket<br>./firecracker –api-sock /tmp/firecracker.socket</p>
+<p>5、再打开一个窗口进行vm配置工作<br>既然是基于kvm的vm那么一定需要rootfs和kernal.原始文件放在aws的s3存储上但是被墙了..<br>这里找到国内的源如下:<br>wget <a href="https://silenceshell-1255345740.cos.ap-shanghai.myqcloud.com/hello-vmlinux.bin" target="_blank" rel="external">https://silenceshell-1255345740.cos.ap-shanghai.myqcloud.com/hello-vmlinux.bin</a><br>wget <a href="https://silenceshell-1255345740.cos.ap-shanghai.myqcloud.com/hello-rootfs.ext4" target="_blank" rel="external">https://silenceshell-1255345740.cos.ap-shanghai.myqcloud.com/hello-rootfs.ext4</a></p>
+<p>通过api配置rootfs与kernal<br>sudo curl –unix-socket /tmp/firecracker.sock -i     -X PUT ‘<a href="http://localhost/boot-source" target="_blank" rel="external">http://localhost/boot-source</a>‘       -H ‘Accept: application/json’               -H ‘Content-Type: application/json’         -d ‘{<br>        “kernel_image_path”: “./hello-vmlinux.bin”,<br>        “boot_args”: “console=ttyS0 reboot=k panic=1 pci=off”<br>    }’</p>
+<p> sudo curl –unix-socket /tmp/firecracker.socket -i     -X PUT ‘<a href="http://localhost/drives/rootfs" target="_blank" rel="external">http://localhost/drives/rootfs</a>‘     -H ‘Accept: application/json’               -H ‘Content-Type: application/json’         -d ‘{<br>        “drive_id”: “rootfs”,<br>        “path_on_host”: “./hello-rootfs.ext4”,<br>        “is_root_device”: true,<br>        “is_read_only”: false<br>    }’<br>5、通过api启动vm<br>sudo curl –unix-socket /tmp/firecracker.socket -i     -X PUT ‘<a href="http://localhost/actions" target="_blank" rel="external">http://localhost/actions</a>‘           -H  ‘Accept: application/json’              -H  ‘Content-Type: application/json’        -d ‘{<br>        “action_type”: “InstanceStart”<br>     }’</p>
+<p>6、最后切换到启动服务的窗口,这时候应该有了登录窗口了,用户名密码默认是root/root<br><img src="/2020/04/14/firecracker-introduction/login.png" alt="introduce" title="introduce"></p>
+<p>firecreaker给我们提供了一种容器之外的解决方案,同时具备容器的轻量但实际上是vm.我们可以针对vm创建tap网络设备,而且由于是vm从而使其可以具有状态.<br>在物联网领域可以与规则引擎结合处理告警或者复杂逻辑运算.<br>在容器领域也可以与kata结合让容器运行在micro vm中,增强容器.</p>
+<p>参考资料:<br><a href="https://www.tuicool.com/articles/memqyaV" target="_blank" rel="external">https://www.tuicool.com/articles/memqyaV</a><br><a href="https://github.com/firecracker-microvm/firecracker/blob/master/docs/getting-started.md" target="_blank" rel="external">https://github.com/firecracker-microvm/firecracker/blob/master/docs/getting-started.md</a><br><a href="https://blog.csdn.net/wangzan18/article/details/104519333" target="_blank" rel="external">https://blog.csdn.net/wangzan18/article/details/104519333</a><br><a href="https://github.com/kata-containers/documentation/issues/351?spm=a2c4e.10696291.0.0.480319a44pfqoF" target="_blank" rel="external">https://github.com/kata-containers/documentation/issues/351?spm=a2c4e.10696291.0.0.480319a44pfqoF</a><br><a href="https://yq.aliyun.com/articles/692117" target="_blank" rel="external">https://yq.aliyun.com/articles/692117</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2020/04/14/firecracker-introduction/" data-id="ck8yulsg70000is79pk5050py" class="article-share-link">Share</a>
       
       
     </footer>
@@ -146,7 +194,7 @@ restart:
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2020/04/13/how-to-unregister-service-from-eureka/" data-id="ck8xdtwxb0008bq79ilae58tq" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2020/04/13/how-to-unregister-service-from-eureka/" data-id="ck8yulshp000ais79q638rl9f" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spring-eureka/">spring eureka</a></li></ul>
@@ -203,7 +251,7 @@ restart:
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2020/01/15/how-to-deploy-logstash-plugin-env/" data-id="ck8xdtwxg000bbq79j9ax1au5" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2020/01/15/how-to-deploy-logstash-plugin-env/" data-id="ck8yulshj0009is79kd7erjr0" class="article-share-link">Share</a>
       
       
     </footer>
@@ -240,7 +288,7 @@ restart:
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/11/11/k8s-install/" data-id="ck8xdtwxj000cbq79mxxm8mps" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2019/11/11/k8s-install/" data-id="ck8yulshw000dis79cfnjg7v6" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/k8s/">k8s</a></li></ul>
@@ -284,7 +332,7 @@ restart:
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/05/05/tracingSystem/" data-id="ck8xdtx0v000wbq794ebqxh0t" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2019/05/05/tracingSystem/" data-id="ck8yulsnr000xis79nz0937i6" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/zipkin-skywalking-cat/">zipkin skywalking cat</a></li></ul>
@@ -325,7 +373,7 @@ restart:
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/01/07/presto-source-code/" data-id="ck8xdtwyh000lbq79ozyzogfo" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2019/01/07/presto-source-code/" data-id="ck8yulsiv000mis79q2d139xy" class="article-share-link">Share</a>
       
       
     </footer>
@@ -365,7 +413,7 @@ restart:
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/12/20/sqoop-huizong/" data-id="ck8xdtwzf000sbq791jzti85d" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/12/20/sqoop-huizong/" data-id="ck8yulskw000tis79hni8eu6x" class="article-share-link">Share</a>
       
       
     </footer>
@@ -478,7 +526,7 @@ df.select(col(&quot;*&quot;) +: fieldCols: _*).show()
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/12/17/how-to-add-col-spark-dataframe/" data-id="ck8xdtww40000bq79zr5x1nqx" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/12/17/how-to-add-col-spark-dataframe/" data-id="ck8yulshe0008is798m261bte" class="article-share-link">Share</a>
       
       
     </footer>
@@ -516,59 +564,7 @@ df.select(col(&quot;*&quot;) +: fieldCols: _*).show()
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/12/17/mysql-HOUR-OF-DAY-2-3/" data-id="ck8xdtwxo000fbq79eua6i71m" class="article-share-link">Share</a>
-      
-      
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-spark-sql-count-as-issue" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/12/13/spark-sql-count-as-issue/" class="article-date">
-  <time datetime="2018-12-13T15:25:33.000Z" itemprop="datePublished">2018-12-13</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/12/13/spark-sql-count-as-issue/">spark-sql-count-as-issue</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>今天遇到了一个奇怪的问题，就是用as的时候，如果别名全部为数字，那么会报错，具体说明如下：<br>准备的数据如下：<br><img src="/2018/12/13/spark-sql-count-as-issue/4.png" alt="data" title="data"><br>如果设置成2或者2-2，那么会报如下错误。如果是’2’效果一样<br><img src="/2018/12/13/spark-sql-count-as-issue/2.png" alt="wrong" title="wrong"><br><img src="/2018/12/13/spark-sql-count-as-issue/3.png" alt="exception" title="exception"><br>如果设置成2_2，则查询正常<br><img src="/2018/12/13/spark-sql-count-as-issue/1.png" alt="right" title="right"></p>
-<p>用的spark和spark sql为2.3.1，pom如下：</p>
-<pre><code>&lt;dependency&gt;
-    &lt;groupId&gt;org.apache.spark&lt;/groupId&gt;
-    &lt;artifactId&gt;spark-core_2.11&lt;/artifactId&gt;
-    &lt;version&gt;2.3.1&lt;/version&gt;
-    &lt;scope&gt;${spark.scope}&lt;/scope&gt;
-&lt;/dependency&gt;
-
-&lt;dependency&gt;
-    &lt;groupId&gt;org.apache.spark&lt;/groupId&gt;
-    &lt;artifactId&gt;spark-sql_2.11&lt;/artifactId&gt;
-    &lt;version&gt;2.3.1&lt;/version&gt;
-    &lt;scope&gt;${spark.scope}&lt;/scope&gt;
-&lt;/dependency&gt;
-</code></pre><p>暂时先用’_’，还没有具体的解决办法</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/12/13/spark-sql-count-as-issue/" data-id="ck8xdtwyu000pbq79bksnphwx" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/12/17/mysql-HOUR-OF-DAY-2-3/" data-id="ck8yulsi2000gis791v0kar0z" class="article-share-link">Share</a>
       
       
     </footer>
@@ -581,7 +577,7 @@ df.select(col(&quot;*&quot;) +: fieldCols: _*).show()
 
 
   <nav id="page-nav">
-    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="extend next" rel="next" href="/page/2/">__('next') &raquo;</a>
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><a class="extend next" rel="next" href="/page/2/">__('next') &raquo;</a>
   </nav>
 </section>
         
@@ -626,7 +622,11 @@ df.select(col(&quot;*&quot;) +: fieldCols: _*).show()
       <ul>
         
           <li>
-            <a href="/2020/04/13/hello-world/">如何搭建新版本hexo</a>
+            <a href="/2020/04/14/hello-world/">如何搭建新版本hexo</a>
+          </li>
+        
+          <li>
+            <a href="/2020/04/14/firecracker-introduction/">firecracker介绍</a>
           </li>
         
           <li>
@@ -639,10 +639,6 @@ df.select(col(&quot;*&quot;) +: fieldCols: _*).show()
         
           <li>
             <a href="/2019/11/11/k8s-install/">k8s安装</a>
-          </li>
-        
-          <li>
-            <a href="/2019/05/05/tracingSystem/">链路追踪系统之选型篇</a>
           </li>
         
       </ul>
