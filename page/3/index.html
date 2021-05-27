@@ -61,6 +61,44 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-openstack-newton-mysql-config" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2016/12/12/openstack-newton-mysql-config/" class="article-date">
+  <time datetime="2016-12-12T14:26:55.000Z" itemprop="datePublished">2016-12-12</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2016/12/12/openstack-newton-mysql-config/">openstack新版本（newton）初始化sql报长度太长的解决方法</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>今天想安装一下最新的os，结果又tm各种新问题。遇到一个记录一个吧。<br>这次遇到的是数据库问题，错误信息如下：<br>2016-12-12 22:15:28.991 4450 ERROR keystone     self._affected_rows = self._read_query_result(unbuffered=unbuffered)<br>2016-12-12 22:15:28.991 4450 ERROR keystone   File “/usr/lib/python2.7/dist-packages/pymysql/connections.py”, line 1002, in _read_query_result<br>2016-12-12 22:15:28.991 4450 ERROR keystone     result.read()<br>2016-12-12 22:15:28.991 4450 ERROR keystone   File “/usr/lib/python2.7/dist-packages/pymysql/connections.py”, line 1285, in read<br>2016-12-12 22:15:28.991 4450 ERROR keystone     first_packet = self.connection._read_packet()<br>2016-12-12 22:15:28.991 4450 ERROR keystone   File “/usr/lib/python2.7/dist-packages/pymysql/connections.py”, line 966, in _read_packet<br>2016-12-12 22:15:28.991 4450 ERROR keystone     packet.check_error()<br>2016-12-12 22:15:28.991 4450 ERROR keystone   File “/usr/lib/python2.7/dist-packages/pymysql/connections.py”, line 394, in check_error<br>2016-12-12 22:15:28.991 4450 ERROR keystone     err.raise_mysql_exception(self._data)<br>2016-12-12 22:15:28.991 4450 ERROR keystone   File “/usr/lib/python2.7/dist-packages/pymysql/err.py”, line 120, in raise_mysql_exception<br>2016-12-12 22:15:28.991 4450 ERROR keystone     _check_mysql_exception(errinfo)<br>2016-12-12 22:15:28.991 4450 ERROR keystone   File “/usr/lib/python2.7/dist-packages/pymysql/err.py”, line 115, in _check_mysql_exception<br>2016-12-12 22:15:28.991 4450 ERROR keystone     raise InternalError(errno, errorvalue)<br>2016-12-12 22:15:28.991 4450 ERROR keystone DBError: (pymysql.err.InternalError) (1071, u’Specified key was too long; max key length is 767 bytes’) [SQL: u’\nCREATE TABLE migrate_version (\n\trepository_id VARCHAR(250) NOT NULL, \n\trepository_path TEXT, \n\tversion INTEGER, \n\tPRIMARY KEY (repository_id)\n)\n\n’]</p>
+<p>上网一查才知道跟字符集还有关系。utf8的要长点。导致的问题。<br>百思不得其姐，后来报着装大运的心态竟然给解决了。。。。。。<br>按照官网上的文档是这样初始化数据库的：<br>CREATE DATABASE keystone;<br>而实际上如果执行<br>CREATE SCHEMA <code>keystone</code> DEFAULT CHARACTER SET utf8 ;<br>再执行<br>su -s /bin/sh -c “keystone-manage db_sync” keystone<br>就能正常初始化了！！！！！！<br>太tm神奇了。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2016/12/12/openstack-newton-mysql-config/" data-id="ckp76575p000n9z79gkp2uwow" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
     <article id="how-to-install-ubuntu16-in-virtualbox-如何在virtualbox中安装ubuntu16" class="article article-type-how-to-install-ubuntu16-in-virtualbox" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2016/11/29/如何在virtualbox中安装ubuntu16/" class="article-date">
@@ -89,7 +127,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2016/11/29/如何在virtualbox中安装ubuntu16/" data-id="ck9fngvic0014fm79646ykdiu" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2016/11/29/如何在virtualbox中安装ubuntu16/" data-id="ckp76576z00149z794yzmhlyq" class="article-share-link">Share</a>
       
       
     </footer>
@@ -126,7 +164,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2016/11/24/写给自己/" data-id="ck9fngvhx0013fm79zz1do43e" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2016/11/24/写给自己/" data-id="ckp76576t00139z79wxfl87kl" class="article-share-link">Share</a>
       
       
     </footer>
@@ -152,7 +190,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Tags</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/flume/">flume</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/k8s/">k8s</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack-neutron/">openstack neutron</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spark-classload-ClassNotFound/">spark classload ClassNotFound</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring/">spring</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring-eureka/">spring eureka</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tensroflow/">tensroflow</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/zipkin-skywalking-cat/">zipkin skywalking cat</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/阿里云-sgoop-presto/">阿里云 sgoop presto</a></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/flume/">flume</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/influx-proxy/">influx-proxy</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/k8s/">k8s</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack-neutron/">openstack neutron</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spark-classload-ClassNotFound/">spark classload ClassNotFound</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring/">spring</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring-eureka/">spring eureka</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tensroflow/">tensroflow</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/zipkin-skywalking-cat/">zipkin skywalking cat</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/阿里云-sgoop-presto/">阿里云 sgoop presto</a></li></ul>
     </div>
   </div>
 
@@ -162,7 +200,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/flume/" style="font-size: 10px;">flume</a> <a href="/tags/k8s/" style="font-size: 10px;">k8s</a> <a href="/tags/openstack-neutron/" style="font-size: 10px;">openstack neutron</a> <a href="/tags/spark-classload-ClassNotFound/" style="font-size: 10px;">spark classload ClassNotFound</a> <a href="/tags/spring/" style="font-size: 20px;">spring</a> <a href="/tags/spring-eureka/" style="font-size: 10px;">spring eureka</a> <a href="/tags/tensroflow/" style="font-size: 10px;">tensroflow</a> <a href="/tags/zipkin-skywalking-cat/" style="font-size: 10px;">zipkin skywalking cat</a> <a href="/tags/阿里云-sgoop-presto/" style="font-size: 10px;">阿里云 sgoop presto</a>
+      <a href="/tags/flume/" style="font-size: 10px;">flume</a> <a href="/tags/influx-proxy/" style="font-size: 10px;">influx-proxy</a> <a href="/tags/k8s/" style="font-size: 10px;">k8s</a> <a href="/tags/openstack-neutron/" style="font-size: 10px;">openstack neutron</a> <a href="/tags/spark-classload-ClassNotFound/" style="font-size: 10px;">spark classload ClassNotFound</a> <a href="/tags/spring/" style="font-size: 20px;">spring</a> <a href="/tags/spring-eureka/" style="font-size: 10px;">spring eureka</a> <a href="/tags/tensroflow/" style="font-size: 10px;">tensroflow</a> <a href="/tags/zipkin-skywalking-cat/" style="font-size: 10px;">zipkin skywalking cat</a> <a href="/tags/阿里云-sgoop-presto/" style="font-size: 10px;">阿里云 sgoop presto</a>
     </div>
   </div>
 
@@ -171,7 +209,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Archives</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/04/">April 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/01/">January 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">November 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/05/">May 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">January 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">December 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">October 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">September 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">December 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">November 2016</a></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/05/">May 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/04/">April 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/01/">January 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">November 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/05/">May 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">January 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">December 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">October 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">September 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">December 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">November 2016</a></li></ul>
     </div>
   </div>
 
@@ -184,7 +222,11 @@
       <ul>
         
           <li>
-            <a href="/2020/04/25/hello-world/">如何搭建新版本hexo</a>
+            <a href="/2021/05/28/hello-world/">如何搭建新版本hexo</a>
+          </li>
+        
+          <li>
+            <a href="/2021/05/28/influx-proxy-problemlist/">influx-proxy部署遇到的问题</a>
           </li>
         
           <li>
@@ -199,10 +241,6 @@
             <a href="/2020/04/13/how-to-unregister-service-from-eureka/">如何安全优雅的把spring微服务从eureka上注销</a>
           </li>
         
-          <li>
-            <a href="/2020/01/15/how-to-deploy-logstash-plugin-env/">logstash jdbc plugin 优化</a>
-          </li>
-        
       </ul>
     </div>
   </div>
@@ -215,7 +253,7 @@
   
   <div class="outer">
     <div id="footer-info" class="inner">
-      &copy; 2020 wfliu<br>
+      &copy; 2021 wfliu<br>
       Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
     </div>
   </div>

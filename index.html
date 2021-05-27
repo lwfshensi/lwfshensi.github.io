@@ -63,8 +63,8 @@
   
     <article id="post-hello-world" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
-    <a href="/2020/04/25/hello-world/" class="article-date">
-  <time datetime="2020-04-25T13:18:53.920Z" itemprop="datePublished">2020-04-25</time>
+    <a href="/2021/05/28/hello-world/" class="article-date">
+  <time datetime="2021-05-27T17:27:03.784Z" itemprop="datePublished">2021-05-28</time>
 </a>
     
   </div>
@@ -75,7 +75,7 @@
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2020/04/25/hello-world/">如何搭建新版本hexo</a>
+      <a class="article-title" href="/2021/05/28/hello-world/">如何搭建新版本hexo</a>
     </h1>
   
 
@@ -88,9 +88,57 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2020/04/25/hello-world/" data-id="ck9fngvdt000efm79adzl9ne5" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2021/05/28/hello-world/" data-id="ckp765754000a9z791hvzo0jc" class="article-share-link">Share</a>
       
       
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-influx-proxy-problemlist" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2021/05/28/influx-proxy-problemlist/" class="article-date">
+  <time datetime="2021-05-27T17:08:42.000Z" itemprop="datePublished">2021-05-28</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2021/05/28/influx-proxy-problemlist/">influx-proxy部署遇到的问题</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>环境说明：<br>influxdb 1.8.2<br>influx-proxy采用shell909090<br>系统采用centos7<br>记录过程如下：<br>1、网络问题<br>因为墙的原因，访问不了google的地址，这时启用了科学翻墙工具<br>用http_proxy和https_proxy来设置<br>2、一开始安装的golang 1.11版本<br>安装influx-proxy报错如下：<br>package github.com/influxdata/influxdb/client/v2: cannot find package “github.com/influxdata/influxdb/client/v2” in any of:<br>/usr/lib/go/src/github.com/influxdata/influxdb/client/v2 (from $GOROOT)<br>/home/test/go/src/github.com/influxdata/influxdb/client/v2 (from $GOPATH)<br>尝试独立安装golang的influxdb client<br>参考如下：<br><a href="https://pkg.go.dev/github.com/influxdata/influxdb-client-go/v2#readme-installation" target="_blank" rel="external">https://pkg.go.dev/github.com/influxdata/influxdb-client-go/v2#readme-installation</a><br>采用命令go get github.com/influxdata/influxdb-client-go/v2安装<br>仍然报错<br>这时找到如下资料：<br><a href="https://github.com/influxdata/influxdb-client-go/issues/186" target="_blank" rel="external">https://github.com/influxdata/influxdb-client-go/issues/186</a><br>怀疑是官方代码有问题，不过人家已经在去年8月份修复了<br>这时又查到一篇文章<br><a href="https://github.com/shell909090/influx-proxy/issues/64" target="_blank" rel="external">https://github.com/shell909090/influx-proxy/issues/64</a><br>这里有人提到了可以使用influxdb1-client来代替。<br>“问题还在<br>解决办法：<br>go get - u github.com/influxdata/influxdb1-client （新的依赖地址）<br>go get -u github.com/shell909090/influx-proxy/service<br>报错之后<br>找到（go env）$GOPATH/src/github.com/shell909090/influx-proxy/monitor/metric.go<br>修改为 client “github.com/influxdata/influxdb1-client/v2”<br>到$GOPATH/src/github.com/shell909090/influx-proxy/service目录 go install 然后步骤就顺了”<br>此时却是安装成功了，buginflux-proxy服务起来后从日志（/var/log/influx-proxy.log）上开开始报异常<br>2021/05/27 21:44:42.643833 http.go:99: http error: Get “<a href="http://xxxx:9999/ping" target="_blank" rel="external">http://xxxx:9999/ping</a>“: context deadline exceeded (Client.Timeout exceeded while awaiting headers)<br>2021/05/27 21:44:53.644209 http.go:99: http error: Get “<a href="http://xxxx:9999/ping" target="_blank" rel="external">http://xxxx:9999/ping</a>“: context deadline exceeded (Client.Timeout exceeded while awaiting headers)<br>2021/05/27 21:44:53.644204 http.go:99: http error: Get “<a href="http://xxxx:9999/ping" target="_blank" rel="external">http://xxxx:9999/ping</a>“: context deadline exceeded (Client.Timeout exceeded while awaiting headers)<br>2021/05/27 21:45:04.645219 http.go:99: http error: Get “<a href="http://xxxx:9999/ping" target="_blank" rel="external">http://xxxx:9999/ping</a>“: context deadline exceeded (Client.Timeout exceeded while awaiting headers)<br>2021/05/27 21:45:04.645221 http.go:99: http error: Get “<a href="http://xxx:9999/ping" target="_blank" rel="external">http://xxx:9999/ping</a>“: context deadline exceeded (Client.Timeout exceeded while awaiting headers)<br>也就是连不上我的两个influxdb服务</p>
+<p>最后再回过头来再仔细看influxdb-client-go的安装文档<br>发现要求golang版本必须1.13以上并且influxdb1只针对influxdb1.7之前的版本，1.8之后的在v2里<br>此时重新按转golang和influx-proxy，启动仍然报异常，通过curl命令得到如下异常信息：<br> (```[root@abc github.com]# curl <a href="http://127.0.0.1:8086/ping" target="_blank" rel="external">http://127.0.0.1:8086/ping</a></p>
+<p><html></html></p>
+<p><head><br> <title>500 Internal Privoxy Error</title><br> <link rel="shortcut icon" href="http://config.privoxy.org/error-favicon.ico" type="image/x-icon"></head></p>
+<p><body></body></p>
+<p></p><h1>500 Internal Privoxy Error</h1><p></p>
+<p></p><p>Privoxy encountered an error while processing your request:</p><p></p>
+<p></p><p><b>Could not load template file <code>connect-failed</code> or one of its included components.</b></p><p></p>
+<p></p><p>Please contact your proxy administrator.</p><p></p>
+<p></p><p>If you are the proxy administrator, please put the required file(s)in the <code><i>(confdir)</i>/templates</code> directory.  The location of the <code><i>(confdir)</i></code> directory is specified in the main Privoxy <code>config</code> file.  (It’s typically the Privoxy install directory, or <code>/etc/privoxy/</code>).</p><br><br><br>```)<br>发现是原来设置了http代理的问题，<br>该用goproxy才最终成功，这里值得一提的事golang1.11版本不支持goproxy。<p></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2021/05/28/influx-proxy-problemlist/" data-id="ckp765o650000a679bv7zltxk" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/influx-proxy/">influx-proxy</a></li></ul>
+
     </footer>
   </div>
   
@@ -142,7 +190,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2020/04/25/build-flume-ha/" data-id="ck9fngvcz0003fm79m7yi7ffg" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2020/04/25/build-flume-ha/" data-id="ckp76574z00039z79qn8luu25" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/flume/">flume</a></li></ul>
@@ -198,7 +246,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2020/04/14/firecracker-introduction/" data-id="ck9fngvd80007fm79vvu927a1" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2020/04/14/firecracker-introduction/" data-id="ckp76575100069z793ybsv5t9" class="article-share-link">Share</a>
       
       
     </footer>
@@ -258,7 +306,7 @@ restart:
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2020/04/13/how-to-unregister-service-from-eureka/" data-id="ck9fngvdn000bfm79j1ffmr05" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2020/04/13/how-to-unregister-service-from-eureka/" data-id="ckp765759000d9z79m9yfcn8o" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spring-eureka/">spring eureka</a></li></ul>
@@ -315,7 +363,7 @@ restart:
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2020/01/15/how-to-deploy-logstash-plugin-env/" data-id="ck9fngvdx000ffm79av2g0bf9" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2020/01/15/how-to-deploy-logstash-plugin-env/" data-id="ckp765758000c9z798wga78nb" class="article-share-link">Share</a>
       
       
     </footer>
@@ -352,7 +400,7 @@ restart:
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/11/11/k8s-install/" data-id="ck9fngved000jfm792ii61qbi" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2019/11/11/k8s-install/" data-id="ckp76575k000g9z797uimnyg9" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/k8s/">k8s</a></li></ul>
@@ -396,7 +444,7 @@ restart:
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/05/05/tracingSystem/" data-id="ck9fngvhs0010fm792gs4jt6v" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2019/05/05/tracingSystem/" data-id="ckp76576400109z79d48ds3ns" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/zipkin-skywalking-cat/">zipkin skywalking cat</a></li></ul>
@@ -437,7 +485,7 @@ restart:
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/01/07/presto-source-code/" data-id="ck9fngvev000pfm79v5f1nv3g" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2019/01/07/presto-source-code/" data-id="ckp76575x000p9z793pntkj3n" class="article-share-link">Share</a>
       
       
     </footer>
@@ -477,120 +525,7 @@ restart:
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/12/20/sqoop-huizong/" data-id="ck9fngvfz000wfm798zrhqqyf" class="article-share-link">Share</a>
-      
-      
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-how-to-add-col-spark-dataframe" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/12/17/how-to-add-col-spark-dataframe/" class="article-date">
-  <time datetime="2018-12-17T15:22:06.000Z" itemprop="datePublished">2018-12-17</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/12/17/how-to-add-col-spark-dataframe/">如何给spark表添加一列</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>刚开始接触spark的时候遇到一个特别中二的问题。<br>我从两张表里查数据，这两张表里都只有一行，如何把这两张表合并起来呢？？？？<br>然后我特缺心眼的从网上搜，spark添加列的方式。<br>好吧。。。前情交代完毕。<br>说说过程<br>解决方式特简单，用join就tm可以了。<br>好了<br>话题说到这里就结束哦了吗？？？？<br>那我还写个鸡毛！<br>之后我翻阅了一下我搜到的如何增加一列的问题！<br>首先先看如何增加一个常数列<br>代码如下：<br>        val tempDataFrame = spark.createDataFrame(Seq(<br>            (1, “asf”),<br>            (2, “2143”),<br>            (3, “rfds”)<br>        )).toDF(“id”, “content”)<br>        val addColDataframe = tempDataFrame.withColumn(“col”, tempDataFrame(“id”)*2)<br>        addColDataframe.show(10,false)</p>
-<p>+—+——-+—+<br>|id |content|col|<br>+—+——-+—+<br>|1  |asf    |2  |<br>|2  |2143   |4  |<br>|3  |rfds   |6  |<br>+—+——-+—+</p>
-<p>然后用udf来实现一个复杂一些的：<br>        import scala.util.Try<br>        import org.apache.spark.sql.functions._<br>        val tempDataFrame = spark.createDataFrame(Seq(<br>            (“1”, “2”),<br>            (“2”, “3”),<br>            (“3”, “1”)<br>        )).toDF(“content1”, “content2”)</p>
-<pre><code>val code = (arg1: String, arg2: String) =&gt; {
-    Try(if (arg1.toInt &gt; arg2.toInt) &quot;arg1&gt;arg2&quot; else &quot;arg1&lt;=arg2&quot;).getOrElse(&quot;error&quot;)
-}
-val compareUdf = udf(code)
-
-val addColDataframe = tempDataFrame.withColumn(&quot;compare&quot;, compareUdf(tempDataFrame(&quot;content1&quot;),tempDataFrame(&quot;content2&quot;)))
-addColDataframe.show(10, false)
-</code></pre><p>+——–+——–+———-+<br>|content1|content2|compare   |<br>+——–+——–+———-+<br>|1       |2       |arg1&lt;=arg2|<br>|2       |3       |arg1&lt;=arg2|<br>|3       |1       |arg1&gt;arg2 |<br>+——–+——–+———-+</p>
-<p>这样添加的一列就可以是比较复杂的了。<br>参考资料如下：<br><a href="http://www.cnblogs.com/TTyb/p/7169148.html" target="_blank" rel="external">http://www.cnblogs.com/TTyb/p/7169148.html</a></p>
-<p>让我们再深入一些！<br>如何添加唯一的一列，对！就是类似主键的那样<br>两种方式：<br>第一种 使用zipWithUniqueId获取id 并重建 DataFrame.<br>        import spark.implicits._<br>        import org.apache.spark.sql.Row<br>        import org.apache.spark.sql.types.{StructType, StructField, LongType}</p>
-<pre><code>val df =Seq((&quot;a&quot;, -1.0), (&quot;b&quot;, -2.0), (&quot;c&quot;, -3.0)).toDF(&quot;foo&quot;, &quot;bar&quot;)
-// 获取df 的表头
-val s = df.schema
-
-// 将原表转换成带有rdd,
-//再转换成带有id的rdd,
-//再展开成Seq方便转化成 Dataframe
-val rows = df.rdd.zipWithUniqueId.map{case (r: Row, id: Long) =&gt; Row.fromSeq(id +: r.toSeq)}
-
-// 再由 row 根据原表头进行转换
-val dfWithPK = spark.createDataFrame( rows, StructType(StructField(&quot;id&quot;, LongType, false) +: s.fields))
-dfWithPK.show
-</code></pre><p>+—+—+—-+<br>| id|foo| bar|<br>+—+—+—-+<br>|  0|  a|-1.0|<br>|  1|  b|-2.0|<br>|  2|  c|-3.0|<br>+—+—+—-+</p>
-<p>以上可以实现自增列。<br>第二种：直接使用spark 自己的api,monotonicallyIncreasingId<br>        val df =Seq((“a”, -1.0), (“b”, -2.0), (“c”, -3.0)).toDF(“foo”, “bar”)<br>        import org.apache.spark.sql.functions.monotonically_increasing_id<br>        df.withColumn(“id”, monotonically_increasing_id).show()</p>
-<p>+—+—-+—+<br>|foo| bar| id|<br>+—+—-+—+<br>|  a|-1.0|  0|<br>|  b|-2.0|  1|<br>|  c|-3.0|  2|<br>+—+—-+—+<br>注意这里也是自增列</p>
-<p>还有第三种：使用createDateFrame<br>        val input =Seq((“a”, 100.0), (“b”, -2.0), (“c”, -3.0)).toDF(“foo”, “bar”)<br>        var critValueR = 0<br>        var critValueL = -10</p>
-<pre><code>val trdd = input.select(&quot;bar&quot;).rdd.map(x=&gt;{
-    if (x.get(0).toString().toDouble &gt; critValueR || x.get(0).toString().toDouble &lt; critValueL)
-        Row(x.get(0).toString().toDouble,&quot;F&quot;)
-    else Row(x.get(0).toString().toDouble,&quot;T&quot;)
-})
-val schema = input.select(&quot;bar&quot;).schema.add(&quot;flag&quot;, StringType, true)
-val sample3 = spark.createDataFrame(trdd, schema).distinct().withColumnRenamed(&quot;flag&quot;, &quot;idx&quot;)
-sample3.show
-</code></pre><p>+—–+—+<br>|  bar|idx|<br>+—–+—+<br>| -3.0|  T|<br>|100.0|  F|<br>| -2.0|  T|<br>+—–+—+</p>
-<p>觉得比较直观且开放性大的还是实用udf。</p>
-<p>参考资料：<br><a href="https://www.jianshu.com/p/7e6e406dd15b" target="_blank" rel="external">https://www.jianshu.com/p/7e6e406dd15b</a></p>
-<p>。。。。。。。。。。你以为这就完了？。。。。。。<br>那我还写个毛线。。。。。。<br>后来又发现了对列的拆分和合并</p>
-<p>1、如何合并列：<br>        val df =Seq((“Ming”,20,”15552211521”), (“hong”,19,”13287994007”), (“zhi”,21,”15552211523”)).toDF(“name”,”age”, “phone”)<br>        val separator = “,”<br>        df.map(<em>.toSeq.foldLeft(“”)(</em> + separator + _).substring(1)).show()<br>+——————-+<br>|              value|<br>+——————-+<br>|Ming,20,15552211521|<br>|hong,19,13287994007|<br>| zhi,21,15552211523|<br>+——————-+<br>也可以使用concat<em>ws:<br>        import org.apache.spark.sql.functions.</em><br>        df.select(concat_ws(separator, $”name”, $”age”, $”phone”).cast(StringType).as(“value”)).show()</p>
-<p>结果一样<br>第三种实用udf！<br>       def mergeCols(row: Row): String = {<br>            row.toSeq.foldLeft(“”)(<em> + separator + </em>).substring(1)<br>        }</p>
-<pre><code>val mergeColsUDF = udf(mergeCols _)
-df.select(mergeColsUDF(struct($&quot;name&quot;, $&quot;age&quot;, $&quot;phone&quot;)).as(&quot;value&quot;)).show()
-</code></pre><p>结果也是同上</p>
-<p>2、如何拆分列呢？<br>a、实用split<br>    val df =Seq((“Ming,20,15552211521”), (“hong,19,13287994007”), (“zhi,21,15552211523”)).toDF(“value”)<br>    val separator = “,”<br>    lazy val first = df.first()</p>
-<pre><code>val numAttrs = first.toString().split(separator).length
-val attrs = Array.tabulate(numAttrs)(n =&gt; &quot;col_&quot; + n)
-//按指定分隔符拆分value列，生成splitCols列
-var newDF = df.withColumn(&quot;splitCols&quot;, split($&quot;value&quot;, separator))
-attrs.zipWithIndex.foreach(x =&gt; {
-  newDF = newDF.withColumn(x._1, $&quot;splitCols&quot;.getItem(x._2))
-})
-newDF.show()
-</code></pre><p>+——————-+——————–+—–+—–+———–+<br>|              value|           splitCols|col_0|col_1|      col_2|<br>+——————-+——————–+—–+—–+———–+<br>|Ming,20,15552211521|[Ming, 20, 155522…| Ming|   20|15552211521|<br>|hong,19,13287994007|[hong, 19, 132879…| hong|   19|13287994007|<br>| zhi,21,15552211523|[zhi, 21, 1555221…|  zhi|   21|15552211523|<br>+——————-+——————–+—–+—–+———–+</p>
-<p>b、实用udf：<br>        import org.apache.spark.ml.attribute.{Attribute, NumericAttribute}</p>
-<pre><code>val df =Seq((&quot;Ming,20,15552211521&quot;), (&quot;hong,19,13287994007&quot;), (&quot;zhi,21,15552211523&quot;)).toDF(&quot;value&quot;)
-val separator = &quot;,&quot;
-lazy val first = df.first()
-val attributes: Array[Attribute] = {
-    val numAttrs = first.toString().split(separator).length
-    //生成attributes
-    Array.tabulate(numAttrs)(i =&gt; NumericAttribute.defaultAttr.withName(&quot;value&quot; + &quot;_&quot; + i))
-}
-//创建多列数据
-val fieldCols = attributes.zipWithIndex.map(x =&gt; {
-    val assembleFunc = udf {
-        str: String =&gt;
-            str.split(separator)(x._2)
-    }
-    assembleFunc(df(&quot;value&quot;).cast(StringType)).as(x._1.name.get, x._1.toMetadata())
-})
-//合并数据
-df.select(col(&quot;*&quot;) +: fieldCols: _*).show()
-</code></pre><p>+——————-+——————–+—–+—–+———–+<br>|              value|           splitCols|col_0|col_1|      col_2|<br>+——————-+——————–+—–+—–+———–+<br>|Ming,20,15552211521|[Ming, 20, 155522…| Ming|   20|15552211521|<br>|hong,19,13287994007|[hong, 19, 132879…| hong|   19|13287994007|<br>| zhi,21,15552211523|[zhi, 21, 1555221…|  zhi|   21|15552211523|<br>+——————-+——————–+—–+—–+———–+<br>参考资料：<br><a href="http://www.cnblogs.com/itboys/p/9813934.html" target="_blank" rel="external">http://www.cnblogs.com/itboys/p/9813934.html</a></p>
-<p>综上所述，udf还是很牛逼的。</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/12/17/how-to-add-col-spark-dataframe/" data-id="ck9fngvd60006fm79up6g4xyl" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/12/20/sqoop-huizong/" data-id="ckp765762000w9z79fino0xvo" class="article-share-link">Share</a>
       
       
     </footer>
@@ -616,7 +551,7 @@ df.select(col(&quot;*&quot;) +: fieldCols: _*).show()
   <div class="widget-wrap">
     <h3 class="widget-title">Tags</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/flume/">flume</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/k8s/">k8s</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack-neutron/">openstack neutron</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spark-classload-ClassNotFound/">spark classload ClassNotFound</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring/">spring</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring-eureka/">spring eureka</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tensroflow/">tensroflow</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/zipkin-skywalking-cat/">zipkin skywalking cat</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/阿里云-sgoop-presto/">阿里云 sgoop presto</a></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/flume/">flume</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/influx-proxy/">influx-proxy</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/k8s/">k8s</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack-neutron/">openstack neutron</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spark-classload-ClassNotFound/">spark classload ClassNotFound</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring/">spring</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring-eureka/">spring eureka</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tensroflow/">tensroflow</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/zipkin-skywalking-cat/">zipkin skywalking cat</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/阿里云-sgoop-presto/">阿里云 sgoop presto</a></li></ul>
     </div>
   </div>
 
@@ -626,7 +561,7 @@ df.select(col(&quot;*&quot;) +: fieldCols: _*).show()
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/flume/" style="font-size: 10px;">flume</a> <a href="/tags/k8s/" style="font-size: 10px;">k8s</a> <a href="/tags/openstack-neutron/" style="font-size: 10px;">openstack neutron</a> <a href="/tags/spark-classload-ClassNotFound/" style="font-size: 10px;">spark classload ClassNotFound</a> <a href="/tags/spring/" style="font-size: 20px;">spring</a> <a href="/tags/spring-eureka/" style="font-size: 10px;">spring eureka</a> <a href="/tags/tensroflow/" style="font-size: 10px;">tensroflow</a> <a href="/tags/zipkin-skywalking-cat/" style="font-size: 10px;">zipkin skywalking cat</a> <a href="/tags/阿里云-sgoop-presto/" style="font-size: 10px;">阿里云 sgoop presto</a>
+      <a href="/tags/flume/" style="font-size: 10px;">flume</a> <a href="/tags/influx-proxy/" style="font-size: 10px;">influx-proxy</a> <a href="/tags/k8s/" style="font-size: 10px;">k8s</a> <a href="/tags/openstack-neutron/" style="font-size: 10px;">openstack neutron</a> <a href="/tags/spark-classload-ClassNotFound/" style="font-size: 10px;">spark classload ClassNotFound</a> <a href="/tags/spring/" style="font-size: 20px;">spring</a> <a href="/tags/spring-eureka/" style="font-size: 10px;">spring eureka</a> <a href="/tags/tensroflow/" style="font-size: 10px;">tensroflow</a> <a href="/tags/zipkin-skywalking-cat/" style="font-size: 10px;">zipkin skywalking cat</a> <a href="/tags/阿里云-sgoop-presto/" style="font-size: 10px;">阿里云 sgoop presto</a>
     </div>
   </div>
 
@@ -635,7 +570,7 @@ df.select(col(&quot;*&quot;) +: fieldCols: _*).show()
   <div class="widget-wrap">
     <h3 class="widget-title">Archives</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/04/">April 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/01/">January 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">November 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/05/">May 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">January 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">December 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">October 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">September 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">December 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">November 2016</a></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/05/">May 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/04/">April 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/01/">January 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">November 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/05/">May 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">January 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">December 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">October 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">September 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">December 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">November 2016</a></li></ul>
     </div>
   </div>
 
@@ -648,7 +583,11 @@ df.select(col(&quot;*&quot;) +: fieldCols: _*).show()
       <ul>
         
           <li>
-            <a href="/2020/04/25/hello-world/">如何搭建新版本hexo</a>
+            <a href="/2021/05/28/hello-world/">如何搭建新版本hexo</a>
+          </li>
+        
+          <li>
+            <a href="/2021/05/28/influx-proxy-problemlist/">influx-proxy部署遇到的问题</a>
           </li>
         
           <li>
@@ -663,10 +602,6 @@ df.select(col(&quot;*&quot;) +: fieldCols: _*).show()
             <a href="/2020/04/13/how-to-unregister-service-from-eureka/">如何安全优雅的把spring微服务从eureka上注销</a>
           </li>
         
-          <li>
-            <a href="/2020/01/15/how-to-deploy-logstash-plugin-env/">logstash jdbc plugin 优化</a>
-          </li>
-        
       </ul>
     </div>
   </div>
@@ -679,7 +614,7 @@ df.select(col(&quot;*&quot;) +: fieldCols: _*).show()
   
   <div class="outer">
     <div id="footer-info" class="inner">
-      &copy; 2020 wfliu<br>
+      &copy; 2021 wfliu<br>
       Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
     </div>
   </div>
