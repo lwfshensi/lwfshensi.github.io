@@ -63,8 +63,8 @@
   
     <article id="post-hello-world" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
-    <a href="/2021/05/28/hello-world/" class="article-date">
-  <time datetime="2021-05-27T17:27:03.784Z" itemprop="datePublished">2021-05-28</time>
+    <a href="/2024/07/17/hello-world/" class="article-date">
+  <time datetime="2024-07-17T13:13:36.139Z" itemprop="datePublished">2024-07-17</time>
 </a>
     
   </div>
@@ -75,7 +75,7 @@
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2021/05/28/hello-world/">如何搭建新版本hexo</a>
+      <a class="article-title" href="/2024/07/17/hello-world/">如何搭建新版本hexo</a>
     </h1>
   
 
@@ -88,9 +88,72 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2021/05/28/hello-world/" data-id="ckp765754000a9z791hvzo0jc" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2024/07/17/hello-world/" data-id="clypv5bij000d6y79hhhmmvz6" class="article-share-link">Share</a>
       
       
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-Doris-begin" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2024/07/17/Doris-begin/" class="article-date">
+  <time datetime="2024-07-17T11:59:10.000Z" itemprop="datePublished">2024-07-17</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2024/07/17/Doris-begin/">Doris使用入门</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>  本文着重介绍doris使用。<br>  按照数据的时效性要求，分为实时报表与准实时报表。<br>  实时报表的实现：<br>  通过apache flink实时同步mysql binlog、mongodDB oplog、kafka的数据通过Flink Doris Connector 插件把数据实时插入到doris中产生实时报表。<br>  这里简单介绍一下Flink CDC：<br>  CDC 是变更数据捕获（Change Data Capture）技术的缩写，它可以将源数据库（Source）的增量变动记录，同步到一个或多个数据目的（Sink）。在同步过程中，还可以对数据进行一定的处理，例如分组（GROUP BY）、多表的关联（JOIN）等。通常来讲，CDC 分为主动查询和事件接收两种技术实现模式。</p>
+<p>  对于主动查询而言，用户通常会在数据源表的某个字段中，保存上次更新的时间戳或版本号等信息，然后下游通过不断的查询和与上次的记录做对比，来确定数据是否有变动，是否需要同步。这种方式优点是不涉及数据库底层特性，实现比较通用；缺点是要对业务表做改造，且实时性不高，不能确保跟踪到所有的变更记录，且持续的频繁查询对数据库的压力较大。<br>  事件接收模式可以通过触发器（Trigger）或者日志（例如 Transaction log、Binary log、Write-ahead log 等）来实现。当数据源表发生变动时，会通过附加在表上的触发器或者 binlog 等途径，将操作记录下来。下游可以通过数据库底层的协议，订阅并消费这些事件，然后对数据库变动记录做重放，从而实现同步。这种方式的优点是实时性高，可以精确捕捉上游的各种变动；缺点是部署数据库的事件接收和解析器（例如 Debezium、Canal 等），有一定的学习和运维成本，对一些冷门的数据库支持不够。<br>  综合来看，事件接收模式整体在实时性、吞吐量方面占优，如果数据源是 MySQL、PostgreSQL、MongoDB 等常见的数据库实现，建议使用 Debezium 来实现变更数据的捕获（下图来自 Debezium 官方文档）。如果使用的只有 MySQL，则还可以用 Canal。<br>   以下是debezium的架构：<br>   <img src="/2024/07/17/Doris-begin/debezium.png" alt="debezium" title="debezium"><br>   那么有debezium还是要选择flink的原因有哪些呢：<br>   从上图可以看到，Debezium 官方架构图中，是通过 Kafka Streams 直接实现的 CDC 功能。而我们这里更建议使用 Flink CDC 模块，因为 Flink 相对 Kafka Streams 而言，有如下优势：<br>  Flink 的算子和 SQL 模块更为成熟和易用<br>  Flink 作业可以通过调整算子并行度的方式，轻松扩展处理能力<br>  Flink 支持高级的状态后端（State Backends），允许存取海量的状态数据<br>  Flink 提供更多的 Source 和 Sink 等生态支持<br>  Flink 有更大的用户基数和活跃的支持社群，问题更容易解决<br>Flink 的开源协议允许云厂商进行全托管的深度定制，而 Kafka Streams 只能自行部署和运维。而且 Flink Table / SQL 模块将数据库表和变动记录流（例如 CDC 的数据流）看做是同一事物的两面，因此内部提供的 Upsert 消息结构（+I 表示新增、-U 表示记录更新前的值、+U 表示记录更新后的值，-D 表示删除）可以与 Debezium 等生成的变动记录一一对应。<br>   从上图可以看到，Debezium 官方架构图中，是通过 Kafka Streams 直接实现的 CDC 功能。而我们这里更建议使用 Flink CDC 模块，因为 Flink 相对 Kafka Streams 而言，有如下优势：</p>
+<p>Flink 的算子和 SQL 模块更为成熟和易用<br>Flink 作业可以通过调整算子并行度的方式，轻松扩展处理能力<br>Flink 支持高级的状态后端（State Backends），允许存取海量的状态数据<br>Flink 提供更多的 Source 和 Sink 等生态支持<br>Flink 有更大的用户基数和活跃的支持社群，问题更容易解决<br>Flink 的开源协议允许云厂商进行全托管的深度定制，而 Kafka Streams 只能自行部署和运维<br>而且 Flink Table / SQL 模块将数据库表和变动记录流（例如 CDC 的数据流）看做是同一事物的两面，因此内部提供的 Upsert 消息结构（+I 表示新增、-U 表示记录更新前的值、+U 表示记录更新后的值，-D 表示删除）可以与 Debezium 等生成的变动记录一一对应。<br>  准实时报表的实现：<br>  准实时报表的实现最好用海豚调度器，其他调度器比如xxljob或者ejob也不是不可以。</p>
+<p>  实时报表的配置例子：<br>  一个标准的实时报表配置包括资源配置、数据源配置、目标数据配置和同步语句配置，配置可以用zeppelin为载体，以用户管理为例子<br>资源配置如下：<br>  Apache<br>%flink.conf</p>
+<p>jobmanager.memory.process.size 1048m //这几个配置看情况进行调整，一般来说足够<br>taskmanager.memory.process.size 1048m<br>taskmanager.numberOfTaskSlots 1<br>parallelism.default 2  //一般来说足够<br>yarn.application.name dwd_auth_user_s //这是别名根据自己业务修改<br>execution.checkpointing.interval 120000<br>execution.checkpointing.tolerable-failed-checkpoints 5<br>execution.checkpointing.externalized-checkpoint-retention RETAIN_ON_CANCELLATION</p>
+<p>#flink metric job_name 监控报警用<br>metrics.reporter.promgateway.jobName dwd_auth_user_s  //任务名称<br>metrics.reporter.promgateway.groupingKey job_name=dwd_auth_user_s;team=auth   //任务名称和团队根据情况修改</p>
+<p>flink.execution.jars hdfs:///zeppelin/jars/doris-flink-1.0.jar,hdfs:///zeppelin/jars/flink-connector-mysql-cdc-2.1.jar</p>
+<p>#连接kafka用 可以不用配置<br>flink.execution.packages org.apache.flink:flink-connector-kafka_2.11:1.13.3//</p>
+<p>数据源配置：<br>SQL<br>%flink.ssql</p>
+<p>CREATE TABLE <code>mysql_auth_user</code> (<br>  <code>id</code> STRING NOT NULL COMMENT ‘用户id’,<br>  <code>user_name</code> STRING NOT NULL,<br>  <code>full_name</code> STRING NOT NULL COMMENT ‘全名’,<br>  <code>user_type</code> int COMMENT ‘用户类型’,<br>  <code>deleted</code> int,<br>  <code>create_time</code> timestamp(3) COMMENT ‘创建时间’,<br>  <code>create_user</code> STRING  COMMENT ‘创建用户’,<br>  <code>update_time</code> timestamp(3) NULL ,<br>  <code>update_user</code> STRING ,<br>  <code>password</code> STRING  COMMENT ‘密码’,<br>  PRIMARY KEY (<code>id</code>)   NOT ENFORCED<br>) WITH (<br> ‘connector’ = ‘mysql-cdc’,<br> ‘hostname’ = ‘127.0.0.1’,<br> ‘port’ = ‘3306’,<br> ‘username’ = ‘root’,<br> ‘password’ = ‘123456’,<br> ‘database-name’ = ‘auth’,//数据库名称<br> ‘table-name’ = ‘user’,//数据表<br> ‘scan.startup.mode’ = ‘initial’, //读取全量数据<br> ‘server-time-zone’ = ‘Asia/Shanghai’<br>);</p>
+<p>目标数据源配置：<br>SQL<br>%flink.ssql<br>CREATE TABLE <code>doris_ods_auth_user_s</code> (<br>SQL<br>%flink.ssql<br>CREATE TABLE <code>doris_ods_g2park_barrier_s</code> (<br><code>id</code> STRING NOT NULL COMMENT ‘用户id’,<br>  <code>user_name</code> STRING NOT NULL,<br>  <code>full_name</code> STRING NOT NULL COMMENT ‘全名’,<br>  <code>user_type</code> int COMMENT ‘用户类型’,<br>  <code>deleted</code> int,<br>  <code>create_time</code> timestamp(3) COMMENT ‘创建时间’,<br>  <code>create_user</code> STRING  COMMENT ‘创建用户’,<br>  <code>update_time</code> timestamp(3) NULL ,<br>  <code>update_user</code> STRING ,<br>  <code>password</code> STRING  COMMENT ‘密码’,<br>  PRIMARY KEY (<code>id</code>)   NOT ENFORCED<br>)  WITH (<br>    ‘connector’ = ‘doris’,<br>    ‘fenodes’ = ‘127.0.0.1:8030’,//doris地fe地址<br>    ‘table.identifier’ = ‘auth_db.ods_auth_mysql_user_s’,<br>    ‘sink.batch.size’ = ‘50000’,//批量插入数据<br>    ‘sink.batch.interval’=’6000’,//6s提交一次<br>    ‘username’ = ‘’,//用户名<br>    ‘password’ = ‘’,//密码<br>    ‘sink.properties.column_separator’ = ‘|||’,//文件分隔符<br>    ‘sink.properties.max_filter_ratio’=’0.2’,//r容忍错误率20%<br>    ‘doris.request.connect.timeout.ms’=’3000000’,<br>    ‘doris.request.read.timeout.ms’=’3000000’,<br>    ‘doris.request.query.timeout.s’=’360000’<br>);</p>
+<p>同步语句设置：<br>SQL<br>%flink.ssql(jobName=”mysql_g2park_inout_record”, resumeFromLatestCheckpoint=false)</p>
+<p>insert into doris_ods_auth_user_s select * from mysql_auth_user;</p>
+<p>resumeFromLatestCheckpoint=false表示重新拉取</p>
+<p>kafka数据同步：<br>kafka的数据同步是基于flink进行同步的，当然doris也能从kafka直接抽取数据，但是为了统一管理配置，数据抽取统一采用flink，以下为例子：<br>资源配置：</p>
+<p>%flink.conf</p>
+<p>jobmanager.memory.process.size 1048m //这几个配置看情况进行调整，一般来说足够<br>taskmanager.memory.process.size 1048m<br>taskmanager.numberOfTaskSlots 1<br>parallelism.default 2  //一般来说足够<br>yarn.application.name kafka_to_doris //这是别名根据自己业务修改<br>execution.checkpointing.interval 120000<br>execution.checkpointing.tolerable-failed-checkpoints 5<br>execution.checkpointing.externalized-checkpoint-retention RETAIN_ON_CANCELLATION</p>
+<p>flink.execution.jars hdfs:///zeppelin/jars/doris-flink-1.0.jar,hdfs:///zeppelin/jars/flink-connector-mysql-cdc-2.1.jar<br>flink.execution.packages org.apache.flink:flink-connector-kafka_2.11:1.13.3</p>
+<p>数据源配置：<br>SQL<br>%flink.ssql<br>CREATE TABLE source_kafka_data<br>(<br>    siteid INT,<br>    citycode INT,<br>    username String,<br>    pv INT<br>)WITH(<br>‘connector’ = ‘kafka’,<br>‘topic’ = ‘doris_topic’,<br>‘properties.bootstrap.servers’ = ‘’,<br>‘properties.group.id’ = ‘doris_group’,<br>‘scan.startup.mode’ = ‘latest-offset’, //读取最新数据<br>‘format’ = ‘json’<br>)</p>
+<p>目标数据配置：<br>SQL<br>%flink.ssql<br>CREATE TABLE doris_test_kafka<br>(<br>    siteid INT,<br>    citycode INT,<br>    username String,<br>    pv INT<br>) WITH (<br>    ‘connector’ = ‘doris’,<br>    ‘fenodes’ = ‘127.0.0.1:8030’,<br>    ‘table.identifier’ = ‘example_db.test_kafka’,<br>    ‘sink.batch.size’ = ‘50000’,<br>    ‘sink.batch.interval’=’600’,<br>    ‘username’ = ‘’,<br>    ‘password’ = ‘’,<br>    ‘sink.properties.column_separator’ = ‘|||’,<br>    ‘sink.properties.max_filter_ratio’=’0.2’,<br>    ‘doris.request.connect.timeout.ms’=’3000000’,<br>    ‘doris.request.read.timeout.ms’=’3000000’,<br>    ‘doris.request.query.timeout.s’=’360000’<br>);</p>
+<p>同步语句配置：<br>SQL<br>%flink.ssql(jobName=”kafka_to_doris”, resumeFromLatestCheckpoint=false)</p>
+<p>insert into doris_test_kafka select * from source_kafka_data;</p>
+<p>最后通过zeppelin发布<br>点击每个配置的右上角按钮进行配置，如果报错查看对应日志进行修改</p>
+<img src="/2024/07/17/Doris-begin/zeppelin1.png" alt="zeppelin1" title="zeppelin1">
+<p>在同步语句配置块点击按钮到flink控制台查看对应执行日志<br><img src="/2024/07/17/Doris-begin/zeppelin2.png" alt="zeppelin2" title="zeppelin2"><br><img src="/2024/07/17/Doris-begin/zeppelin3.png" alt="zeppelin3" title="zeppelin3"></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2024/07/17/Doris-begin/" data-id="clypv5bhy00006y790qk6hg5w" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/bigdata/">bigdata</a></li></ul>
+
     </footer>
   </div>
   
@@ -134,7 +197,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2021/05/28/influx-proxy-problemlist/" data-id="ckp765o650000a679bv7zltxk" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2021/05/28/influx-proxy-problemlist/" data-id="clypv5bis000j6y7983lp8t2d" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/influx-proxy/">influx-proxy</a></li></ul>
@@ -190,7 +253,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2020/04/25/build-flume-ha/" data-id="ckp76574z00039z79qn8luu25" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2020/04/25/build-flume-ha/" data-id="clypv5bie00066y79kqvdcm90" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/flume/">flume</a></li></ul>
@@ -246,7 +309,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2020/04/14/firecracker-introduction/" data-id="ckp76575100069z793ybsv5t9" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2020/04/14/firecracker-introduction/" data-id="clypv5big00096y79a4o8krhi" class="article-share-link">Share</a>
       
       
     </footer>
@@ -306,7 +369,7 @@ restart:
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2020/04/13/how-to-unregister-service-from-eureka/" data-id="ckp765759000d9z79m9yfcn8o" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2020/04/13/how-to-unregister-service-from-eureka/" data-id="clypv5biq000g6y79w698alsk" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spring-eureka/">spring eureka</a></li></ul>
@@ -363,7 +426,7 @@ restart:
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2020/01/15/how-to-deploy-logstash-plugin-env/" data-id="ckp765758000c9z798wga78nb" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2020/01/15/how-to-deploy-logstash-plugin-env/" data-id="clypv5bip000f6y794ddblouh" class="article-share-link">Share</a>
       
       
     </footer>
@@ -400,7 +463,7 @@ restart:
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/11/11/k8s-install/" data-id="ckp76575k000g9z797uimnyg9" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2019/11/11/k8s-install/" data-id="clypv5bit000m6y79lpou7ra1" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/k8s/">k8s</a></li></ul>
@@ -444,7 +507,7 @@ restart:
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/05/05/tracingSystem/" data-id="ckp76576400109z79d48ds3ns" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2019/05/05/tracingSystem/" data-id="clypv5bjq00106y795soya3bn" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/zipkin-skywalking-cat/">zipkin skywalking cat</a></li></ul>
@@ -485,47 +548,7 @@ restart:
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/01/07/presto-source-code/" data-id="ckp76575x000p9z793pntkj3n" class="article-share-link">Share</a>
-      
-      
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-sqoop-huizong" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/12/20/sqoop-huizong/" class="article-date">
-  <time datetime="2018-12-20T15:38:06.000Z" itemprop="datePublished">2018-12-20</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/12/20/sqoop-huizong/">sqoop问题汇总</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>sqoop最近遇到的问题在这里汇总一下</p>
-<p>先说环境<br>阿里emr-3.12.0<br>sqoop 1.4.7<br>1、字段类型问题<br>首先遇到的一个问题是通过sqoop从mysql导入到hive的时候，如果不指定列的类型，到hive默认都是字符串。<br>这样做日期计算的时候会稍微麻烦一些。<br>解决办法：<br>通过–map-column-java 和–map-column-hive 来指定类型<br>参考资料：<br><a href="https://blog.csdn.net/xianjie0318/article/details/79300435" target="_blank" rel="external">https://blog.csdn.net/xianjie0318/article/details/79300435</a><br>2、mysql导入hive报GC overhead limit exceeded<br>解决方法：<br>mysql connection连接字符串加上：<br>?dontTrackOpenResources=true&amp;defaultFetchSize=1000&amp;useCursorFetch=true<br>参考资料：<br><a href="https://www.cnblogs.com/chwilliam85/p/9693276.html" target="_blank" rel="external">https://www.cnblogs.com/chwilliam85/p/9693276.html</a><br>3、通过sqoop增量地从mysql导入到hive<br>这个我一开始用–append 模式导入的，然后报错如下：<br>Append mode for hive imports is not  yet supported. Please remove the parameter –append-mode<br>我提了一个工单给阿里客服，<br>提供了一个参考链接：<br><a href="https://community.hortonworks.com/questions/11373/sqoop-incremental-import-in-hive-i-get-error-messa.html" target="_blank" rel="external">https://community.hortonworks.com/questions/11373/sqoop-incremental-import-in-hive-i-get-error-messa.html</a><br>这种方式是通过创建外部表，然后增量写入到hdfs来实现的。<br>这里有个注意的地方是要配合-check-column来使用，而这个字段可以是数值型的id，也可以是时间戳！<br>参考资料如下：<br><a href="https://stackoverflow.com/questions/41238887/sqoop-incremental-import-error-using-date-column" target="_blank" rel="external">https://stackoverflow.com/questions/41238887/sqoop-incremental-import-error-using-date-column</a><br>以时间戳为增量的sqoop基本设计流程如下：<br>首先创建外部表：<br>CREATE EXTERNAL TABLE test (id string,create_time timestamp,reservation1 string,reservation2 string,reservation3 string,reservation4 string,reservation5 string,reservation6 string,reservation7 string,reservation8 string,reservation9 string,reservation10 string) ROW FORMAT DELIMITED FIELDS TERMINATED BY ‘,’ STORED AS TEXTFILE location ‘/user/wfliu/test’ ;<br>然后全量导入mysql数据库表，如下：</p>
-<p>sqoop import -Dorg.apache.sqoop.splitter.allow_text_splitter=true –connect ‘jdbc:mysql://host:3306/test?useUnicode=true&amp;characterEncoding=utf-8&amp;zeroDateTimeBehavior=convertToNull&amp;dontTrackOpenResources=true&amp;defaultFetchSize=1000&amp;useCursorFetch=true’ –driver com.mysql.jdbc.Driver –username test –password xxx –incremental append –table test –target-dir /user/wfliu/test -check-column update_time -m 1 –hive-drop-import-delims –verbose -m 1<br>最后定一个定时执行增量的sqoop任务：<br>sqoop import -Dorg.apache.sqoop.splitter.allow_text_splitter=true –connect ‘jdbc:mysql://host:3306/test?useUnicode=true&amp;characterEncoding=utf-8&amp;zeroDateTimeBehavior=convertToNull&amp;dontTrackOpenResources=true&amp;defaultFetchSize=1000&amp;useCursorFetch=true’ –driver com.mysql.jdbc.Driver –username test –password xxx –table test –target-dir /user/wfliu/test –incremental lastmodified -check-column create_time -m 1 –last-value “${lastvalue}” –append –hive-drop-import-delims –verbose -m 1<br>其中lastvalue是emr中配置的参数可以为${yyyy-MM-dd 00:00:00-1d}。为增量导入截止到每天凌晨12点的数据。<br>4、新版“数据开发”功能支持参数化<br>以前用老版的“作业调度”sqoop并不支持参数<br>用新版的“数据开发”<br><img src="/2018/12/20/sqoop-huizong/1.png" alt="参数化" title="参数化"><br>5、如何删除外部表中的数据<br>今天遇到的问题是因为导入数据有错误想清空外部表的数据<br>一开始用<br>delete from xxx的方式，不行<br>然后用trancat table xxx 也不行<br>这两种都不能删除外部表的数据<br>那怎么办呢<br>答案：先把外部表变成内部表再删除<br>ALTER TABLE xxx SET TBLPROPERTIES(‘EXTERNAL’=’False’);<br>然后<br>truncate table xxx;<br>这样就可以啦！<br>参考资料：<br><a href="https://blog.csdn.net/tengxing007/article/details/81211500" target="_blank" rel="external">https://blog.csdn.net/tengxing007/article/details/81211500</a></p>
-<p>另外sqoop也是可以直接直接创建hive表的<br>sqoop create-hive-table<br>可以指定–hive-overwrite来覆盖表中原有数据<br>参考资料：<br><a href="https://segmentfault.com/a/1190000002532293" target="_blank" rel="external">https://segmentfault.com/a/1190000002532293</a></p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/12/20/sqoop-huizong/" data-id="ckp765762000w9z79fino0xvo" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2019/01/07/presto-source-code/" data-id="clypv5bji000v6y791lh6bua5" class="article-share-link">Share</a>
       
       
     </footer>
@@ -551,7 +574,7 @@ restart:
   <div class="widget-wrap">
     <h3 class="widget-title">Tags</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/flume/">flume</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/influx-proxy/">influx-proxy</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/k8s/">k8s</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack-neutron/">openstack neutron</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spark-classload-ClassNotFound/">spark classload ClassNotFound</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring/">spring</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring-eureka/">spring eureka</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tensroflow/">tensroflow</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/zipkin-skywalking-cat/">zipkin skywalking cat</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/阿里云-sgoop-presto/">阿里云 sgoop presto</a></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/bigdata/">bigdata</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/flume/">flume</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/influx-proxy/">influx-proxy</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/k8s/">k8s</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack-neutron/">openstack neutron</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spark-classload-ClassNotFound/">spark classload ClassNotFound</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring/">spring</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring-eureka/">spring eureka</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tensroflow/">tensroflow</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/zipkin-skywalking-cat/">zipkin skywalking cat</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/阿里云-sgoop-presto/">阿里云 sgoop presto</a></li></ul>
     </div>
   </div>
 
@@ -561,7 +584,7 @@ restart:
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/flume/" style="font-size: 10px;">flume</a> <a href="/tags/influx-proxy/" style="font-size: 10px;">influx-proxy</a> <a href="/tags/k8s/" style="font-size: 10px;">k8s</a> <a href="/tags/openstack-neutron/" style="font-size: 10px;">openstack neutron</a> <a href="/tags/spark-classload-ClassNotFound/" style="font-size: 10px;">spark classload ClassNotFound</a> <a href="/tags/spring/" style="font-size: 20px;">spring</a> <a href="/tags/spring-eureka/" style="font-size: 10px;">spring eureka</a> <a href="/tags/tensroflow/" style="font-size: 10px;">tensroflow</a> <a href="/tags/zipkin-skywalking-cat/" style="font-size: 10px;">zipkin skywalking cat</a> <a href="/tags/阿里云-sgoop-presto/" style="font-size: 10px;">阿里云 sgoop presto</a>
+      <a href="/tags/bigdata/" style="font-size: 10px;">bigdata</a> <a href="/tags/flume/" style="font-size: 10px;">flume</a> <a href="/tags/influx-proxy/" style="font-size: 10px;">influx-proxy</a> <a href="/tags/k8s/" style="font-size: 10px;">k8s</a> <a href="/tags/openstack-neutron/" style="font-size: 10px;">openstack neutron</a> <a href="/tags/spark-classload-ClassNotFound/" style="font-size: 10px;">spark classload ClassNotFound</a> <a href="/tags/spring/" style="font-size: 20px;">spring</a> <a href="/tags/spring-eureka/" style="font-size: 10px;">spring eureka</a> <a href="/tags/tensroflow/" style="font-size: 10px;">tensroflow</a> <a href="/tags/zipkin-skywalking-cat/" style="font-size: 10px;">zipkin skywalking cat</a> <a href="/tags/阿里云-sgoop-presto/" style="font-size: 10px;">阿里云 sgoop presto</a>
     </div>
   </div>
 
@@ -570,7 +593,7 @@ restart:
   <div class="widget-wrap">
     <h3 class="widget-title">Archives</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/05/">May 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/04/">April 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/01/">January 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">November 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/05/">May 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">January 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">December 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">October 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">September 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">December 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">November 2016</a></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/07/">July 2024</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/05/">May 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/04/">April 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/01/">January 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">November 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/05/">May 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">January 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">December 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">October 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">September 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">December 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">November 2016</a></li></ul>
     </div>
   </div>
 
@@ -583,7 +606,11 @@ restart:
       <ul>
         
           <li>
-            <a href="/2021/05/28/hello-world/">如何搭建新版本hexo</a>
+            <a href="/2024/07/17/hello-world/">如何搭建新版本hexo</a>
+          </li>
+        
+          <li>
+            <a href="/2024/07/17/Doris-begin/">Doris使用入门</a>
           </li>
         
           <li>
@@ -598,10 +625,6 @@ restart:
             <a href="/2020/04/14/firecracker-introduction/">firecracker介绍</a>
           </li>
         
-          <li>
-            <a href="/2020/04/13/how-to-unregister-service-from-eureka/">如何安全优雅的把spring微服务从eureka上注销</a>
-          </li>
-        
       </ul>
     </div>
   </div>
@@ -614,7 +637,7 @@ restart:
   
   <div class="outer">
     <div id="footer-info" class="inner">
-      &copy; 2021 wfliu<br>
+      &copy; 2024 wfliu<br>
       Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
     </div>
   </div>

@@ -61,6 +61,46 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-sqoop-huizong" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/12/20/sqoop-huizong/" class="article-date">
+  <time datetime="2018-12-20T15:38:06.000Z" itemprop="datePublished">2018-12-20</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/12/20/sqoop-huizong/">sqoop问题汇总</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>sqoop最近遇到的问题在这里汇总一下</p>
+<p>先说环境<br>阿里emr-3.12.0<br>sqoop 1.4.7<br>1、字段类型问题<br>首先遇到的一个问题是通过sqoop从mysql导入到hive的时候，如果不指定列的类型，到hive默认都是字符串。<br>这样做日期计算的时候会稍微麻烦一些。<br>解决办法：<br>通过–map-column-java 和–map-column-hive 来指定类型<br>参考资料：<br><a href="https://blog.csdn.net/xianjie0318/article/details/79300435" target="_blank" rel="external">https://blog.csdn.net/xianjie0318/article/details/79300435</a><br>2、mysql导入hive报GC overhead limit exceeded<br>解决方法：<br>mysql connection连接字符串加上：<br>?dontTrackOpenResources=true&amp;defaultFetchSize=1000&amp;useCursorFetch=true<br>参考资料：<br><a href="https://www.cnblogs.com/chwilliam85/p/9693276.html" target="_blank" rel="external">https://www.cnblogs.com/chwilliam85/p/9693276.html</a><br>3、通过sqoop增量地从mysql导入到hive<br>这个我一开始用–append 模式导入的，然后报错如下：<br>Append mode for hive imports is not  yet supported. Please remove the parameter –append-mode<br>我提了一个工单给阿里客服，<br>提供了一个参考链接：<br><a href="https://community.hortonworks.com/questions/11373/sqoop-incremental-import-in-hive-i-get-error-messa.html" target="_blank" rel="external">https://community.hortonworks.com/questions/11373/sqoop-incremental-import-in-hive-i-get-error-messa.html</a><br>这种方式是通过创建外部表，然后增量写入到hdfs来实现的。<br>这里有个注意的地方是要配合-check-column来使用，而这个字段可以是数值型的id，也可以是时间戳！<br>参考资料如下：<br><a href="https://stackoverflow.com/questions/41238887/sqoop-incremental-import-error-using-date-column" target="_blank" rel="external">https://stackoverflow.com/questions/41238887/sqoop-incremental-import-error-using-date-column</a><br>以时间戳为增量的sqoop基本设计流程如下：<br>首先创建外部表：<br>CREATE EXTERNAL TABLE test (id string,create_time timestamp,reservation1 string,reservation2 string,reservation3 string,reservation4 string,reservation5 string,reservation6 string,reservation7 string,reservation8 string,reservation9 string,reservation10 string) ROW FORMAT DELIMITED FIELDS TERMINATED BY ‘,’ STORED AS TEXTFILE location ‘/user/wfliu/test’ ;<br>然后全量导入mysql数据库表，如下：</p>
+<p>sqoop import -Dorg.apache.sqoop.splitter.allow_text_splitter=true –connect ‘jdbc:mysql://host:3306/test?useUnicode=true&amp;characterEncoding=utf-8&amp;zeroDateTimeBehavior=convertToNull&amp;dontTrackOpenResources=true&amp;defaultFetchSize=1000&amp;useCursorFetch=true’ –driver com.mysql.jdbc.Driver –username test –password xxx –incremental append –table test –target-dir /user/wfliu/test -check-column update_time -m 1 –hive-drop-import-delims –verbose -m 1<br>最后定一个定时执行增量的sqoop任务：<br>sqoop import -Dorg.apache.sqoop.splitter.allow_text_splitter=true –connect ‘jdbc:mysql://host:3306/test?useUnicode=true&amp;characterEncoding=utf-8&amp;zeroDateTimeBehavior=convertToNull&amp;dontTrackOpenResources=true&amp;defaultFetchSize=1000&amp;useCursorFetch=true’ –driver com.mysql.jdbc.Driver –username test –password xxx –table test –target-dir /user/wfliu/test –incremental lastmodified -check-column create_time -m 1 –last-value “${lastvalue}” –append –hive-drop-import-delims –verbose -m 1<br>其中lastvalue是emr中配置的参数可以为${yyyy-MM-dd 00:00:00-1d}。为增量导入截止到每天凌晨12点的数据。<br>4、新版“数据开发”功能支持参数化<br>以前用老版的“作业调度”sqoop并不支持参数<br>用新版的“数据开发”<br><img src="/2018/12/20/sqoop-huizong/1.png" alt="参数化" title="参数化"><br>5、如何删除外部表中的数据<br>今天遇到的问题是因为导入数据有错误想清空外部表的数据<br>一开始用<br>delete from xxx的方式，不行<br>然后用trancat table xxx 也不行<br>这两种都不能删除外部表的数据<br>那怎么办呢<br>答案：先把外部表变成内部表再删除<br>ALTER TABLE xxx SET TBLPROPERTIES(‘EXTERNAL’=’False’);<br>然后<br>truncate table xxx;<br>这样就可以啦！<br>参考资料：<br><a href="https://blog.csdn.net/tengxing007/article/details/81211500" target="_blank" rel="external">https://blog.csdn.net/tengxing007/article/details/81211500</a></p>
+<p>另外sqoop也是可以直接直接创建hive表的<br>sqoop create-hive-table<br>可以指定–hive-overwrite来覆盖表中原有数据<br>参考资料：<br><a href="https://segmentfault.com/a/1190000002532293" target="_blank" rel="external">https://segmentfault.com/a/1190000002532293</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/12/20/sqoop-huizong/" data-id="clypv5bkn00156y79n1k0j6jl" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
     <article id="post-how-to-add-col-spark-dataframe" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2018/12/17/how-to-add-col-spark-dataframe/" class="article-date">
@@ -164,7 +204,7 @@ df.select(col(&quot;*&quot;) +: fieldCols: _*).show()
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/12/17/how-to-add-col-spark-dataframe/" data-id="ckp765757000b9z795nd4wvtx" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/12/17/how-to-add-col-spark-dataframe/" data-id="clypv5bio000e6y79ev98i542" class="article-share-link">Share</a>
       
       
     </footer>
@@ -202,7 +242,7 @@ df.select(col(&quot;*&quot;) +: fieldCols: _*).show()
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/12/17/mysql-HOUR-OF-DAY-2-3/" data-id="ckp76575m000j9z791xtvl4ri" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/12/17/mysql-HOUR-OF-DAY-2-3/" data-id="clypv5bj1000p6y792b0m5qk6" class="article-share-link">Share</a>
       
       
     </footer>
@@ -254,7 +294,7 @@ df.select(col(&quot;*&quot;) +: fieldCols: _*).show()
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/12/13/spark-sql-count-as-issue/" data-id="ckp76575z000t9z79qfuy8ban" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/12/13/spark-sql-count-as-issue/" data-id="clypv5bjp000z6y79cxo5gx1i" class="article-share-link">Share</a>
       
       
     </footer>
@@ -291,7 +331,7 @@ df.select(col(&quot;*&quot;) +: fieldCols: _*).show()
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/12/13/spark-classloader-cannot-find-classdef-in-the-jar/" data-id="ckp76575y000q9z79sxc5y5gv" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/12/13/spark-classloader-cannot-find-classdef-in-the-jar/" data-id="clypv5bjo000w6y79t6grmmbo" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spark-classload-ClassNotFound/">spark classload ClassNotFound</a></li></ul>
@@ -336,7 +376,7 @@ df.select(col(&quot;*&quot;) +: fieldCols: _*).show()
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/12/04/ali-emr-presto/" data-id="ckp76574600009z79mabz1yug" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/12/04/ali-emr-presto/" data-id="clypv5bib00036y79447sis0n" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/阿里云-sgoop-presto/">阿里云 sgoop presto</a></li></ul>
@@ -392,7 +432,7 @@ df.select(col(&quot;*&quot;) +: fieldCols: _*).show()
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/10/30/tensorflow介绍/" data-id="ckp765763000x9z796rf6k8ka" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/10/30/tensorflow介绍/" data-id="clypv5bl200166y79idfmwuep" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/tensroflow/">tensroflow</a></li></ul>
@@ -432,7 +472,7 @@ df.select(col(&quot;*&quot;) +: fieldCols: _*).show()
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/09/05/openstack简介/" data-id="ckp76575w000o9z79m0l65v6q" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/09/05/openstack简介/" data-id="clypv5bj7000u6y79qpsv8mg0" class="article-share-link">Share</a>
       
       
     </footer>
@@ -484,7 +524,7 @@ df.select(col(&quot;*&quot;) +: fieldCols: _*).show()
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/05/01/openstack-neutron/" data-id="ckp76575n000k9z79b732cdk8" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/05/01/openstack-neutron/" data-id="clypv5bj2000q6y79zfx9dr6d" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/openstack-neutron/">openstack neutron</a></li></ul>
@@ -523,46 +563,7 @@ df.select(col(&quot;*&quot;) +: fieldCols: _*).show()
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/05/01/spring-cloud/" data-id="ckp765760000u9z790obu35bp" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spring/">spring</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="spring-frame" class="article article-type-spring" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2017/05/01/frame/" class="article-date">
-  <time datetime="2017-05-01T07:56:04.000Z" itemprop="datePublished">2017-05-01</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/05/01/frame/">spring frame</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>总结的spring 所有项目如下：<br><img src="/2017/05/01/frame/spring.png" alt="This is an example image" title="This is an example image"></p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/05/01/frame/" data-id="ckp76575300079z79kai7xq5p" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/05/01/spring-cloud/" data-id="clypv5bjw00136y79xxbgvfer" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spring/">spring</a></li></ul>
@@ -590,7 +591,7 @@ df.select(col(&quot;*&quot;) +: fieldCols: _*).show()
   <div class="widget-wrap">
     <h3 class="widget-title">Tags</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/flume/">flume</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/influx-proxy/">influx-proxy</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/k8s/">k8s</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack-neutron/">openstack neutron</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spark-classload-ClassNotFound/">spark classload ClassNotFound</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring/">spring</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring-eureka/">spring eureka</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tensroflow/">tensroflow</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/zipkin-skywalking-cat/">zipkin skywalking cat</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/阿里云-sgoop-presto/">阿里云 sgoop presto</a></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/bigdata/">bigdata</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/flume/">flume</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/influx-proxy/">influx-proxy</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/k8s/">k8s</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack-neutron/">openstack neutron</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spark-classload-ClassNotFound/">spark classload ClassNotFound</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring/">spring</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring-eureka/">spring eureka</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tensroflow/">tensroflow</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/zipkin-skywalking-cat/">zipkin skywalking cat</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/阿里云-sgoop-presto/">阿里云 sgoop presto</a></li></ul>
     </div>
   </div>
 
@@ -600,7 +601,7 @@ df.select(col(&quot;*&quot;) +: fieldCols: _*).show()
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/flume/" style="font-size: 10px;">flume</a> <a href="/tags/influx-proxy/" style="font-size: 10px;">influx-proxy</a> <a href="/tags/k8s/" style="font-size: 10px;">k8s</a> <a href="/tags/openstack-neutron/" style="font-size: 10px;">openstack neutron</a> <a href="/tags/spark-classload-ClassNotFound/" style="font-size: 10px;">spark classload ClassNotFound</a> <a href="/tags/spring/" style="font-size: 20px;">spring</a> <a href="/tags/spring-eureka/" style="font-size: 10px;">spring eureka</a> <a href="/tags/tensroflow/" style="font-size: 10px;">tensroflow</a> <a href="/tags/zipkin-skywalking-cat/" style="font-size: 10px;">zipkin skywalking cat</a> <a href="/tags/阿里云-sgoop-presto/" style="font-size: 10px;">阿里云 sgoop presto</a>
+      <a href="/tags/bigdata/" style="font-size: 10px;">bigdata</a> <a href="/tags/flume/" style="font-size: 10px;">flume</a> <a href="/tags/influx-proxy/" style="font-size: 10px;">influx-proxy</a> <a href="/tags/k8s/" style="font-size: 10px;">k8s</a> <a href="/tags/openstack-neutron/" style="font-size: 10px;">openstack neutron</a> <a href="/tags/spark-classload-ClassNotFound/" style="font-size: 10px;">spark classload ClassNotFound</a> <a href="/tags/spring/" style="font-size: 20px;">spring</a> <a href="/tags/spring-eureka/" style="font-size: 10px;">spring eureka</a> <a href="/tags/tensroflow/" style="font-size: 10px;">tensroflow</a> <a href="/tags/zipkin-skywalking-cat/" style="font-size: 10px;">zipkin skywalking cat</a> <a href="/tags/阿里云-sgoop-presto/" style="font-size: 10px;">阿里云 sgoop presto</a>
     </div>
   </div>
 
@@ -609,7 +610,7 @@ df.select(col(&quot;*&quot;) +: fieldCols: _*).show()
   <div class="widget-wrap">
     <h3 class="widget-title">Archives</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/05/">May 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/04/">April 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/01/">January 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">November 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/05/">May 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">January 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">December 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">October 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">September 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">December 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">November 2016</a></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/07/">July 2024</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/05/">May 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/04/">April 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/01/">January 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">November 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/05/">May 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">January 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">December 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">October 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">September 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">December 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">November 2016</a></li></ul>
     </div>
   </div>
 
@@ -622,7 +623,11 @@ df.select(col(&quot;*&quot;) +: fieldCols: _*).show()
       <ul>
         
           <li>
-            <a href="/2021/05/28/hello-world/">如何搭建新版本hexo</a>
+            <a href="/2024/07/17/hello-world/">如何搭建新版本hexo</a>
+          </li>
+        
+          <li>
+            <a href="/2024/07/17/Doris-begin/">Doris使用入门</a>
           </li>
         
           <li>
@@ -637,10 +642,6 @@ df.select(col(&quot;*&quot;) +: fieldCols: _*).show()
             <a href="/2020/04/14/firecracker-introduction/">firecracker介绍</a>
           </li>
         
-          <li>
-            <a href="/2020/04/13/how-to-unregister-service-from-eureka/">如何安全优雅的把spring微服务从eureka上注销</a>
-          </li>
-        
       </ul>
     </div>
   </div>
@@ -653,7 +654,7 @@ df.select(col(&quot;*&quot;) +: fieldCols: _*).show()
   
   <div class="outer">
     <div id="footer-info" class="inner">
-      &copy; 2021 wfliu<br>
+      &copy; 2024 wfliu<br>
       Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
     </div>
   </div>
