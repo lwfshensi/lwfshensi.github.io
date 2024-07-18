@@ -3,14 +3,18 @@
 <head>
   <meta charset="utf-8">
   
-  <title>Tag: influx-proxy | 肆叔的酱油</title>
+  <title>influxdb优化 | 肆叔的酱油</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="website">
-<meta property="og:title" content="肆叔的酱油">
-<meta property="og:url" content="http://yoursite.com/tags/influx-proxy/index.html">
+  <meta name="description" content="网上关于influxdb优化的内容有不少，这里只记录一下实际遇到的问题和优化过程。  我们用的是一套基于influxdb-proxy的高可用集群，配置是6个节点，两个circle，每个节点配置为16G内存，500G硬盘，4核CPU。  遇到了三个问题：  1、有一个node频繁重启，差不多每隔半小时重启一次。  解决方式为：   shell config123[data]  index-ver">
+<meta property="og:type" content="article">
+<meta property="og:title" content="influxdb优化">
+<meta property="og:url" content="http://yoursite.com/2024/07/18/influxdb-opt/index.html">
 <meta property="og:site_name" content="肆叔的酱油">
+<meta property="og:description" content="网上关于influxdb优化的内容有不少，这里只记录一下实际遇到的问题和优化过程。  我们用的是一套基于influxdb-proxy的高可用集群，配置是6个节点，两个circle，每个节点配置为16G内存，500G硬盘，4核CPU。  遇到了三个问题：  1、有一个node频繁重启，差不多每隔半小时重启一次。  解决方式为：   shell config123[data]  index-ver">
+<meta property="og:updated_time" content="2024-07-18T07:31:52.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="肆叔的酱油">
+<meta name="twitter:title" content="influxdb优化">
+<meta name="twitter:description" content="网上关于influxdb优化的内容有不少，这里只记录一下实际遇到的问题和优化过程。  我们用的是一套基于influxdb-proxy的高可用集群，配置是6个节点，两个circle，每个节点配置为16G内存，500G硬盘，4核CPU。  遇到了三个问题：  1、有一个node频繁重启，差不多每隔半小时重启一次。  解决方式为：   shell config123[data]  index-ver">
   
     <link rel="alternate" href="/atom.xml" title="肆叔的酱油" type="application/atom+xml">
   
@@ -59,39 +63,61 @@
   </div>
 </header>
       <div class="outer">
-        <section id="main">
-  
-  
-    
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2021" class="archive-year">2021</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/2021/05/28/influx-proxy-problemlist/" class="archive-article-date">
-  <time datetime="2021-05-27T17:08:42.000Z" itemprop="datePublished">May 28</time>
+        <section id="main"><article id="post-influxdb-opt" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2024/07/18/influxdb-opt/" class="article-date">
+  <time datetime="2024-07-18T07:18:04.000Z" itemprop="datePublished">2024-07-18</time>
 </a>
-      
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2021/05/28/influx-proxy-problemlist/">influx-proxy部署遇到的问题</a>
+    <h1 class="article-title" itemprop="name">
+      influxdb优化
     </h1>
   
 
-    </header>
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>  网上关于influxdb优化的内容有不少，这里只记录一下实际遇到的问题和优化过程。<br>  我们用的是一套基于influxdb-proxy的高可用集群，配置是6个节点，两个circle，每个节点配置为16G内存，500G硬盘，4核CPU。<br>  遇到了三个问题：<br>  1、有一个node频繁重启，差不多每隔半小时重启一次。<br>  解决方式为：<br>   <figure class="highlight plain"><figcaption><span>shell config</span></figcaption><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">[data]</div><div class="line">  index-verrsion = &quot;tsi1&quot;</div><div class="line">   </div></pre></td></tr></table></figure><br>   将内存索引改为磁盘索引，之后内存占用问题得到解决<br>  2、influx数据库 internal磁盘占用非常高。<br>  解决方式为：<br><figure class="highlight plain"><figcaption><span>shell config</span></figcaption><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">[monitor]</div><div class="line">  store-enabled = false</div></pre></td></tr></table></figure><br>  3、通过systemCtl启动不起来influxdb<br>  产生原因是因为systemCtl有时间限制，规定时间内起不来会一直重启<br>  解决方式为：<br>  增加时间或者nohup</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2024/07/18/influxdb-opt/" data-id="clyqydtvg000mo579y4ecftxm" class="article-share-link">Share</a>
+      
+      
+    </footer>
   </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2024/07/18/hello-world/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          如何搭建新版本hexo
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2024/07/17/Doris-begin/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">Doris使用入门</div>
+    </a>
+  
+</nav>
+
+  
 </article>
-  
-  
-    </div></section>
-  
 
 </section>
         

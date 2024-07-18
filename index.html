@@ -63,8 +63,8 @@
   
     <article id="post-hello-world" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
-    <a href="/2024/07/17/hello-world/" class="article-date">
-  <time datetime="2024-07-17T13:13:36.139Z" itemprop="datePublished">2024-07-17</time>
+    <a href="/2024/07/18/hello-world/" class="article-date">
+  <time datetime="2024-07-18T07:31:58.197Z" itemprop="datePublished">2024-07-18</time>
 </a>
     
   </div>
@@ -75,7 +75,7 @@
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2024/07/17/hello-world/">如何搭建新版本hexo</a>
+      <a class="article-title" href="/2024/07/18/hello-world/">如何搭建新版本hexo</a>
     </h1>
   
 
@@ -88,7 +88,44 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2024/07/17/hello-world/" data-id="clypv5bij000d6y79hhhmmvz6" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2024/07/18/hello-world/" data-id="clyqydtv9000do579ua27nmby" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-influxdb-opt" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2024/07/18/influxdb-opt/" class="article-date">
+  <time datetime="2024-07-18T07:18:04.000Z" itemprop="datePublished">2024-07-18</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2024/07/18/influxdb-opt/">influxdb优化</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>  网上关于influxdb优化的内容有不少，这里只记录一下实际遇到的问题和优化过程。<br>  我们用的是一套基于influxdb-proxy的高可用集群，配置是6个节点，两个circle，每个节点配置为16G内存，500G硬盘，4核CPU。<br>  遇到了三个问题：<br>  1、有一个node频繁重启，差不多每隔半小时重启一次。<br>  解决方式为：<br>   <figure class="highlight plain"><figcaption><span>shell config</span></figcaption><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">[data]</div><div class="line">  index-verrsion = &quot;tsi1&quot;</div><div class="line">   </div></pre></td></tr></table></figure><br>   将内存索引改为磁盘索引，之后内存占用问题得到解决<br>  2、influx数据库 internal磁盘占用非常高。<br>  解决方式为：<br><figure class="highlight plain"><figcaption><span>shell config</span></figcaption><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">[monitor]</div><div class="line">  store-enabled = false</div></pre></td></tr></table></figure><br>  3、通过systemCtl启动不起来influxdb<br>  产生原因是因为systemCtl有时间限制，规定时间内起不来会一直重启<br>  解决方式为：<br>  增加时间或者nohup</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2024/07/18/influxdb-opt/" data-id="clyqydtvg000mo579y4ecftxm" class="article-share-link">Share</a>
       
       
     </footer>
@@ -139,7 +176,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2024/07/17/Doris-begin/" data-id="clypv5bhy00006y790qk6hg5w" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2024/07/17/Doris-begin/" data-id="clyqydtu50000o579rkair0bh" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/bigdata/">bigdata</a></li></ul>
@@ -187,7 +224,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2021/05/28/influx-proxy-problemlist/" data-id="clypv5bis000j6y7983lp8t2d" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2021/05/28/influx-proxy-problemlist/" data-id="clyqydtve000jo579q3gwvtn7" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/influx-proxy/">influx-proxy</a></li></ul>
@@ -243,7 +280,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2020/04/25/build-flume-ha/" data-id="clypv5bie00066y79kqvdcm90" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2020/04/25/build-flume-ha/" data-id="clyqydtv10006o579xhjg6aso" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/flume/">flume</a></li></ul>
@@ -299,7 +336,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2020/04/14/firecracker-introduction/" data-id="clypv5big00096y79a4o8krhi" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2020/04/14/firecracker-introduction/" data-id="clyqydtv20009o5795xomm0j4" class="article-share-link">Share</a>
       
       
     </footer>
@@ -359,7 +396,7 @@ restart:
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2020/04/13/how-to-unregister-service-from-eureka/" data-id="clypv5biq000g6y79w698alsk" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2020/04/13/how-to-unregister-service-from-eureka/" data-id="clyqydtvd000go579cleti6gw" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spring-eureka/">spring eureka</a></li></ul>
@@ -416,7 +453,7 @@ restart:
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2020/01/15/how-to-deploy-logstash-plugin-env/" data-id="clypv5bip000f6y794ddblouh" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2020/01/15/how-to-deploy-logstash-plugin-env/" data-id="clyqydtvc000fo579seojtq34" class="article-share-link">Share</a>
       
       
     </footer>
@@ -453,7 +490,7 @@ restart:
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/11/11/k8s-install/" data-id="clypv5bit000m6y79lpou7ra1" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2019/11/11/k8s-install/" data-id="clyqydtvi000no5795rh8mwny" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/k8s/">k8s</a></li></ul>
@@ -497,50 +534,11 @@ restart:
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/05/05/tracingSystem/" data-id="clypv5bjq00106y795soya3bn" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2019/05/05/tracingSystem/" data-id="clyqydtwp0017o5793a1804jk" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/zipkin-skywalking-cat/">zipkin skywalking cat</a></li></ul>
 
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-presto-source-code" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2019/01/07/presto-source-code/" class="article-date">
-  <time datetime="2019-01-07T14:40:06.000Z" itemprop="datePublished">2019-01-07</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/01/07/presto-source-code/">码林啄木之presto阅读理解</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>Day 1:<br>一般来讲，我们要阅读一个项目的源代码，首先要从网上找一下有没有读过该项目，次之去官网上找文档，最后再读细节。<br>我们第一天先讲讲presto的启动命令、架构以及代码架构。<br>首先祭出架构图：摘自官网<br><img src="/2019/01/07/presto-source-code/presto-overview.png" alt="overview" title="overview"><br>也就是说presto主要有如下几个部分组成：<br>CLI：就是命令行，用于提交查询，通俗点的理解就是发起rest请求<br>服务器端有两种节点：coordinators和worker。一下简称C节点和W节点<br>首先来看C节点：<br>C节点主要用于解析语句，生成请求接话，管理W节点。<br>W节点用于执行请求计划，处理数据，W节点从连接器读取数据并彼此交换数据。<br>C节点与W节点通过rest API来通信。<br>以上就是这个overview图的最直白简洁。<br>然鹅还有一些关键概念。<br>一、presto链接数据源的时候需要什么参数？<br>1、Connector连接器，连接器顾名思义，作用相当于jdbc中的driver。<br>2、Catalog，一个数据源就是catalog，可以是mysql，可以是hive等等<br>3、Schema，类似mysql中的database，一个catalog可以有多个schema<br>4、Table，就是表！<br>二、presto的查询模型<br>1、statement<br>语句，就是sql语句。是一个静态的概念。<br>2、query<br>查询，通过语句生成的query，是一个动态的执行。<br>3、stage<br>一个stage代表查询执行计划的一个部分。<br>stage有四种类型：<br>Coordinator_Only:<br>用于执行DDM或者DDL表的创建与更改<br>Single:<br>这种类型用于聚合子Stage的输出数据<br>Fixed:<br>用于接受其子Stage产生的数据并在集群中对这些数据进行分布式的聚合或者分组计算。<br>Source:<br>用于直接链接数据源，从数据源读取数据，在读取数据的时候，该阶段也会根据presto对查询执行计划的优化完成相关的断言下发和条件过滤等<br>Exchange：<br>交换，stage之间用于数据交换用的。场景包括下游从上游读取数据。<br>Task:<br>就是stage切分出来运行在W节点上的具体任务。<br>Split：<br>就是数据集上的子集。下文说道的driver就是在split上做操作<br>Driver：<br>一个task包括一个或者多个Driver。就是一个split的一系列operator集合。<br>Page是presto中处理的最小数据单元。一个Page对象包含多个Block对象，而每个Block对象是一个字节数组，存储一个字段的若干行。多个block横切的一行是真实的一行数据。</p>
-<p>以上，就是我们对于presto源码阅读理解的重点喽</p>
-<p>再来看看presto的启动命令吧<br>首先是C节点：<br>-Dnode.data-dir=/mnt/disk1/log/presto -Dnode.id=xxxxxxxxxxx -Dnode.environment=production -Dlog.enable-console=false -Dlog.levels-file=/etc/ecm/presto-conf-0.188/log.properties -Dconfig=/etc/ecm/presto-conf-0.188/config.properties com.facebook.presto.server.PrestoServer<br>然后是W节点<br>-Dnode.data-dir=/mnt/disk1/log/presto -Dnode.id=xxxxxxx -Dnode.environment=production -Dlog.enable-console=false -Dlog.levels-file=/etc/ecm/presto-conf-0.188/log.properties -Dconfig=/etc/ecm/presto-conf-0.188/config.properties com.facebook.presto.server.PrestoServer<br>命令是一样滴哦，惊不惊喜，意不意外！<br>差别就在properties里了<br>里面有个coordinator属性为true则为C节点，false为W节点<br>本来想今天把服务跑起来看看的，结果意外了。<br>连续两次意外了。<br>第一次的时候发现需要装antlr插件也就是g4插件。。。。<br>第二次又意外了 jdk版本不够。。。<br>Presto requires Java 8u151+ (found 1.8.0_144)</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/01/07/presto-source-code/" data-id="clypv5bji000v6y791lh6bua5" class="article-share-link">Share</a>
-      
-      
     </footer>
   </div>
   
@@ -596,7 +594,11 @@ restart:
       <ul>
         
           <li>
-            <a href="/2024/07/17/hello-world/">如何搭建新版本hexo</a>
+            <a href="/2024/07/18/hello-world/">如何搭建新版本hexo</a>
+          </li>
+        
+          <li>
+            <a href="/2024/07/18/influxdb-opt/">influxdb优化</a>
           </li>
         
           <li>
@@ -609,10 +611,6 @@ restart:
         
           <li>
             <a href="/2020/04/25/build-flume-ha/">构建flume高可用集群</a>
-          </li>
-        
-          <li>
-            <a href="/2020/04/14/firecracker-introduction/">firecracker介绍</a>
           </li>
         
       </ul>
