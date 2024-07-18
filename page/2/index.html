@@ -61,6 +61,50 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-tracingSystem" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/05/05/tracingSystem/" class="article-date">
+  <time datetime="2019-05-05T11:29:34.000Z" itemprop="datePublished">2019-05-05</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/05/05/tracingSystem/">链路追踪系统之选型篇</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>Distributed Tracing最早起源于google的一片论文（链接见文末），之后各家都退出了自己的监控系统<br>但是数据格式并不统一，所以发起了open tracing标准，现在skywalking、zipkin和jaeger都遵循这一协议。<br>本篇是对近期链路跟踪系统选型的汇总。<br>主要选型对象有如下几个：zipkin、skywalking、CAT和pinpoint。<br>CAT的代码侵入性最大，并且过于臃肿可以reject，不过CAT的分析系统做的不错，可以借鉴一下。<br>pinpoint是naver出产的，团队规模小，并且需要hbase，韩国出品，所以也reject。<br>这里主要讨论zipkin与skywalking<br>zipkin架构图如下：<br><img src="/2019/05/05/tracingSystem/zipkin_architecture.png" alt="zipkin_overview" title="zipkin_overview"><br>在这里解读一下上图各个部分。<br>首先instrumented client 表示是经过扩展的客户端<br>Non-instrumented client 表示未经过扩展的客户端<br>instrumented client的一个请求叫做Span，一个完整调用链叫trace。<br>上图首先从instrumented client发送一个span到transport然后到collect，最后落盘存储用于ui展示。<br>发送到Non-instrumented client 并不会给collect发送记录存储。</p>
+<p>zipkin主要有两个工程：<br><a href="https://github.com/openzipkin/brave" target="_blank" rel="external">https://github.com/openzipkin/brave</a><br><a href="https://github.com/apache/incubator-zipkin" target="_blank" rel="external">https://github.com/apache/incubator-zipkin</a><br>brave主要是zipkin的外围扩展。<br>现在主要支持一下扩展：<br><img src="/2019/05/05/tracingSystem/zipkin_instrument.png" alt="zipkin_instrument" title="zipkin_instrument"></p>
+<p>ncubator-zipkin是zipkin的服务端。<br>包含如下部分：<br>server：服务端程序。<br>lens：web ui<br>storage：将数据存盘，现在支持mysql、cassandra和es<br>collect：收集器，包括三种收集模式：rest、kafka和rabbitmq。<br>正常来说应该使用mq异步的collect这样对程序本身性能影响最小。<br>zipkin的扩展是通过有针对性的埋点来实现的。<br>比如对于rest的扩展是通过spring的resttemplate拦截器在header里传traceid和spanid来实现的。<br>对于kafka消息的扩展也是在header里加参数来实现的。<br>所以zipkin本身依赖于第三方目标服务是否具有扩展性。<br>侵入性来说需要添加配置。</p>
+<p>下面说说skywalking<br><img src="/2019/05/05/tracingSystem/skywalking.jpeg" alt="skywalking" title="skywalking"><br>首先tracing（跟踪）也好，Metric（指标）也罢，都是通过http或者grpc将采集起来的数据传送到服务器端的。<br>其数据存储包括mysql、es、tidb、h2和sharding<br>因为skywalking是通过AOP的方式动态织入代码的，所以并不受限于api扩展。<br>以下是已有的扩展：<br><img src="/2019/05/05/tracingSystem/skywalking_plugin1.png" alt="skywalking_plu1" title="skywalking_plu1"><br>&amp;<br><img src="/2019/05/05/tracingSystem/skywalking_plugin2.png" alt="skywalking plu2" title="skywalking plu2"><br>而且skywalking对于代码完全没有任何侵入性。<br>缺点是与我司运维人员了解到有两个问题：<br>1、存在es中的数据无法删除<br>2、如果es重启的话，必须所有agent都重启完毕，skywalking的监控上才会有数值。<br>这个要跟一下具体问题。</p>
+<p>综合总结一下如下：<br>zipkin是基于api调用的，skywalking是基于AOP的。扩展性上讲skywalking要优于zipkin。<br>代码复杂度上来说，zipkin更容易上手一些，代码量也少。<br>性能上来说skywalking比zipkin要好。</p>
+<p>相关zipkin与skywalking的理论基础如下：<br><a href="https://bigbully.github.io/Dapper-translation/" target="_blank" rel="external">https://bigbully.github.io/Dapper-translation/</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2019/05/05/tracingSystem/" data-id="clyr2kpjm001a3d793zj91rsh" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/zipkin-skywalking-cat/">zipkin skywalking cat</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
     <article id="post-presto-source-code" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2019/01/07/presto-source-code/" class="article-date">
@@ -90,7 +134,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/01/07/presto-source-code/" data-id="clyqydtw1000wo5790c4s2wcz" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2019/01/07/presto-source-code/" data-id="clyr2kpif000w3d79uprzfd8r" class="article-share-link">Share</a>
       
       
     </footer>
@@ -130,7 +174,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/12/20/sqoop-huizong/" data-id="clyqydtw40013o579y4x29rx2" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/12/20/sqoop-huizong/" data-id="clyr2kpil00163d79s186hlzf" class="article-share-link">Share</a>
       
       
     </footer>
@@ -243,7 +287,7 @@ df.select(col(&quot;*&quot;) +: fieldCols: _*).show()
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/12/17/how-to-add-col-spark-dataframe/" data-id="clyqydtva000eo579wliwmq2b" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/12/17/how-to-add-col-spark-dataframe/" data-id="clyr2kpho000e3d79tkdf3r9b" class="article-share-link">Share</a>
       
       
     </footer>
@@ -281,7 +325,7 @@ df.select(col(&quot;*&quot;) +: fieldCols: _*).show()
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/12/17/mysql-HOUR-OF-DAY-2-3/" data-id="clyqydtvk000qo579criv11z6" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/12/17/mysql-HOUR-OF-DAY-2-3/" data-id="clyr2kphy000q3d79os5necss" class="article-share-link">Share</a>
       
       
     </footer>
@@ -333,7 +377,7 @@ df.select(col(&quot;*&quot;) +: fieldCols: _*).show()
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/12/13/spark-sql-count-as-issue/" data-id="clyqydtw30010o579l5y7zzfh" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/12/13/spark-sql-count-as-issue/" data-id="clyr2kpij00133d79e56us2h7" class="article-share-link">Share</a>
       
       
     </footer>
@@ -370,7 +414,7 @@ df.select(col(&quot;*&quot;) +: fieldCols: _*).show()
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/12/13/spark-classloader-cannot-find-classdef-in-the-jar/" data-id="clyqydtw1000xo579g732jmmb" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/12/13/spark-classloader-cannot-find-classdef-in-the-jar/" data-id="clyr2kpii00103d79em9jrkud" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spark-classload-ClassNotFound/">spark classload ClassNotFound</a></li></ul>
@@ -415,7 +459,7 @@ df.select(col(&quot;*&quot;) +: fieldCols: _*).show()
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/12/04/ali-emr-presto/" data-id="clyqydtv00003o579hlhn2gp8" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/12/04/ali-emr-presto/" data-id="clyr2kphf00033d79lpmk4qkl" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/阿里云-sgoop-presto/">阿里云 sgoop presto</a></li></ul>
@@ -471,7 +515,7 @@ df.select(col(&quot;*&quot;) +: fieldCols: _*).show()
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/10/30/tensorflow介绍/" data-id="clyqydtwn0014o579x1wnbjcf" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/10/30/tensorflow介绍/" data-id="clyr2kpjk00173d7981hxhnd1" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/tensroflow/">tensroflow</a></li></ul>
@@ -511,63 +555,9 @@ df.select(col(&quot;*&quot;) +: fieldCols: _*).show()
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/09/05/openstack简介/" data-id="clyqydtvw000vo579mg9uqqeu" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/09/05/openstack简介/" data-id="clyr2kpi8000v3d79iqxk2kqw" class="article-share-link">Share</a>
       
       
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-openstack-neutron" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2017/05/01/openstack-neutron/" class="article-date">
-  <time datetime="2017-05-01T08:36:25.000Z" itemprop="datePublished">2017-05-01</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/05/01/openstack-neutron/">openstack_neutron</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>本文主要着重介绍openstack neutron vxlan网络模式下的原理和体系架构。<br>名词解释：<br>东西向网络流量：vm内网流量<br>南北向网络流量：vm通过浮动ip与外网产生的流量<br>veth设备：成对出现，往往用于跨namespace通信，如下图所示：<br><img src="/2017/05/01/openstack-neutron/veth.png" alt="veth device" title="veth device"><br>tap设备：虚拟网络接口<br>fdb表：作用于数据链路层（二层网络），mac+vxlan和port的对应关系。<br>arp协议和arp表：<br>Arp协议是三层协议，主机发送网络包的时候会先广播到网络上的所有主机，如果接收到返回，就放到arp表中缓存。<br>Arp表存放ip和mac地址的对应关系<br>vxlan:Vxlan是 一种overlay网络，是一种隧道技术。<br><img src="/2017/05/01/openstack-neutron/vxlan.png" alt="vxlan network" title="vxlan network"></p>
-<p>openstack vxlan 网络模式简介</p>
-<p>东西向流量(虚拟机之间的网络流向)<br><img src="/2017/05/01/openstack-neutron/eastWest.png" alt="eastwest" title="eastwest"></p>
-<p>东西流量示例讲解：<br>计算节点网络：<br><img src="/2017/05/01/openstack-neutron/vm_network.png" alt="eastwest" title="eastwest"></p>
-<img src="/2017/05/01/openstack-neutron/port.png" alt="eastwest" title="eastwest">
-<p>网桥的命名规则是取networks的id前12位<br><img src="/2017/05/01/openstack-neutron/portid.png" alt="eastwest" title="eastwest"><br>tap设备的命名规则是取portid的前12位<br><img src="/2017/05/01/openstack-neutron/portDB.png" alt="port" title="port"><br>给一个安全组添加ssh（22端口）访问权限后的计算节点iptables：</p>
-<img src="/2017/05/01/openstack-neutron/5.png" alt="iptables" title="iptables">
-<p>网络节点：<br><img src="/2017/05/01/openstack-neutron/4.png" alt="iptables" title="iptables"></p>
-<img src="/2017/05/01/openstack-neutron/2.png" alt="iptables" title="iptables">
-<img src="/2017/05/01/openstack-neutron/3.png" alt="iptables" title="iptables">
-<img src="/2017/05/01/openstack-neutron/1.png" alt="iptables" title="iptables">
-<p>另外负载均衡器也在网络节点上。<br>南北向流量流向（虚拟机与外网之间的网络流向）</p>
-<img src="/2017/05/01/openstack-neutron/nanbei.png" alt="northsouth" title="northsouth">
-<img src="/2017/05/01/openstack-neutron/6.png" alt="iptables" title="iptables">
-<img src="/2017/05/01/openstack-neutron/7.png" alt="iptables" title="iptables">
-<img src="/2017/05/01/openstack-neutron/8.png" alt="iptables" title="iptables">
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/05/01/openstack-neutron/" data-id="clyqydtvs000ro579o9e7cfny" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/openstack-neutron/">openstack neutron</a></li></ul>
-
     </footer>
   </div>
   
@@ -591,7 +581,7 @@ df.select(col(&quot;*&quot;) +: fieldCols: _*).show()
   <div class="widget-wrap">
     <h3 class="widget-title">Tags</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/bigdata/">bigdata</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/flume/">flume</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/influx-proxy/">influx-proxy</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/k8s/">k8s</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack-neutron/">openstack neutron</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spark-classload-ClassNotFound/">spark classload ClassNotFound</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring/">spring</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring-eureka/">spring eureka</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tensroflow/">tensroflow</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/zipkin-skywalking-cat/">zipkin skywalking cat</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/阿里云-sgoop-presto/">阿里云 sgoop presto</a></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/bigdata/">bigdata</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/flume/">flume</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/influx-proxy/">influx-proxy</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/k8s/">k8s</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack-neutron/">openstack neutron</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sharding-jdbc/">sharding-jdbc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spark-classload-ClassNotFound/">spark classload ClassNotFound</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring/">spring</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring-eureka/">spring eureka</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tensroflow/">tensroflow</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/zipkin-skywalking-cat/">zipkin skywalking cat</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/阿里云-sgoop-presto/">阿里云 sgoop presto</a></li></ul>
     </div>
   </div>
 
@@ -601,7 +591,7 @@ df.select(col(&quot;*&quot;) +: fieldCols: _*).show()
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/bigdata/" style="font-size: 10px;">bigdata</a> <a href="/tags/flume/" style="font-size: 10px;">flume</a> <a href="/tags/influx-proxy/" style="font-size: 10px;">influx-proxy</a> <a href="/tags/k8s/" style="font-size: 10px;">k8s</a> <a href="/tags/openstack-neutron/" style="font-size: 10px;">openstack neutron</a> <a href="/tags/spark-classload-ClassNotFound/" style="font-size: 10px;">spark classload ClassNotFound</a> <a href="/tags/spring/" style="font-size: 20px;">spring</a> <a href="/tags/spring-eureka/" style="font-size: 10px;">spring eureka</a> <a href="/tags/tensroflow/" style="font-size: 10px;">tensroflow</a> <a href="/tags/zipkin-skywalking-cat/" style="font-size: 10px;">zipkin skywalking cat</a> <a href="/tags/阿里云-sgoop-presto/" style="font-size: 10px;">阿里云 sgoop presto</a>
+      <a href="/tags/bigdata/" style="font-size: 10px;">bigdata</a> <a href="/tags/flume/" style="font-size: 10px;">flume</a> <a href="/tags/influx-proxy/" style="font-size: 10px;">influx-proxy</a> <a href="/tags/k8s/" style="font-size: 10px;">k8s</a> <a href="/tags/openstack-neutron/" style="font-size: 10px;">openstack neutron</a> <a href="/tags/sharding-jdbc/" style="font-size: 10px;">sharding-jdbc</a> <a href="/tags/spark-classload-ClassNotFound/" style="font-size: 10px;">spark classload ClassNotFound</a> <a href="/tags/spring/" style="font-size: 20px;">spring</a> <a href="/tags/spring-eureka/" style="font-size: 10px;">spring eureka</a> <a href="/tags/tensroflow/" style="font-size: 10px;">tensroflow</a> <a href="/tags/zipkin-skywalking-cat/" style="font-size: 10px;">zipkin skywalking cat</a> <a href="/tags/阿里云-sgoop-presto/" style="font-size: 10px;">阿里云 sgoop presto</a>
     </div>
   </div>
 
@@ -627,6 +617,10 @@ df.select(col(&quot;*&quot;) +: fieldCols: _*).show()
           </li>
         
           <li>
+            <a href="/2024/07/18/sharding-jdbc-beggin/">sharding-jdbc极简使用</a>
+          </li>
+        
+          <li>
             <a href="/2024/07/18/influxdb-opt/">influxdb优化</a>
           </li>
         
@@ -636,10 +630,6 @@ df.select(col(&quot;*&quot;) +: fieldCols: _*).show()
         
           <li>
             <a href="/2021/05/28/influx-proxy-problemlist/">influx-proxy部署遇到的问题</a>
-          </li>
-        
-          <li>
-            <a href="/2020/04/25/build-flume-ha/">构建flume高可用集群</a>
           </li>
         
       </ul>
