@@ -61,6 +61,100 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-how-to-deploy-logstash-plugin-env" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2020/01/15/how-to-deploy-logstash-plugin-env/" class="article-date">
+  <time datetime="2020-01-15T15:21:19.000Z" itemprop="datePublished">2020-01-15</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2020/01/15/how-to-deploy-logstash-plugin-env/">logstash jdbc plugin 优化</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>本文主要讲logstash 插件环境搭建<br>起因是我需要把mysql里一张1000w条数据的表导入到es中,于是采用了logstash数据泵导入到es.<br>logstash是有jdbc插件的,因为数据量巨大,一次性载入内存耗费太大,16g内存机器吃不消.所以采用分页的方式来搞.<br>配置如下:<br>input {<br>jdbc {<br>    jdbc_driver_library =&gt; “/opt/logstash-7.5.1/lib/mysql-connector-java-5.1.44.jar”<br>    jdbc_driver_class =&gt; “com.mysql.jdbc.Driver”<br>    jdbc_connection_string =&gt; “jdbc:mysql://xxxxxxx:33063/xxxxxx?autoReconnect=true&amp;failOverReadOnly=false&amp;maxReconnects=10”<br>    jdbc_user =&gt; “xxxxxx”<br>    jdbc_password =&gt; “xxx”<br>    jdbc_page_size =&gt; 1000<br>    jdbc_validate_connection =&gt; true<br>    jdbc_pool_timeout =&gt; 5<br>    jdbc_validation_timeout =&gt; 10<br>    jdbc_fetch_size =&gt; 1000<br>    connection_retry_attempts_wait_time =&gt; 5<br>    jdbc_paging_enabled =&gt; true<br>    statement =&gt; “SELECT * from a”<br>}<br>}<br>output {<br>  elasticsearch {<br>    index =&gt; “his”<br>    hosts =&gt; [“localhost:9200”]<br>  }<br>  stdout { codec =&gt; rubydebug }<br>}</p>
+<p>然后开始报错:<br>[2020-01-09T22:02:19,614][ERROR][logstash.inputs.jdbc     ][main] Java::ComMysqlJdbcExceptionsJdbc4::CommunicationsException: Communications link failure</p>
+<p>The last packet successfully received from the server was 60,296 milliseconds ago.  The last packet sent successfully to the server was 60,108 milliseconds ago.: SELECT count(*) AS <code>count</code> FROM (SELECT inout_id,vehicle_no,create_time from a) AS <code>t1</code> LIMIT 1<br>[2020-01-09T22:02:19,666][WARN ][logstash.inputs.jdbc     ][main] Exception when executing JDBC query {:exception=&gt;#&lt;Sequel::DatabaseDisconnectError: Java::ComMysqlJdbcExceptionsJdbc4::CommunicationsException: Communications link failure</p>
+<p>The last packet successfully received from the server was 60,296 milliseconds ago.  The last packet sent successfully to the server was 60,108 milliseconds ago.&gt;}<br>[2020-01-09T22:02:20,206][INFO ][logstash.runner          ] Logstash shut down.</p>
+<p>一开始以为是参数设置问题,加上各种timeout设置也不起作用.<br>这里有个重点是分页logstash默认走的是子查询查到一个总和,如下所示:<br>select count(<em>) as <code>count</code> from (select </em> from a)<br>但是这要求把全部数据先查一遍.怀疑这里造成性能损耗太大.<br>于是换了个思路,改一下logstash-jdbc源码把……加个专门查总数查询的配置.<br>那因为logstash是juby的,那咱就先装ruby.<br>先安装rvm:<br>curl -sSL <a href="https://get.rvm.io" target="_blank" rel="external">https://get.rvm.io</a> | bash -s stable<br>logstash 必须安装jruby!!<br>安装jruby:<br>rvm install jruby<br>使用rvm的时候要先执行<br>source /etc/profile.d/rvm.sh<br>安装 bundle:<br>gem install bundler<br>这里有至少两个坑:<br>1、安装bundler的时候要注意给/usr/local/rvm以ruby当前用户的权限 chown和chgrp 要不然权限会有问题.<br>另外要随时跟进安装错误日志<br>比如期间遇到过git clone jruby hang住了,那就手动先git clone 到指定目录再执行 安装jruby.</p>
+<p>2、网络!<br>装的时候有时需要走ss代理,有时不需要.需要多试试<br>比如步骤1的时候手动clone jruby然后 mvn build的时候,可以用ss代理提速<br>3、安装jruby的时候报错:<br>root@slave-node:~/logstash-input-jdbc# rvm install jruby<br>jruby-9.2.6.0 - #removing src/jruby-9.2.6.0..<br>Searching for binary rubies, this might take some time.<br>Found remote file <a href="https://repo1.maven.org/maven2/org/jruby/jruby-dist/9.2.6.0/jruby-dist-9.2.6.0-bin.tar.gz" target="_blank" rel="external">https://repo1.maven.org/maven2/org/jruby/jruby-dist/9.2.6.0/jruby-dist-9.2.6.0-bin.tar.gz</a><br>Checking requirements for ubuntu.<br>Requirements installation successful.<br>jruby-9.2.6.0 - #configure<br>jruby-9.2.6.0 - #download<br>  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current<br>                                 Dload  Upload   Total   Spent    Left  Speed<br>100 22.9M  100 22.9M    0     0  24821      0  0:16:09  0:16:09 –:–:– 25820<br>No checksum for downloaded archive, recording checksum in user configuration.<br>jruby-9.2.6.0 - #validate archive<br>jruby-9.2.6.0 - #extract<br>jruby-9.2.6.0 - #validate binary<br>jruby-9.2.6.0 - #setup<br>jruby-9.2.6.0 - #gemset created /usr/local/rvm/gems/jruby-9.2.6.0@global<br>jruby-9.2.6.0 - #importing gemset /usr/local/rvm/gemsets/jruby/global.gems.<br>Error running ‘gemset_import_list jruby-openssl jruby-launcher gem-wrappers rubygems-bundler rake rvm bundler’,<br>please read /usr/local/rvm/log/1578889834_jruby-9.2.6.0/gemsets.import.global.log<br>打开本地日志文件如下:<br>java.lang.LayerInstantiationException: Package jdk.internal.jrtfs in both module jrt.fs and module java.base<br>本人用的是jdk13,把jdk13下的jrt-fs.jar删掉后解决<br>4、安装jury的时候,报如下错误:<br>ERROR:  While executing gem … (Gem::Exception)<br>    Failed to find gems [“”] &gt;= 0<br>++ _failed+=(“${_gem} –version ${_version}”)<br>++ read _gem _version _platforms<br>++ ((  1 &gt; 0  ))<br>++ rvm_error ‘\n’\’’command gem pristine –extensions  –version ‘\’’ failed, you need to fix these gems manually.’<br>++ rvm_pretty_print stderr<br>++ case “${rvm_pretty_print_flag:=auto}” in<br>++ case “${TERM:-dumb}” in<br>++ case “$1” in<br>++ [[ -t 2 ]]<br>++ return 1<br>++ printf %b ‘\n’\’’command gem pristine –extensions  –version ‘\’’ failed, you need to fix these gems manually.\n’<br>++ return 1<br>++ return 1</p>
+<p>不过我再次输入<br>rvm install jruby的时候提示我已经安装成功了,就没深究这个问题<br>5、删除本地插件的时候要注意执行命令的当前目录<br>必须在 logstash的主目录下!不能在bin下.要不然会报如下错误:<br>ERROR: Operation aborted, cannot remove plugin, message: The path <code>/opt/logstash-7.5.1/bin/logstash-core</code> does not exist.</p>
+<p>本地插件编译和安装的步骤如下:<br>1、cd 到jdbc插件的根目录<br>2、切换到ruby的用户,比如我这里是es<br>su -s es<br>4、souce /etc/profile.d/rvm.sh<br>5、项目安装依赖</p>
+<p>bundle install<br>这里安装依赖的时候 我忘了是不是要用ss代理了………<br>安装的时候如果有失败的情况会提示你做一些操作,比如:<br>URI::InvalidURIError: can not set user with opaque<br>An error occurred while installing rake (13.0.1), and Bundler<br>cannot continue.<br>Make sure that <code>gem install rake -v &#39;13.0.1&#39; --source &#39;https://rubygems.org/&#39;</code><br>succeeds before bundling.</p>
+<p>In Gemfile:<br>  logstash-devutils was resolved to 1.3.6, which depends on<br>    rake</p>
+<p>那就执行一下gem install rake -v ‘13.0.1’ –source ‘<a href="https://rubygems.org/" target="_blank" rel="external">https://rubygems.org/</a> 就好了<br>6、构建插件gem (在项目主目录下产生logstash-input-jdbc-4.3.19.gem文件)</p>
+<p>gem build logstash-input-jdbc.gemspec</p>
+<p>7、logstash卸载logstash-input-jdbc插件</p>
+<p>/bin/logstash-plugin uninstall logstash-input-jdbc<br>8、删除<br>rm -rf /opt/logstash-7.5.1/vendor/cache/logstash-filter-geoip-6.0.3-java.gem<br>9、logstash安装本地插件 (先将构建成功的gem文件拷贝至logstash主目录的trade_gem文件夹中)</p>
+<p>/bin/logstash-plugin install –no-verify –local ../logstash-input-jdbc-4.3.19.gem</p>
+<p>优化后的配置文件如下:<br>input {<br>jdbc {<br>    jdbc_driver_library =&gt; “/opt/logstash-7.5.1/lib/mysql-connector-java-5.1.44.jar”<br>    jdbc_driver_class =&gt; “com.mysql.jdbc.Driver”<br>    jdbc_connection_string =&gt; “jdbc:mysql://xxxxxx:33063/database?autoReconnect=true&amp;failOverReadOnly=false&amp;maxReconnects=10&amp;zeroDateTimeBehavior=convertToNull”<br>    jdbc_user =&gt; “username”<br>    jdbc_password =&gt; “password”<br>    jdbc_page_size =&gt; 1000<br>    jdbc_validate_connection =&gt; true<br>    jdbc_pool_timeout =&gt; 5<br>    jdbc_validation_timeout =&gt; 10<br>    jdbc_fetch_size =&gt; 1000<br>    connection_retry_attempts_wait_time =&gt; 5<br>    jdbc_paging_enabled =&gt; true<br>    subquery_paging_enabled =&gt; true<br>    sum_statement =&gt; “select count(1) as sum from his”<br>    statement =&gt; “SELECT * from his_shadow where id &gt;= (select id from his order by id limit :data_offset,1) limit :jdbc_page_size”<br>}<br>}<br>output {<br>  elasticsearch {<br>    index =&gt; “_his”<br>    hosts =&gt; [“localhost:9200”]<br>  }<br>  stdout { codec =&gt; rubydebug }<br>}</p>
+<p>参考资料:</p>
+<p><a href="https://www.jianshu.com/p/84e807e1a575" target="_blank" rel="external">https://www.jianshu.com/p/84e807e1a575</a><br>感谢前人无私的分享,新版本的logstash代码接口已经有变化了这里附上新版本的代码如下:<br><a href="/2020/01/15/how-to-deploy-logstash-plugin-env/statement_handler.rb" title="statement_handler.rb">statement_handler.rb</a><br><br>完整工程如下:</p>
+<a href="/2020/01/15/how-to-deploy-logstash-plugin-env/logstash-input-jdbc_youhua.zip" title="logstash-input-jdbc_youhua.zip">logstash-input-jdbc_youhua.zip</a>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2020/01/15/how-to-deploy-logstash-plugin-env/" data-id="clyx03umg000foo797rs0qfb1" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-k8s-install" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/11/11/k8s-install/" class="article-date">
+  <time datetime="2019-11-11T13:43:45.000Z" itemprop="datePublished">2019-11-11</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/11/11/k8s-install/">k8s安装</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>今天遇到了k8s 在ubuntu18.04下安装的时候进行kubeadm init的时候拉取image失败的问题，<br>而且我设置了shadowshocket的代理http_proxy和https_proxy依然不行，<br>后来指定镜像库解决。命令如下：<br>kubeadm init –image-repository registry.aliyuncs.com/google_containers –ignore-preflight-errors=Swap<br>收官</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2019/11/11/k8s-install/" data-id="clyx03umm000qoo799rhf5gs5" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/k8s/">k8s</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
     <article id="post-tracingSystem" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2019/05/05/tracingSystem/" class="article-date">
@@ -93,7 +187,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/05/05/tracingSystem/" data-id="clyr2kpjm001a3d793zj91rsh" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2019/05/05/tracingSystem/" data-id="clyx03uow001goo7956q4pq0a" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/zipkin-skywalking-cat/">zipkin skywalking cat</a></li></ul>
@@ -134,7 +228,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/01/07/presto-source-code/" data-id="clyr2kpif000w3d79uprzfd8r" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2019/01/07/presto-source-code/" data-id="clyx03umt000zoo795a6gcoi3" class="article-share-link">Share</a>
       
       
     </footer>
@@ -174,7 +268,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/12/20/sqoop-huizong/" data-id="clyr2kpil00163d79s186hlzf" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/12/20/sqoop-huizong/" data-id="clyx03unu001coo79jtx7g58p" class="article-share-link">Share</a>
       
       
     </footer>
@@ -287,7 +381,7 @@ df.select(col(&quot;*&quot;) +: fieldCols: _*).show()
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/12/17/how-to-add-col-spark-dataframe/" data-id="clyr2kpho000e3d79tkdf3r9b" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/12/17/how-to-add-col-spark-dataframe/" data-id="clyx03uma000eoo799htq6dvd" class="article-share-link">Share</a>
       
       
     </footer>
@@ -325,7 +419,7 @@ df.select(col(&quot;*&quot;) +: fieldCols: _*).show()
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/12/17/mysql-HOUR-OF-DAY-2-3/" data-id="clyr2kphy000q3d79os5necss" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/12/17/mysql-HOUR-OF-DAY-2-3/" data-id="clyx03umn000too79543hv2w4" class="article-share-link">Share</a>
       
       
     </footer>
@@ -377,7 +471,7 @@ df.select(col(&quot;*&quot;) +: fieldCols: _*).show()
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/12/13/spark-sql-count-as-issue/" data-id="clyr2kpij00133d79e56us2h7" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/12/13/spark-sql-count-as-issue/" data-id="clyx03un90016oo79krhxxudg" class="article-share-link">Share</a>
       
       
     </footer>
@@ -414,7 +508,7 @@ df.select(col(&quot;*&quot;) +: fieldCols: _*).show()
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/12/13/spark-classloader-cannot-find-classdef-in-the-jar/" data-id="clyr2kpii00103d79em9jrkud" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/12/13/spark-classloader-cannot-find-classdef-in-the-jar/" data-id="clyx03un80013oo79236vgid6" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spark-classload-ClassNotFound/">spark classload ClassNotFound</a></li></ul>
@@ -459,105 +553,11 @@ df.select(col(&quot;*&quot;) +: fieldCols: _*).show()
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/12/04/ali-emr-presto/" data-id="clyr2kphf00033d79lpmk4qkl" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/12/04/ali-emr-presto/" data-id="clyx03uly0003oo79aswm5ard" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/阿里云-sgoop-presto/">阿里云 sgoop presto</a></li></ul>
 
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="tensorflow-1-tensorflow介绍" class="article article-type-tensorflow-1" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/10/30/tensorflow介绍/" class="article-date">
-  <time datetime="2018-10-30T14:11:59.000Z" itemprop="datePublished">2018-10-30</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/10/30/tensorflow介绍/">图像识别与tensorflow</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>1、图像识别基本流程：<br>a、输入:<br>    我们的给定K个类别的N张图片，作为计算机学习的训练集<br>b、学习:<br>    让计算机逐张图片地『观察』和『学习』<br>c、 评估:<br>    就像我们上学学了东西要考试检测一样，我们也得考 考计算机学得如何，于是我们给定一些计算机不知道 类别的图片让它判别，然后再比对我们已知的正确答案。<br>举个例子：<br>教小孩认识水果。</p>
-<p><div style="height: 20%;width: 20%;" float="left"><img src="/2018/10/30/tensorflow介绍/boy.jpg" alt="xianxingfenlei" title="xianxingfenlei"></div><br>  <div style="height: 20%;width: 20%;" float="right"><img src="/2018/10/30/tensorflow介绍/juzi.jpg" alt="xianxingfenlei" title="xianxingfenlei"></div><br>看！这是橘子！<br>再看看这个还认识不？</p>
-<p><div style="height: 20%;width: 20%;" float="right"><img src="/2018/10/30/tensorflow介绍/chengzi.jpg" alt="xianxingfenlei" title="xianxingfenlei"></div><br>2、tensorflow入门例子：<br>tensorflow是google的亲儿子。<br>从名字可以看出tensorflow=tensor+flow。就是张量加图<br>tensorflow的输入就是张量，以mnist数据集为例：<br>mnist每个图片是28*28像素，将图片按像素展开为数组得到784纬向量空间中的点。<br>而mnist训练集中更有55000张图，就是一个[55000，784]的张量。<br>第一维是图片索引，第二维是像素索引。<br><img src="/2018/10/30/tensorflow介绍/mnist.jpg" alt="xianxingfen" title="xianxingfen"><br><img src="/2018/10/30/tensorflow介绍/tens.jpg" alt="xianxingfen" title="xianxingfen"></p>
-<img src="/2018/10/30/tensorflow介绍/demo1.jpg" alt="xianxingfen" title="xianxingfen">
-<img src="/2018/10/30/tensorflow介绍/1.jpg" alt="xianxingfen" title="xianxingfen">
-<p>tensorflow的处理流程可以这样</p>
-<p>从线性分类器开始说起<br>2、线性分类器：<br><img src="/2018/10/30/tensorflow介绍/xianxingfenleiqi.jpg" alt="xianxingfenlei" title="xianxingfenlei"><br>具体计算过程：<br><img src="/2018/10/30/tensorflow介绍/xianxingfenlei1.jpg" alt="xianxingfenlei1" title="xianxingfenlei1"><br>W的每一行可以看做是其中一个类别的模板<br>每类得分，实际上是像素点和模板匹配度<br>模板匹配的方式是内积计算</p>
-<p>4、激励函数：<br>常见激励函数：<br>4.1.sigmoid函数<br>S(x)=1/(1+exp(-x))<br>导数为：S(x)*(1-S(x))。<br>4.2 tanh函数<br><img src="/2018/10/30/tensorflow介绍/tanhx.png" alt="softmax" title="softmax"><br>导数为<br><img src="/2018/10/30/tensorflow介绍/tanhx1.png" alt="softmax" title="softmax"><br>4.3 elu函数：<br><img src="/2018/10/30/tensorflow介绍/elu.png" alt="softmax" title="softmax"><br>4.4 softplus函数：<br>f(x)=ln(1+ex)<br>导数为：<br>f′(x)=ex1+ex=11+e−x<br>4.5 softsign函数：<br><img src="/2018/10/30/tensorflow介绍/softsign.png" alt="softmax" title="softmax"><br>4.6 relu函数<br>f(x) = max(0, x)<br>4.7 relu6函数<br>f(x) = max(0,6,x)<br><img src="/2018/10/30/tensorflow介绍/1204043-20170722004859120-1107549120.png" alt="link_fun" title="link_fun"><br>如何选择：<br>神经网络层次很少，可以随意尝试记录函数组合，<br>卷积神经网络用relu<br>循环神经网络推荐relu或者tanh</p>
-<p>5、损失函数：<br>损失函数是评价我们训练模型好坏的关键函数，顾名思义就是损失函数的值越小越好。<br>整个训练学习的过程就是最小化损失函数的过程<br>交叉熵:<br><img src="/2018/10/30/tensorflow介绍/cross.jpg" alt="softmax" title="softmax"><br>一般用来求目标与预测值之间的差距。y 是我们预测的概率分布,y′ 是实际的分布<br>激励函数计算方式：<br>以softmax为例<br><img src="/2018/10/30/tensorflow介绍/softmax1.jpg" alt="softmax" title="softmax"><br><img src="/2018/10/30/tensorflow介绍/softmax2.jpg" alt="softmax1" title="softmax1"></p>
-<p>4、梯度下降：<br>梯度下降的过程是将损失函数最小化的过程。<br>梯度的负方向是局部下降最快的方向<br><img src="/2018/10/30/tensorflow介绍/gd5.png" alt="softmax1" title="softmax1"><br>tensorflow 优化器：<br><img src="/2018/10/30/tensorflow介绍/youhuaqi.png" alt="softmax1" title="softmax1"><br>梯度下降实际上是tensorflow中最基本的一种优化器。一共有9种。简单总结一下。<br>如果数据是稀疏的，就用自适用方法，即 Adagrad, Adadelta, RMSprop, Adam。</p>
-<p>RMSprop, Adadelta, Adam 在很多情况下的效果是相似的。</p>
-<p>Adam 就是在 RMSprop 的基础上加了 bias-correction 和 momentum，</p>
-<p>随着梯度变的稀疏，Adam 比 RMSprop 效果会好。</p>
-<p>整体来讲，Adam 是最好的选择。</p>
-<p>5、人工神经网络：<br><img src="/2018/10/30/tensorflow介绍/shenjingwangluo.png" alt="神经网络" title="神经网络"><br>神经网络由神经元构成，每一个神经元都有各自的权重，代表一种特征。<br>神经元的“与或”运算达到了非线性切分目的。<br>“正向传播”求损失，“反向传播”回传误差<br>根据误差信号修正每层的权重<br>神经元：<br><img src="/2018/10/30/tensorflow介绍/shenjingyuan.png" alt="神经元" title="神经元"><br>6、卷积神经网络<br>卷积神经网络是神经网络的一种，他解决了图片处理的一个大问题就是特征向量提取的问题。<br><img src="/2018/10/30/tensorflow介绍/juanji1.png" alt="神经元" title="神经元"><br>卷积神经网络层级分为:输入层、卷积层、激励层、池化层和全联接层<br>卷积层(conv)：<br>固定每个神经元连接权重，可以看做模板 每个神经元只关注一个特性<br>参数共享机制:假设每个神经元连接数据窗的权重是固定的<br>一组固定的权重和不同窗口内数据做内积: 卷积<br><img src="/2018/10/30/tensorflow介绍/juanji2.png" alt="卷积神经网络" title="卷积神经网络"><br>激励层(RELU):<br>把卷积层输出结果做非线性映射<br>卷积神经网络主要用RELU做激励函数<br><img src="/2018/10/30/tensorflow介绍/jili.png" alt="卷积神经网络" title="卷积神经网络"><br>池化层pooling:<br>夹在连续的卷积层中间<br>压缩数据和参数的量，减小过拟合<br>这个与数据量的大小也有关系，过多的池化会把数据压没，不做池化也有可能造成过拟合。<br><img src="/2018/10/30/tensorflow介绍/pooling.png" alt="卷积神经网络" title="卷积神经网络"><br>卷积神经网络的构成<br><img src="/2018/10/30/tensorflow介绍/cnn.png" alt="卷积神经网络" title="卷积神经网络"><br>CNN的优点：<br>共享卷积核，对高维数据处理无压力<br>无需手动选取特征，训练好权重，即得特征<br>分类效果好<br>缺点：<br>需要调参，需要大样本量，训练最好要GPU<br>8、tensorflow卷积神经网络实例<br><img src="/2018/10/30/tensorflow介绍/demo1副本.png" alt="卷积神经网络" title="卷积神经网络"></p>
-<img src="/2018/10/30/tensorflow介绍/cnnlogic.png" alt="卷积神经网络" title="卷积神经网络">
-<p>9、opencv与tensorflow</p>
-<p>参考资料：<br>softmax函数详解 <a href="https://www.cnblogs.com/alexanderkun/p/8098781.html" target="_blank" rel="external">https://www.cnblogs.com/alexanderkun/p/8098781.html</a><br>交叉熵  <a href="https://blog.csdn.net/tsyccnh/article/details/79163834" target="_blank" rel="external">https://blog.csdn.net/tsyccnh/article/details/79163834</a><br>优化器选择  <a href="https://blog.csdn.net/tiankongtiankong01/article/details/80570729" target="_blank" rel="external">https://blog.csdn.net/tiankongtiankong01/article/details/80570729</a><br>tensorflow建议教程 <a href="https://morvanzhou.github.io/tutorials/machine-learning/tensorflow/1-1-A-ANN-and-NN/" target="_blank" rel="external">https://morvanzhou.github.io/tutorials/machine-learning/tensorflow/1-1-A-ANN-and-NN/</a></p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/10/30/tensorflow介绍/" data-id="clyr2kpjk00173d7981hxhnd1" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/tensroflow/">tensroflow</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="openstack-instroduce-openstack简介" class="article article-type-openstack-instroduce" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/09/05/openstack简介/" class="article-date">
-  <time datetime="2018-09-05T14:08:38.000Z" itemprop="datePublished">2018-09-05</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/09/05/openstack简介/">openstack简介</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <img src="/2018/09/05/openstack简介/introduce.png" alt="introduce" title="introduce">
-<p>Openstack由美国国家航空航天局和Rackspace公司合作研发，目前已经占据市场主导地位。它致力于提供规模化、灵活扩展易部署且功能丰富的全开源模式平台，协助运营商、企业、ISP/CP、科研机构等搭建并实现满足自身需求的公共云和私有云服务，有力的推动了云计算的创新发展。<br>  Openstack的主要组件包括：计算（nova）、对象存储（swift）、镜像（glance）、认证（keystone）<br>、web控制台（horizon）以及网络（neutron）。其中Horizon提供了一个Web前端到Openstack其他服务的界面；nova组件主要负责管理虚拟机，存储和检索虚拟磁盘（Image）和Image上相关的元数据（Glance），并提供管理和维护系统镜像服务；网络组件（neutron）提供构建与管理虚拟网路的功能，他将网络连接作为服务；块存储服务服务组件（cinder）提供存储功能；Image（Glance）在对象存储（swift）上能够完成虚拟磁盘文件的存储，该组件提供pb级别、安全可靠的对象存储服务；所有的服务均需要利用keystone进行身份认证。</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/09/05/openstack简介/" data-id="clyr2kpi8000v3d79iqxk2kqw" class="article-share-link">Share</a>
-      
-      
     </footer>
   </div>
   
@@ -581,7 +581,7 @@ df.select(col(&quot;*&quot;) +: fieldCols: _*).show()
   <div class="widget-wrap">
     <h3 class="widget-title">Tags</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/bigdata/">bigdata</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/flume/">flume</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/influx-proxy/">influx-proxy</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/k8s/">k8s</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack-neutron/">openstack neutron</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sharding-jdbc/">sharding-jdbc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spark-classload-ClassNotFound/">spark classload ClassNotFound</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring/">spring</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring-eureka/">spring eureka</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tensroflow/">tensroflow</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/zipkin-skywalking-cat/">zipkin skywalking cat</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/阿里云-sgoop-presto/">阿里云 sgoop presto</a></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/bigdata/">bigdata</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/flume/">flume</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/influx-proxy/">influx-proxy</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/k8s/">k8s</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/k8s-rancher/">k8s rancher</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack-neutron/">openstack neutron</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sharding-jdbc/">sharding-jdbc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spark-classload-ClassNotFound/">spark classload ClassNotFound</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring/">spring</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring-eureka/">spring eureka</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tensroflow/">tensroflow</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ubuntu/">ubuntu</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/zipkin-skywalking-cat/">zipkin skywalking cat</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/阿里云-sgoop-presto/">阿里云 sgoop presto</a></li></ul>
     </div>
   </div>
 
@@ -591,7 +591,7 @@ df.select(col(&quot;*&quot;) +: fieldCols: _*).show()
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/bigdata/" style="font-size: 10px;">bigdata</a> <a href="/tags/flume/" style="font-size: 10px;">flume</a> <a href="/tags/influx-proxy/" style="font-size: 10px;">influx-proxy</a> <a href="/tags/k8s/" style="font-size: 10px;">k8s</a> <a href="/tags/openstack-neutron/" style="font-size: 10px;">openstack neutron</a> <a href="/tags/sharding-jdbc/" style="font-size: 10px;">sharding-jdbc</a> <a href="/tags/spark-classload-ClassNotFound/" style="font-size: 10px;">spark classload ClassNotFound</a> <a href="/tags/spring/" style="font-size: 20px;">spring</a> <a href="/tags/spring-eureka/" style="font-size: 10px;">spring eureka</a> <a href="/tags/tensroflow/" style="font-size: 10px;">tensroflow</a> <a href="/tags/zipkin-skywalking-cat/" style="font-size: 10px;">zipkin skywalking cat</a> <a href="/tags/阿里云-sgoop-presto/" style="font-size: 10px;">阿里云 sgoop presto</a>
+      <a href="/tags/bigdata/" style="font-size: 10px;">bigdata</a> <a href="/tags/flume/" style="font-size: 10px;">flume</a> <a href="/tags/influx-proxy/" style="font-size: 10px;">influx-proxy</a> <a href="/tags/k8s/" style="font-size: 10px;">k8s</a> <a href="/tags/k8s-rancher/" style="font-size: 10px;">k8s rancher</a> <a href="/tags/openstack-neutron/" style="font-size: 10px;">openstack neutron</a> <a href="/tags/sharding-jdbc/" style="font-size: 10px;">sharding-jdbc</a> <a href="/tags/spark-classload-ClassNotFound/" style="font-size: 10px;">spark classload ClassNotFound</a> <a href="/tags/spring/" style="font-size: 20px;">spring</a> <a href="/tags/spring-eureka/" style="font-size: 10px;">spring eureka</a> <a href="/tags/tensroflow/" style="font-size: 10px;">tensroflow</a> <a href="/tags/ubuntu/" style="font-size: 10px;">ubuntu</a> <a href="/tags/zipkin-skywalking-cat/" style="font-size: 10px;">zipkin skywalking cat</a> <a href="/tags/阿里云-sgoop-presto/" style="font-size: 10px;">阿里云 sgoop presto</a>
     </div>
   </div>
 
@@ -613,7 +613,15 @@ df.select(col(&quot;*&quot;) +: fieldCols: _*).show()
       <ul>
         
           <li>
-            <a href="/2024/07/18/hello-world/">如何搭建新版本hexo</a>
+            <a href="/2024/07/22/hello-world/">如何搭建新版本hexo</a>
+          </li>
+        
+          <li>
+            <a href="/2024/07/22/unbuntu20-with-vbox7/">virtualbox7安装ubuntu20</a>
+          </li>
+        
+          <li>
+            <a href="/2024/07/21/how-to-install-k8s-with-rke/">用RKE安装k8s</a>
           </li>
         
           <li>
@@ -622,14 +630,6 @@ df.select(col(&quot;*&quot;) +: fieldCols: _*).show()
         
           <li>
             <a href="/2024/07/18/influxdb-opt/">influxdb优化</a>
-          </li>
-        
-          <li>
-            <a href="/2024/07/17/Doris-begin/">Doris使用入门</a>
-          </li>
-        
-          <li>
-            <a href="/2021/05/28/influx-proxy-problemlist/">influx-proxy部署遇到的问题</a>
           </li>
         
       </ul>
