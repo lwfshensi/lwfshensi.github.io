@@ -61,6 +61,45 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-spark-classloader-cannot-find-classdef-in-the-jar" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/12/13/spark-classloader-cannot-find-classdef-in-the-jar/" class="article-date">
+  <time datetime="2018-12-13T14:47:35.000Z" itemprop="datePublished">2018-12-13</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/12/13/spark-classloader-cannot-find-classdef-in-the-jar/">spark找不到jar里有定义的class</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>今天遇到了一个奇怪的问题：明明打包的时候把class文件打进去了，但是却报classnotfound！<br>相同的程序如果在本地以local形式运行是可以的，但是如果submit到远程就会报classnotfound。<br>开始猜测是classloader的问题。<br>终于在stackoverflow上找到了类似的问题。<br>加上参数–driver-class-path 将jar包自己放到这个参数后面，问题解决。<br>连接如下：<br><a href="https://stackoverflow.com/questions/30426245/apache-spark-classloader-cannot-find-classdef-in-the-jar" target="_blank" rel="external">https://stackoverflow.com/questions/30426245/apache-spark-classloader-cannot-find-classdef-in-the-jar</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/12/13/spark-classloader-cannot-find-classdef-in-the-jar/" data-id="clz12ws1b0016qv79867ss87m" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spark-classload-ClassNotFound/">spark classload ClassNotFound</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
     <article id="post-ali-emr-presto" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2018/12/04/ali-emr-presto/" class="article-date">
@@ -94,7 +133,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/12/04/ali-emr-presto/" data-id="clyy5k6ef0003yv795a9890gx" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/12/04/ali-emr-presto/" data-id="clz12wrzd0003qv79r1t1yft1" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/阿里云-sgoop-presto/">阿里云 sgoop presto</a></li></ul>
@@ -150,7 +189,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/10/30/tensorflow介绍/" data-id="clyy5k6g2001ayv79b6bln343" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/10/30/tensorflow介绍/" data-id="clz12ws39001dqv79iaqu7fon" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/tensroflow/">tensroflow</a></li></ul>
@@ -190,7 +229,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/09/05/openstack简介/" data-id="clyy5k6f6000yyv79sbbt8u9i" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/09/05/openstack简介/" data-id="clz12ws0v0011qv790ujlii8l" class="article-share-link">Share</a>
       
       
     </footer>
@@ -242,7 +281,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/05/01/openstack-neutron/" data-id="clyy5k6f4000uyv79i632pehq" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/05/01/openstack-neutron/" data-id="clz12ws0t000xqv79fb6fkhj4" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/openstack-neutron/">openstack neutron</a></li></ul>
@@ -281,7 +320,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/05/01/spring-cloud/" data-id="clyy5k6fh0017yv79w4ozj76d" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/05/01/spring-cloud/" data-id="clz12ws1f001aqv79x2ypa6dq" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spring/">spring</a></li></ul>
@@ -320,7 +359,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/05/01/frame/" data-id="clyy5k6ej000ayv79k2r3icnb" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/05/01/frame/" data-id="clz12wrzo000aqv797xanpjc5" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spring/">spring</a></li></ul>
@@ -360,7 +399,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2016/12/12/openstack-newton-mysql-config/" data-id="clyy5k6f5000xyv79mxoubl76" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2016/12/12/openstack-newton-mysql-config/" data-id="clz12ws0u0010qv79qkc11ai9" class="article-share-link">Share</a>
       
       
     </footer>
@@ -398,7 +437,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2016/11/29/如何在virtualbox中安装ubuntu16/" data-id="clyy5k6gx001myv79aeb7z42j" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2016/11/29/如何在virtualbox中安装ubuntu16/" data-id="clz12ws57001pqv7988qgu5fk" class="article-share-link">Share</a>
       
       
     </footer>
@@ -435,7 +474,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2016/11/24/写给自己/" data-id="clyy5k6gx001lyv79guzu8h8s" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2016/11/24/写给自己/" data-id="clz12ws56001oqv79w2fkgxur" class="article-share-link">Share</a>
       
       
     </footer>
@@ -461,7 +500,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Tags</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/bigdata/">bigdata</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/flume/">flume</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/influx-proxy/">influx-proxy</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/k8s/">k8s</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/k8s-rancher/">k8s rancher</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack-neutron/">openstack neutron</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sharding-jdbc/">sharding-jdbc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spark-classload-ClassNotFound/">spark classload ClassNotFound</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring/">spring</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring-eureka/">spring eureka</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tensroflow/">tensroflow</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ubuntu/">ubuntu</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/zipkin-skywalking-cat/">zipkin skywalking cat</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/阿里云-sgoop-presto/">阿里云 sgoop presto</a></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/bigdata/">bigdata</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/emqx-haproxy-keepalive/">emqx haproxy keepalive</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/flume/">flume</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/influx-proxy/">influx-proxy</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/k8s/">k8s</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/k8s-rancher/">k8s rancher</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack-neutron/">openstack neutron</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sharding-jdbc/">sharding-jdbc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spark-classload-ClassNotFound/">spark classload ClassNotFound</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring/">spring</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring-eureka/">spring eureka</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tensroflow/">tensroflow</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ubuntu/">ubuntu</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/zipkin-skywalking-cat/">zipkin skywalking cat</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/阿里云-sgoop-presto/">阿里云 sgoop presto</a></li></ul>
     </div>
   </div>
 
@@ -471,7 +510,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/bigdata/" style="font-size: 10px;">bigdata</a> <a href="/tags/flume/" style="font-size: 10px;">flume</a> <a href="/tags/influx-proxy/" style="font-size: 10px;">influx-proxy</a> <a href="/tags/k8s/" style="font-size: 10px;">k8s</a> <a href="/tags/k8s-rancher/" style="font-size: 10px;">k8s rancher</a> <a href="/tags/openstack-neutron/" style="font-size: 10px;">openstack neutron</a> <a href="/tags/sharding-jdbc/" style="font-size: 10px;">sharding-jdbc</a> <a href="/tags/spark-classload-ClassNotFound/" style="font-size: 10px;">spark classload ClassNotFound</a> <a href="/tags/spring/" style="font-size: 20px;">spring</a> <a href="/tags/spring-eureka/" style="font-size: 10px;">spring eureka</a> <a href="/tags/tensroflow/" style="font-size: 10px;">tensroflow</a> <a href="/tags/ubuntu/" style="font-size: 20px;">ubuntu</a> <a href="/tags/zipkin-skywalking-cat/" style="font-size: 10px;">zipkin skywalking cat</a> <a href="/tags/阿里云-sgoop-presto/" style="font-size: 10px;">阿里云 sgoop presto</a>
+      <a href="/tags/bigdata/" style="font-size: 10px;">bigdata</a> <a href="/tags/emqx-haproxy-keepalive/" style="font-size: 10px;">emqx haproxy keepalive</a> <a href="/tags/flume/" style="font-size: 10px;">flume</a> <a href="/tags/influx-proxy/" style="font-size: 10px;">influx-proxy</a> <a href="/tags/k8s/" style="font-size: 10px;">k8s</a> <a href="/tags/k8s-rancher/" style="font-size: 10px;">k8s rancher</a> <a href="/tags/openstack-neutron/" style="font-size: 10px;">openstack neutron</a> <a href="/tags/sharding-jdbc/" style="font-size: 10px;">sharding-jdbc</a> <a href="/tags/spark-classload-ClassNotFound/" style="font-size: 10px;">spark classload ClassNotFound</a> <a href="/tags/spring/" style="font-size: 20px;">spring</a> <a href="/tags/spring-eureka/" style="font-size: 10px;">spring eureka</a> <a href="/tags/tensroflow/" style="font-size: 10px;">tensroflow</a> <a href="/tags/ubuntu/" style="font-size: 20px;">ubuntu</a> <a href="/tags/zipkin-skywalking-cat/" style="font-size: 10px;">zipkin skywalking cat</a> <a href="/tags/阿里云-sgoop-presto/" style="font-size: 10px;">阿里云 sgoop presto</a>
     </div>
   </div>
 
@@ -493,7 +532,11 @@
       <ul>
         
           <li>
-            <a href="/2024/07/23/hello-world/">如何搭建新版本hexo</a>
+            <a href="/2024/07/25/hello-world/">如何搭建新版本hexo</a>
+          </li>
+        
+          <li>
+            <a href="/2024/07/25/install-emqx-cluster/">服务器高可用负载均衡集群</a>
           </li>
         
           <li>
@@ -506,10 +549,6 @@
         
           <li>
             <a href="/2024/07/21/how-to-install-k8s-with-rke/">用RKE安装k8s</a>
-          </li>
-        
-          <li>
-            <a href="/2024/07/18/sharding-jdbc-beggin/">sharding-jdbc极简使用</a>
           </li>
         
       </ul>

@@ -63,8 +63,8 @@
   
     <article id="post-hello-world" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
-    <a href="/2024/07/23/hello-world/" class="article-date">
-  <time datetime="2024-07-23T08:27:14.925Z" itemprop="datePublished">2024-07-23</time>
+    <a href="/2024/07/25/hello-world/" class="article-date">
+  <time datetime="2024-07-25T09:36:22.458Z" itemprop="datePublished">2024-07-25</time>
 </a>
     
   </div>
@@ -75,7 +75,7 @@
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2024/07/23/hello-world/">如何搭建新版本hexo</a>
+      <a class="article-title" href="/2024/07/25/hello-world/">如何搭建新版本hexo</a>
     </h1>
   
 
@@ -88,9 +88,84 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2024/07/23/hello-world/" data-id="clyy5k6el000dyv7959idco72" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2024/07/25/hello-world/" data-id="clz12wrzv000dqv790nk4rzpp" class="article-share-link">Share</a>
       
       
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-install-emqx-cluster" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2024/07/25/install-emqx-cluster/" class="article-date">
+  <time datetime="2024-07-25T09:20:37.000Z" itemprop="datePublished">2024-07-25</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2024/07/25/install-emqx-cluster/">服务器高可用负载均衡集群</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="一、服务器和软件版本说明"><a href="#一、服务器和软件版本说明" class="headerlink" title="一、服务器和软件版本说明"></a>一、服务器和软件版本说明</h1><p>操作系统：CentOS7.4。<br>版本：haproxy-2.1.2( <a href="http://download.openpkg.org/components/cache/haproxy/haproxy-2.1.2.tar.gz" target="_blank" rel="external">http://download.openpkg.org/components/cache/haproxy/haproxy-2.1.2.tar.gz</a> )，keepalived-2.0.19( <a href="https://www.keepalived.org/software/keepalived-2.0.19.tar.gz" target="_blank" rel="external">https://www.keepalived.org/software/keepalived-2.0.19.tar.gz</a> )，emqx3.2.7<br>环境配置：6台虚拟机，其中两台作为emqx服务器，四台用来装haproxy+keepalive实现负载均衡和高可用。</p>
+<h1 id="二、-架构图"><a href="#二、-架构图" class="headerlink" title="二、 架构图"></a>二、 架构图</h1><img src="/2024/07/25/install-emqx-cluster/emqx-ha.png" alt="zipkin_overview" title="zipkin_overview">
+<h1 id="三、架构服务器"><a href="#三、架构服务器" class="headerlink" title="三、架构服务器"></a>三、架构服务器</h1><p>服务器IP    部署业务    作用<br>192.168.0.6    EMQX    EMQ集群<br>192.168.0.7    EMQX    EMQ集群<br>192.168.0.4    haproxy    HA<br>192.168.0.5    haproxy    HA<br>192.168.0.2    keepalived    LB<br>192.168.0.3    keepalived    LB</p>
+<h1 id="四、EMQX的部署"><a href="#四、EMQX的部署" class="headerlink" title="四、EMQX的部署"></a>四、EMQX的部署</h1><p>CentOS<br>•CentOS6.X<br>•CentOS7.X<br>使用储存库安装 EMQ X<br>1.安装所需要的依赖包<br>Java<br>$ sudo yum install -y yum-utils device-mapper-persistent-data lvm2<br>1.使用以下命令设置稳定存储库，以 CentOS7 为例<br>Java<br>$ sudo yum-config-manager –add-repo <a href="https://repos.emqx.io/emqx-ce/redhat/centos/7/emqx-ce.repo" target="_blank" rel="external">https://repos.emqx.io/emqx-ce/redhat/centos/7/emqx-ce.repo</a><br>1.安装最新版本的 EMQ X<br>Java<br>$ sudo yum install emqx<br>1.注解<br>2.如果提示接受 GPG 密钥，请确认密钥符合 fc84 1ba6 3775 5ca8 487b 1e3c c0b4 0946 3e64 0d53，如果符合，则接受该指纹。<br>3.安装特定版本的 EMQ X<br>a.查询可用版本<br>Java<br>$ yum list emqx –showduplicates | sort -r emqx.x86_64<br>3.1.0-1.el7 emqx-stable emqx.x86_64<br>3.0.1-1.el7 emqx-stable emqx.x86_64<br>3.0.0-1.el7 emqx-stable<br>a.根据第二列中的版本字符串安装特定版本，例如 3.1.0<br>Java<br>$ sudo yum install emqx-3.1.0<br>4.启动 EMQ X<br>￮直接启动<br>Java<br>$ emqx start </p>
+<p>emqx 3.1.0 is started successfully! </p>
+<p>$ emqx_ctl status </p>
+<p>Node ‘emqx@127.0.0.1’ is started emqx v3.1.0 is running<br>￮systemctl 启动<br>Java<br>$ sudo systemctl start emqx<br>￮service 启动<br>Java<br>$ sudo service emqx start</p>
+<p>五、Haproxy的部署<br>在192.168.0.4服务器上安装haproxy:<br>Java<br>tar -xvf haproxy-2.1.2.tar.gz<br>进入解压目录<br>Java<br>make TARGET=linux2628 ARCH=x86_64 PREFIX=/usr/local/haproxy</p>
+<p>Java<br>make install PREFIX=/usr/local/haproxy<br>使用uname -r查看系统版本，根据内核版本选择编译参数：<br><img src="/2024/07/25/install-emqx-cluster/emqx-linux.png" alt="zipkin_overview" title="zipkin_overview"></p>
+<p>安装完成后查看版本：<br>Java<br>/usr/local/haproxy/sbin/haproxy -v<br>配置启动脚本：复制haproxy文件到/usr/sbin下<br>Java<br>cp /usr/local/haproxy/sbin/haproxy /usr/sbin/<br>复制haproxy脚本，到/etc/init.d下<br>Java<br>cp ./examples/haproxy.init（解压目录） /etc/init.d/haproxy</p>
+<p>Java<br>sed -i ‘s#etc/$BASENAME#usr/local/haproxy/conf#g’ /etc/init.d/haproxy</p>
+<p>Java<br>chmod 755 /etc/init.d/haproxy</p>
+<p>创建配置文件<br>Java<br>cd /usr/local/haproxy/<br>mkdir conf<br>cd conf<br>vi haproxy.cfg<br>配置文件内容—&gt;&gt;&gt;<br>Java<br>frontend emqtt-front<br>    bind *:1885<br>    maxconn     1000000<br>    mode tcp<br>    default_backend emqtt-backend</p>
+<p>backend emqtt-backend<br>    balance roundrobin</p>
+<pre><code># balance source
+server emq-1 192.168.0.6:1883 check inter 100000 fall 2 rise 5 weight 1
+server emq-2 192.168.0.6:1883 check inter 100000 fall 2 rise 5 weight 1
+# source 0.0.0.0 usesrc clientip
+</code></pre><p>frontend emqtt-pub-front<br>    bind *:8085<br>    maxconn     1000000<br>    mode tcp<br>    default_backend emqtt-pub-backend</p>
+<p>backend emqtt-pub-backend<br>    balance roundrobin</p>
+<pre><code># balance source
+server emq-1 192.168.0.5:8083 check inter 100000 fall 2 rise 5 weight 1
+server emq-2 192.168.0.6:8083 check inter 100000 fall 2 rise 5 weight 1
+</code></pre><p>frontend emqtt-admin-front<br>    bind *:18085<br>    mode http<br>    default_backend emqtt-admin-backend</p>
+<p>backend emqtt-admin-backend<br>    mode http<br>    balance roundrobin<br>    server emq-1 192.168.0.5:18083 check<br>    server emq-2 192.168.0.6:18083 check<br>listen admin_stats<br>        stats   enable<br>        bind    *:8082<br>        mode    http<br>        option  httplog<br>        log     global<br>        maxconn 10<br>        stats   refresh 30s<br>        stats   uri /admin<br>        stats   realm haproxy<br>        stats   auth admin:admin<br>        stats   hide-version<br>        stats   admin if TRUE<br>打开rsyslog配置：<br>Java<br>vi /etc/rsyslog.conf<br>打开下面两行的注释<br>Java<br>$ModLoad imudp<br>$UDPServerRun 514</p>
+<p>并添加<br>Java<br>local3.* /var/log/haproxy.log</p>
+<p>重启rsyslog：<br>Java<br>service rsyslog restart</p>
+<p>启动HAProxy：<br>Java<br>service haproxy start</p>
+<p>访问192.168.0.4:8080/admin，打开控制台：<br>192.168.0.5 haproxy的配置与4一样。</p>
+<h1 id="六、keepalived安装"><a href="#六、keepalived安装" class="headerlink" title="六、keepalived安装"></a>六、keepalived安装</h1><p>在192.168.0.2上安装Keepalived<br>安装 keepalived 需要用到 openssl:<br>Java<br>yum install gcc gcc-c++ openssl openssl-devel</p>
+<p>Java<br>tar -xvf keepalived-2.0.19.tar.gz</p>
+<p>Java<br>cd keepalived-2.0.19</p>
+<p>Java<br>./configure –prefix=/usr/local/keepalived<br>（ 如果出现以下警告： WARNING - this build will not support IPVS with IPv6. Please install libnl/libnl-3 dev libraries to support IPv6 with IPVS.<br>请安装：yum -y install libnl libnl-devel，重新执行./configure –prefix=/usr/local/keepalived）<br>Java<br>make &amp;&amp; make install</p>
+<p>编辑配置文件keepalived.conf<br>Java<br>! Configuration File for keepalived<br>global_defs {<br>notification_email {</p>
+<p>}<br>router_id mqtt40<br>vrrp_skip_check_adv_addr<br>vrrp_garp_interval 0<br>vrrp_gna_interval 0<br>}</p>
+<p>vrrp_instance VI_1 {<br>state MASTER<br>interface ens33<br>virtual_router_id 79<br>priority 50<br>advert_int 1<br>authentication {<br>auth_type PASS<br>auth_pass 1111<br>}<br>virtual_ipaddress {<br>192.168.0.1<br>}<br>}<br>virtual_server 192.168.0.1 80{<br>delay_stop 6<br>lb_algo rr<br>lb_kind NAT<br>nat_mask 255.255.255.0<br>persistence_timeout 50<br>protocol TCP<br>real_server 192.168.0.2 80{<br>weight 1<br>}<br>real_server 192.168.0.3 80{<br>weight 1<br>}<br>}<br>配置：<br>Java<br>mkdir /etc/keepalived<br>cp /usr/local/keepalived/etc/keepalived/keepalived.conf /etc/keepalived/keepalived.conf<br>cp ./keepalived/etc/init.d/keepalived(该目录为keepalived的解压目录) /etc/rc.d/init.d/keepalived<br>cp /usr/local/keepalived/etc/sysconfig/keepalived /etc/sysconfig/keepalived<br>cd /etc/init.d/<br>chmod +x keepalived<br>service keepalived start<br>如果出现这种情况Starting keepalived: /bin/bash: keepalived: command not found<br>[FAILED]<br>建立软连接即可：<br>Java<br>ln -s /usr/local/keepalived/sbin/keepalived /usr/bin/</p>
+<p>192.168.0.3从机的配置文件keepalived.conf<br>Java<br>vrrp_instance VI_1 {<br>state BACKUP<br>interface ens33<br>virtual_router_id 79<br>priority 51<br>advert_int 1<br>authentication {<br>auth_type PASS<br>auth_pass 1111<br>}<br>virtual_ipaddress {<br>192.168.0.1<br>}<br>}</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2024/07/25/install-emqx-cluster/" data-id="clz12ws0g000qqv79r9ouu8th" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/emqx-haproxy-keepalive/">emqx haproxy keepalive</a></li></ul>
+
     </footer>
   </div>
   
@@ -126,7 +201,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2024/07/23/ubuntu20-install-docker/" data-id="clyy5k6g7001gyv79ob33vqk1" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2024/07/23/ubuntu20-install-docker/" data-id="clz12ws3d001jqv79k9lzot26" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ubuntu/">ubuntu</a></li></ul>
@@ -167,7 +242,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2024/07/22/unbuntu20-with-vbox7/" data-id="clyy5k6gs001jyv7967n1gym2" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2024/07/22/unbuntu20-with-vbox7/" data-id="clz12ws4t001mqv79shi3k125" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ubuntu/">ubuntu</a></li></ul>
@@ -217,7 +292,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2024/07/21/how-to-install-k8s-with-rke/" data-id="clyy5k6eq000gyv79jwxxj637" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2024/07/21/how-to-install-k8s-with-rke/" data-id="clz12ws03000gqv79fyzx0vrb" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/k8s-rancher/">k8s rancher</a></li></ul>
@@ -269,7 +344,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2024/07/18/sharding-jdbc-beggin/" data-id="clyy5k6fd0010yv79v68aio9e" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2024/07/18/sharding-jdbc-beggin/" data-id="clz12ws160013qv79kbvfxhwn" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/sharding-jdbc/">sharding-jdbc</a></li></ul>
@@ -308,7 +383,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2024/07/18/influxdb-opt/" data-id="clyy5k6ev000pyv79xcohkf0y" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2024/07/18/influxdb-opt/" data-id="clz12ws0b000pqv79o0vtftuy" class="article-share-link">Share</a>
       
       
     </footer>
@@ -359,7 +434,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2024/07/17/Doris-begin/" data-id="clyy5k6e80000yv79f3i1ribg" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2024/07/17/Doris-begin/" data-id="clz12wrz40000qv79ccwp8rzp" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/bigdata/">bigdata</a></li></ul>
@@ -407,7 +482,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2021/05/28/influx-proxy-problemlist/" data-id="clyy5k6et000myv79jmh9ley8" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2021/05/28/influx-proxy-problemlist/" data-id="clz12ws09000mqv79lcxkpdn7" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/influx-proxy/">influx-proxy</a></li></ul>
@@ -463,65 +538,11 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2020/04/25/build-flume-ha/" data-id="clyy5k6eg0006yv79m8mle0cv" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2020/04/25/build-flume-ha/" data-id="clz12wrzg0006qv79g82zckxs" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/flume/">flume</a></li></ul>
 
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-firecracker-introduction" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2020/04/14/firecracker-introduction/" class="article-date">
-  <time datetime="2020-04-13T18:10:23.000Z" itemprop="datePublished">2020-04-14</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2020/04/14/firecracker-introduction/">firecracker介绍</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>firecracker是aws开源的serverless计算框架.<br>firecracker是基于kvm的micro vm技术,相对于容器隔离醒更好,同时性能更快.<br>仅启动相对较新的 Linux 内核，并且仅启动使用特定配置选项集编译的内核（内核编译配置选项超过 1000 种）。<br>此外，不支持任何类型的图形卡或加速器，不支持硬件透传，不支持（大多数）老旧设备。<br>由于设备模型极简，内核加载过程也简单，可以实现小于 125 ms 的启动时间和更少的内存占用。<br>Firecracker 目前支持 Intel CPU，并将于 2019 年开始支持 AMD 和 ARM，还将与 containerd 等流行的容器运行时集成。</p>
-<p>与宿主机的关系:<br><img src="/2020/04/14/firecracker-introduction/host.png" alt="introduce" title="introduce"><br>Firecracker 运行在 Linux 主机上，内核为4.14或更新内核，并且使用 Linux guest OSs (从这一点来说，称为 guest)。 启动该进程后，在发出 instanceart 命令之前，用户与 Firecracker API 交互以配置 microVM。</p>
-<p>Firecracker 内部架构<br><img src="/2020/04/14/firecracker-introduction/org.png" alt="introduce" title="introduce"><br>每个 Firecracker 进程封装一个且只有一个 microVM。 该进程运行以下线程: API、 VMM 和 vCPU。 Api 线程负责 Firecracker 的 API 服务器和相关的控制平面。 它永远不会在虚拟机的快速路径上。 Vmm 线程公开机器模型、最小遗留设备模型、 microVM 元数据服务(MMDS)和 VirtIO 设备仿真 Net 和 Block 设备，并提供 i / o 速率限制。 除此之外，还有一个或多个 vCPU 线程(每个客户 CPU 核心一个)。 它们是通过 KVM 创建的，并运行 KVM run 主循环。 它们在设备模型上执行同步 i / o 和存储器映射输入输出操作。</p>
-<p>Firecracker如何工作<br><img src="/2020/04/14/firecracker-introduction/work.png" alt="introduce" title="introduce"><br>Firecracker 在用户空间中运行，使用基于 Linux 内核的虚拟机（KVM）来创建 microVM。每个 microVM 的快速启动时间和低内存开销使你可将数千个 microVM 打包到同一台机器上。这意味着每个函数或容器组都可以使用虚拟机屏障进行封装，从而使不同用户的工作负载能在同一台计算机上运行，而无需在安全性和效率之间进行权衡。Firecracker 是 QEMU 的替代品，QEMU 是一个成熟的 VMM，具有通用和广泛的功能集，可以托管各种客户操作系统。</p>
-<p>可以通过 RESTful API 控制 Firecracker 进程，RESTful API 可以启用常见操作：例如配置 vCPU 数量或启动计算机。Firecracker 提供内置速率限制器，可精确控制同一台计算机上数千个 microVM 使用的网络和存储资源。你可以通过 Firecracker API 创建和配置速率限制器，并灵活定义速率限制器来支持突发情况或特定带宽 / 操作限制。Firecracker 还提供元数据服务，可在主机和客户机操作系统之间安全地共享配置信息。元数据服务可以使用 Firecracker API 设置。</p>
-<p>Firecracker入门实例<br>1、找个linux电脑并且安装依赖<br>sudo apt update<br>sudo apt install qemu qemu-kvm libvirt-bin bridge-utils virt-manager<br>2、开启cpu虚拟化<br>开机进入bios后<br>Configuratio &gt; Intel Virtual Technology &gt; Enabled<br>3、根据官网进行安装<br>latest=$(basename $(curl -fsSLI -o /dev/null -w  %{url_effective}  <a href="https://github.com/firecracker-microvm/firecracker/releases/latest" target="_blank" rel="external">https://github.com/firecracker-microvm/firecracker/releases/latest</a>))<br>curl -LOJ <a href="https://github.com/firecracker-microvm/firecracker/releases/download/${latest}/firecracker-${latest}-$(uname" target="_blank" rel="external">https://github.com/firecracker-microvm/firecracker/releases/download/${latest}/firecracker-${latest}-$(uname</a> -m)<br>mv firecracker-${latest}-$(uname -m) firecracker<br>chmod +x firecracker<br>至此完成安装步骤<br>4、启动服务<br>rm -f /tmp/firecracker.socket<br>./firecracker –api-sock /tmp/firecracker.socket</p>
-<p>5、再打开一个窗口进行vm配置工作<br>既然是基于kvm的vm那么一定需要rootfs和kernal.原始文件放在aws的s3存储上但是被墙了..<br>这里找到国内的源如下:<br>wget <a href="https://silenceshell-1255345740.cos.ap-shanghai.myqcloud.com/hello-vmlinux.bin" target="_blank" rel="external">https://silenceshell-1255345740.cos.ap-shanghai.myqcloud.com/hello-vmlinux.bin</a><br>wget <a href="https://silenceshell-1255345740.cos.ap-shanghai.myqcloud.com/hello-rootfs.ext4" target="_blank" rel="external">https://silenceshell-1255345740.cos.ap-shanghai.myqcloud.com/hello-rootfs.ext4</a></p>
-<p>通过api配置rootfs与kernal<br>sudo curl –unix-socket /tmp/firecracker.sock -i     -X PUT ‘<a href="http://localhost/boot-source" target="_blank" rel="external">http://localhost/boot-source</a>‘       -H ‘Accept: application/json’               -H ‘Content-Type: application/json’         -d ‘{<br>        “kernel_image_path”: “./hello-vmlinux.bin”,<br>        “boot_args”: “console=ttyS0 reboot=k panic=1 pci=off”<br>    }’</p>
-<p> sudo curl –unix-socket /tmp/firecracker.socket -i     -X PUT ‘<a href="http://localhost/drives/rootfs" target="_blank" rel="external">http://localhost/drives/rootfs</a>‘     -H ‘Accept: application/json’               -H ‘Content-Type: application/json’         -d ‘{<br>        “drive_id”: “rootfs”,<br>        “path_on_host”: “./hello-rootfs.ext4”,<br>        “is_root_device”: true,<br>        “is_read_only”: false<br>    }’<br>5、通过api启动vm<br>sudo curl –unix-socket /tmp/firecracker.socket -i     -X PUT ‘<a href="http://localhost/actions" target="_blank" rel="external">http://localhost/actions</a>‘           -H  ‘Accept: application/json’              -H  ‘Content-Type: application/json’        -d ‘{<br>        “action_type”: “InstanceStart”<br>     }’</p>
-<p>6、最后切换到启动服务的窗口,这时候应该有了登录窗口了,用户名密码默认是root/root<br><img src="/2020/04/14/firecracker-introduction/login.png" alt="introduce" title="introduce"></p>
-<p>7、网络配置<br>首先创建tap设备:<br>sudo ip tuntap add tap0 mode tap</p>
-<p>如果要开通外网访问可以用nat转发的方式<br>设置一个网段<br>sudo ip addr add 172.16.0.1/24 dev tap0<br>启用tap0<br>并且初始化iptables规则,这里{networkCardName}指的是自己机器上外网网卡的名称<br>sudo ip link set tap0 up<br>sudo sh -c “echo 1 &gt; /proc/sys/net/ipv4/ip_forward”<br>sudo iptables -t nat -A POSTROUTING -o {networkCardName} -j MASQUERADE<br>sudo iptables -A FORWARD -m conntrack –ctstate RELATED,ESTABLISHED -j ACCEPT<br>sudo iptables -A FORWARD -i tap0 -o {networkCardName} -j ACCEPT<br>启动前进行如下配置:<br>curl –unix-socket /tmp/firecracker.socket -i \<br>  -X PUT ‘<a href="http://localhost/network-interfaces/eth0" target="_blank" rel="external">http://localhost/network-interfaces/eth0</a>‘ \<br>  -H ‘Accept: application/json’ \<br>  -H ‘Content-Type: application/json’ \<br>  -d ‘{<br>      “iface_id”: “eth0”,<br>      “guest_mac”: “AA:FC:00:00:00:01”,<br>      “host_dev_name”: “tap0”<br>    }’</p>
-<p>启动实例<br>配置实例网络<br>ip addr add 172.16.0.2/24 dev eth0</p>
-<p>ip link set eth0 up<br>ip route add default via 172.16.0.1 dev eth0</p>
-<p>最后查验一下<br><img src="/2020/04/14/firecracker-introduction/network.png" alt="introduce" title="introduce"></p>
-<p>玩完了就清理一下:<br>sudo ip link del tap0<br>sudo iptables -F<br>sudo sh -c “echo 0 &gt; /proc/sys/net/ipv4/ip_forward”</p>
-<p>firecreaker给我们提供了一种容器之外的解决方案,同时具备容器的轻量但实际上是vm.我们可以针对vm创建tap网络设备,而且由于是vm从而使其可以具有状态.<br>在物联网领域可以与规则引擎结合处理告警或者复杂逻辑运算.<br>在容器领域也可以与kata结合让容器运行在micro vm中,增强容器.</p>
-<p>参考资料:<br><a href="https://www.tuicool.com/articles/memqyaV" target="_blank" rel="external">https://www.tuicool.com/articles/memqyaV</a><br><a href="https://github.com/firecracker-microvm/firecracker/blob/master/docs/getting-started.md" target="_blank" rel="external">https://github.com/firecracker-microvm/firecracker/blob/master/docs/getting-started.md</a><br><a href="https://blog.csdn.net/wangzan18/article/details/104519333" target="_blank" rel="external">https://blog.csdn.net/wangzan18/article/details/104519333</a><br><a href="https://github.com/kata-containers/documentation/issues/351?spm=a2c4e.10696291.0.0.480319a44pfqoF" target="_blank" rel="external">https://github.com/kata-containers/documentation/issues/351?spm=a2c4e.10696291.0.0.480319a44pfqoF</a><br><a href="https://yq.aliyun.com/articles/692117" target="_blank" rel="external">https://yq.aliyun.com/articles/692117</a></p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2020/04/14/firecracker-introduction/" data-id="clyy5k6ei0009yv79x57znm46" class="article-share-link">Share</a>
-      
-      
     </footer>
   </div>
   
@@ -545,7 +566,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Tags</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/bigdata/">bigdata</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/flume/">flume</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/influx-proxy/">influx-proxy</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/k8s/">k8s</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/k8s-rancher/">k8s rancher</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack-neutron/">openstack neutron</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sharding-jdbc/">sharding-jdbc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spark-classload-ClassNotFound/">spark classload ClassNotFound</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring/">spring</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring-eureka/">spring eureka</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tensroflow/">tensroflow</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ubuntu/">ubuntu</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/zipkin-skywalking-cat/">zipkin skywalking cat</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/阿里云-sgoop-presto/">阿里云 sgoop presto</a></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/bigdata/">bigdata</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/emqx-haproxy-keepalive/">emqx haproxy keepalive</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/flume/">flume</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/influx-proxy/">influx-proxy</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/k8s/">k8s</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/k8s-rancher/">k8s rancher</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack-neutron/">openstack neutron</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sharding-jdbc/">sharding-jdbc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spark-classload-ClassNotFound/">spark classload ClassNotFound</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring/">spring</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring-eureka/">spring eureka</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tensroflow/">tensroflow</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ubuntu/">ubuntu</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/zipkin-skywalking-cat/">zipkin skywalking cat</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/阿里云-sgoop-presto/">阿里云 sgoop presto</a></li></ul>
     </div>
   </div>
 
@@ -555,7 +576,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/bigdata/" style="font-size: 10px;">bigdata</a> <a href="/tags/flume/" style="font-size: 10px;">flume</a> <a href="/tags/influx-proxy/" style="font-size: 10px;">influx-proxy</a> <a href="/tags/k8s/" style="font-size: 10px;">k8s</a> <a href="/tags/k8s-rancher/" style="font-size: 10px;">k8s rancher</a> <a href="/tags/openstack-neutron/" style="font-size: 10px;">openstack neutron</a> <a href="/tags/sharding-jdbc/" style="font-size: 10px;">sharding-jdbc</a> <a href="/tags/spark-classload-ClassNotFound/" style="font-size: 10px;">spark classload ClassNotFound</a> <a href="/tags/spring/" style="font-size: 20px;">spring</a> <a href="/tags/spring-eureka/" style="font-size: 10px;">spring eureka</a> <a href="/tags/tensroflow/" style="font-size: 10px;">tensroflow</a> <a href="/tags/ubuntu/" style="font-size: 20px;">ubuntu</a> <a href="/tags/zipkin-skywalking-cat/" style="font-size: 10px;">zipkin skywalking cat</a> <a href="/tags/阿里云-sgoop-presto/" style="font-size: 10px;">阿里云 sgoop presto</a>
+      <a href="/tags/bigdata/" style="font-size: 10px;">bigdata</a> <a href="/tags/emqx-haproxy-keepalive/" style="font-size: 10px;">emqx haproxy keepalive</a> <a href="/tags/flume/" style="font-size: 10px;">flume</a> <a href="/tags/influx-proxy/" style="font-size: 10px;">influx-proxy</a> <a href="/tags/k8s/" style="font-size: 10px;">k8s</a> <a href="/tags/k8s-rancher/" style="font-size: 10px;">k8s rancher</a> <a href="/tags/openstack-neutron/" style="font-size: 10px;">openstack neutron</a> <a href="/tags/sharding-jdbc/" style="font-size: 10px;">sharding-jdbc</a> <a href="/tags/spark-classload-ClassNotFound/" style="font-size: 10px;">spark classload ClassNotFound</a> <a href="/tags/spring/" style="font-size: 20px;">spring</a> <a href="/tags/spring-eureka/" style="font-size: 10px;">spring eureka</a> <a href="/tags/tensroflow/" style="font-size: 10px;">tensroflow</a> <a href="/tags/ubuntu/" style="font-size: 20px;">ubuntu</a> <a href="/tags/zipkin-skywalking-cat/" style="font-size: 10px;">zipkin skywalking cat</a> <a href="/tags/阿里云-sgoop-presto/" style="font-size: 10px;">阿里云 sgoop presto</a>
     </div>
   </div>
 
@@ -577,7 +598,11 @@
       <ul>
         
           <li>
-            <a href="/2024/07/23/hello-world/">如何搭建新版本hexo</a>
+            <a href="/2024/07/25/hello-world/">如何搭建新版本hexo</a>
+          </li>
+        
+          <li>
+            <a href="/2024/07/25/install-emqx-cluster/">服务器高可用负载均衡集群</a>
           </li>
         
           <li>
@@ -590,10 +615,6 @@
         
           <li>
             <a href="/2024/07/21/how-to-install-k8s-with-rke/">用RKE安装k8s</a>
-          </li>
-        
-          <li>
-            <a href="/2024/07/18/sharding-jdbc-beggin/">sharding-jdbc极简使用</a>
           </li>
         
       </ul>
