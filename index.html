@@ -127,7 +127,8 @@
 <h1 id="mmap"><a href="#mmap" class="headerlink" title="mmap"></a>mmap</h1><p>  memory map，用户态和内核态之间复制是为了安全性和缓存，那么给用户态和内存态共同开辟一块共享的缓存就是mmap技术。<br>  内核态和用户态可以一起读写一块区域<br>  使用mmap后的流程如下：<br>  <img src="/2024/07/27/zero-copy/mmap.png" alt="mmap" title="mmap"><br>  复制变成3次，上下文切换为4次<br>  使用mmap的缺点：<br>  1、使用mmap必须指定块大小，所以处理的文件不能太大<br>  2、使用mmap自动将脏页回写到磁盘，效率不一定比缓冲区快<br>  3、基于第一条，尤其不要在32位机器上执行大文件</p>
 <h1 id="sendfile"><a href="#sendfile" class="headerlink" title="sendfile"></a>sendfile</h1><p>  如果是静态资源，每次http访问都要这么复制4次，确实浪费资源，所以就有了sendfile<br>  <img src="/2024/07/27/zero-copy/sendfile.png" alt="sendfile" title="sendfile"><br>  在sendfile中，复制仍为3次，但是用户态不参与上下文切换，都是内核态和设备在切换，上下文的切换次数变成2次</p>
 <h1 id="sendfile-dma-scather-gather"><a href="#sendfile-dma-scather-gather" class="headerlink" title="sendfile+dma scather/gather"></a>sendfile+dma scather/gather</h1><p>  DMA gather是linux2.4中引入的新功能，他读取page cache中的数据描述信息（内存地址和偏移量）记录到socket cache中，由dma根据这些将数据复制到输出设备中，又减少了一次复制。<br>  <img src="/2024/07/27/zero-copy/dma-gather.png" alt="dms-gather" title="dms-gather"></p>
-<p>  direct io<br>  就是不经过内核态，用户态和硬件设备直接公用一个内存来提高效率，类似mysql就是这么做的。通过direct io可以直接写入从磁盘，写完后仍然需要fsync缓存到内核空间中。</p>
+<h1 id="direct-io"><a href="#direct-io" class="headerlink" title="direct io"></a>direct io</h1><p>  就是不经过内核态，用户态和硬件设备直接公用一个内存来提高效率，类似mysql就是这么做的。通过direct io可以直接写入从磁盘，写完后仍然需要fsync缓存到内核空间中。</p>
+<h1 id="netty"><a href="#netty" class="headerlink" title="netty"></a>netty</h1><p>  netty的零拷贝有5点：<br>  1、使用CompositeByteBuf类。<br>  2、使用Unpooled.wrappedBuffer类,将byte数组变成bytebuf对象，过程中不会出现内存拷贝<br>  3、使用FileRegion实现文件传输<br>  4、Bytebufe.slice，可以将一个butebufe对象切成多个butebuf对象，底层公用一个bute数组，且不会产生内存拷贝<br>  5、直接使用堆外内存，避免堆内和堆外内存的复制。</p>
 
       
     </div>
