@@ -63,8 +63,8 @@
   
     <article id="post-hello-world" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
-    <a href="/2024/07/25/hello-world/" class="article-date">
-  <time datetime="2024-07-25T09:36:22.458Z" itemprop="datePublished">2024-07-25</time>
+    <a href="/2024/07/27/hello-world/" class="article-date">
+  <time datetime="2024-07-27T04:36:47.524Z" itemprop="datePublished">2024-07-27</time>
 </a>
     
   </div>
@@ -75,7 +75,7 @@
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2024/07/25/hello-world/">如何搭建新版本hexo</a>
+      <a class="article-title" href="/2024/07/27/hello-world/">如何搭建新版本hexo</a>
     </h1>
   
 
@@ -88,7 +88,51 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2024/07/25/hello-world/" data-id="clz12wrzv000dqv790nk4rzpp" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2024/07/27/hello-world/" data-id="clz3n37s4000djs79d50r7vkn" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-zero-copy" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2024/07/27/zero-copy/" class="article-date">
+  <time datetime="2024-07-27T03:16:02.000Z" itemprop="datePublished">2024-07-27</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2024/07/27/zero-copy/">零拷贝技术</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>  程序执行一次的调用流程如下：<br>  <img src="/2024/07/27/zero-copy/zerocopy1.png" alt="zero" title="zero"> </p>
+<p>  1、用户进程发起read系统调用，进入内核态发起DMA复制，从输入设备复制到内核态。<br>  2、调用cpu将数据从内核态复制到用户态。<br>  3、用户态再分配给线程上线文数据地址。<br>  4、程序执行。<br>  5、将处理后的结果发起系统调用通过cpu拷贝从用户态复制到内核态。<br>  6、然后通过DMA技术将内核态缓冲区中的数据刷到硬件输出设备中，内核态回到用户态<br>  7、硬件输出设备输出结束</p>
+<p>  这里一次调用至少需要四次复制。零拷贝技术就是减少数据的io次数，优化吞吐量的技术手段，常用的技术手段有DMA、mmap、sendfile，和direct IO等</p>
+<h1 id="DMA技术"><a href="#DMA技术" class="headerlink" title="DMA技术"></a>DMA技术</h1><p>  无论是设备到内核态还是内核态到用户态的数据复制，都需要CPU的参与，当遇到大文件的时候就会浪费cpu资源。<br>  DMA也就是直接内存访问，是设备到内核态的数据复制过程不需要cpu参与，只需要给dma发送指令，避免了cpu资源浪费。<br>  <img src="/2024/07/27/zero-copy/dma.png" alt="dma" title="dma"><br>  DMA优化了cpu调度，没有减少复制</p>
+<h1 id="mmap"><a href="#mmap" class="headerlink" title="mmap"></a>mmap</h1><p>  memory map，用户态和内核态之间复制是为了安全性和缓存，那么给用户态和内存态共同开辟一块共享的缓存就是mmap技术。<br>  内核态和用户态可以一起读写一块区域<br>  使用mmap后的流程如下：<br>  <img src="/2024/07/27/zero-copy/mmap.png" alt="mmap" title="mmap"><br>  复制变成3次，上下文切换为4次<br>  使用mmap的缺点：<br>  1、使用mmap必须指定块大小，所以处理的文件不能太大<br>  2、使用mmap自动将脏页回写到磁盘，效率不一定比缓冲区快<br>  3、基于第一条，尤其不要在32位机器上执行大文件</p>
+<h1 id="sendfile"><a href="#sendfile" class="headerlink" title="sendfile"></a>sendfile</h1><p>  如果是静态资源，每次http访问都要这么复制4次，确实浪费资源，所以就有了sendfile<br>  <img src="/2024/07/27/zero-copy/sendfile.png" alt="sendfile" title="sendfile"><br>  在sendfile中，复制仍为3次，但是用户态不参与上下文切换，都是内核态和设备在切换，上下文的切换次数变成2次</p>
+<h1 id="sendfile-dma-scather-gather"><a href="#sendfile-dma-scather-gather" class="headerlink" title="sendfile+dma scather/gather"></a>sendfile+dma scather/gather</h1><p>  DMA gather是linux2.4中引入的新功能，他读取page cache中的数据描述信息（内存地址和偏移量）记录到socket cache中，由dma根据这些将数据复制到输出设备中，又减少了一次复制。<br>  <img src="/2024/07/27/zero-copy/dma-gather.png" alt="dms-gather" title="dms-gather"></p>
+<p>  direct io<br>  就是不经过内核态，用户态和硬件设备直接公用一个内存来提高效率，类似mysql就是这么做的。通过direct io可以直接写入从磁盘，写完后仍然需要fsync缓存到内核空间中。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2024/07/27/zero-copy/" data-id="clz3n37tr001gjs79ym0rbc78" class="article-share-link">Share</a>
       
       
     </footer>
@@ -149,7 +193,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2024/07/25/install-emqx-cluster/" data-id="clz12ws0g000qqv79r9ouu8th" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2024/07/25/install-emqx-cluster/" data-id="clz3n37sf000qjs797vou8swa" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/emqx-haproxy-keepalive/">emqx haproxy keepalive</a></li></ul>
@@ -189,7 +233,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2024/07/23/ubuntu20-install-docker/" data-id="clz12ws3d001jqv79k9lzot26" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2024/07/23/ubuntu20-install-docker/" data-id="clz3n37tu001kjs79z3gxrlaz" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ubuntu/">ubuntu</a></li></ul>
@@ -230,7 +274,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2024/07/22/unbuntu20-with-vbox7/" data-id="clz12ws4t001mqv79shi3k125" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2024/07/22/unbuntu20-with-vbox7/" data-id="clz3n37v5001njs7979edkt7a" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ubuntu/">ubuntu</a></li></ul>
@@ -280,7 +324,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2024/07/21/how-to-install-k8s-with-rke/" data-id="clz12ws03000gqv79fyzx0vrb" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2024/07/21/how-to-install-k8s-with-rke/" data-id="clz3n37s9000gjs7993ris2mn" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/k8s-rancher/">k8s rancher</a></li></ul>
@@ -332,7 +376,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2024/07/18/sharding-jdbc-beggin/" data-id="clz12ws160013qv79kbvfxhwn" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2024/07/18/sharding-jdbc-beggin/" data-id="clz3n37t10013js794imrpysi" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/sharding-jdbc/">sharding-jdbc</a></li></ul>
@@ -371,7 +415,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2024/07/18/influxdb-opt/" data-id="clz12ws0b000pqv79o0vtftuy" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2024/07/18/influxdb-opt/" data-id="clz3n37se000pjs79945n9jvh" class="article-share-link">Share</a>
       
       
     </footer>
@@ -422,7 +466,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2024/07/17/Doris-begin/" data-id="clz12wrz40000qv79ccwp8rzp" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2024/07/17/Doris-begin/" data-id="clz3n37rj0000js79wjzx6d63" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/bigdata/">bigdata</a></li></ul>
@@ -470,7 +514,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2021/05/28/influx-proxy-problemlist/" data-id="clz12ws09000mqv79lcxkpdn7" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2021/05/28/influx-proxy-problemlist/" data-id="clz3n37sc000mjs79li24if2h" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/influx-proxy/">influx-proxy</a></li></ul>
@@ -482,66 +526,10 @@
 
 
   
-    <article id="post-build-flume-ha" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2020/04/25/build-flume-ha/" class="article-date">
-  <time datetime="2020-04-25T12:55:43.000Z" itemprop="datePublished">2020-04-25</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2020/04/25/build-flume-ha/">构建flume高可用集群</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <img src="/2020/04/25/build-flume-ha/flume-ha.png" alt="flume-ha" title="flume-ha">
-<p>服务器端配置如下:</p>
-<figure class="highlight plain"><figcaption><span>shell config</span></figcaption><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">#set Agent name</div><div class="line">agent.sources = r1</div><div class="line">agent.channels = c1</div><div class="line">agent.sinks = k1</div><div class="line">#set channel</div><div class="line">agent.channels.c1.type = memory</div><div class="line">agent.channels.c1.capacity = 1024000</div><div class="line">agent.channels.c1.transactionCapacity = 10000</div><div class="line">agent.channels.c1.byteCapacity=134217728</div><div class="line">agent.channels.c1.byteCapacityBufferPercentage=80</div><div class="line"></div><div class="line"># other node,nna to nns</div><div class="line">agent.sources.r1.type = avro</div><div class="line">agent.sources.r1.bind = &#123;localip&#125;</div><div class="line">agent.sources.r1.port = 52020</div><div class="line">agent.sources.r1.channels = c1</div><div class="line"></div><div class="line">#set sink to hdfs</div><div class="line">agent.sinks.k1.channel = c1</div><div class="line">agent.sinks.k1.type = org.apache.flume.sink.kafka.KafkaSink</div><div class="line">agent.sinks.k1.brokerList = &#123;kafkaIp&#125;:9092</div><div class="line">agent.sinks.k1.topic = flume-test</div><div class="line">agent.sinks.k1.serializer.class = kafka.serializer.StringEncoder</div></pre></td></tr></table></figure>
-<p>flume自带load_banlance与fail over<br>先说load_banlance发送端配置如下:<br><figure class="highlight plain"><figcaption><span>shell config</span></figcaption><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div></pre></td><td class="code"><pre><div class="line">#agent1 name</div><div class="line">agent.channels = c1</div><div class="line">agent.sources = r1</div><div class="line">agent.sinks = k1 k2 k3</div><div class="line">#set gruop</div><div class="line">agent.sinkgroups = g1</div><div class="line">#set channel</div><div class="line">agent.channels.c1.type = memory</div><div class="line">agent.channels.c1.capacity = 102400</div><div class="line">agent.channels.c1.transactionCapacity = 1000</div><div class="line">agent.channels.c1.byteCapacity=134217728</div><div class="line">agent.channels.c1.byteCapacityBufferPercentage=80</div><div class="line"></div><div class="line">agent.sources.r1.channels = c1</div><div class="line"></div><div class="line">######## source相关配置 ########</div><div class="line"># source类型</div><div class="line">agent.sources.r1.type = TAILDIR</div><div class="line"># 元数据位置</div><div class="line">agent.sources.r1.positionFile = /root/taildir_position.json</div><div class="line"># 监控的目录</div><div class="line">agent.sources.r1.filegroups = f1</div><div class="line">agent.sources.r1.filegroups.f1=/root/.*log</div><div class="line">agent.sources.r1.fileHeader = true</div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"># set sink1</div><div class="line">agent.sinks.k1.channel = c1</div><div class="line">agent.sinks.k1.type = avro</div><div class="line">agent.sinks.k1.hostname = &#123;node1&#125;</div><div class="line">agent.sinks.k1.port = 52020</div><div class="line"># set sink2</div><div class="line">agent.sinks.k2.channel = c1</div><div class="line">agent.sinks.k2.type = avro</div><div class="line">agent.sinks.k2.hostname = &#123;node2&#125;</div><div class="line">agent.sinks.k2.port = 52020</div><div class="line"># set sink3</div><div class="line">agent.sinks.k3.channel = c1</div><div class="line">agent.sinks.k3.type = avro</div><div class="line">agent.sinks.k3.hostname = &#123;node3&#125;</div><div class="line">agent.sinks.k3.port = 52020</div><div class="line">#set sink group</div><div class="line">agent.sinkgroups.g1.sinks = k1 k2 k3</div><div class="line">#set load_banlance</div><div class="line">agent.sinkgroups.g1.processor.type = load_balance</div><div class="line">agent.sinkgroups.g1.processor.backoff=true   # 这个里面是个惩罚机制</div><div class="line">agent.sinkgroups.g1.processor.selector=round_robin</div></pre></td></tr></table></figure></p>
-<p>load_banlance:<br>1.当三台主机中的一台进程挂掉后，发送端会报错误，但是不影响数据的发送。<br>2.当挂掉的进程回复后，会继续被接受数据。这里面有个惩罚机制，如果开启的失败的接受端会被等待延迟！<br>3.当挂掉的进程回复后，发送端会自动添加会发送列表里，报错消失！<br>4.这个就是一个简单的均衡方式，相当于见了一个sink组，在sink组中的数据被轮询发送！</p>
-<p>再说fail over配置:<br>服务器端不变<br>发送端配置改为:<br><figure class="highlight plain"><figcaption><span>shell config</span></figcaption><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">#agent1 name</div><div class="line">agent.channels = c1</div><div class="line">agent.sources = r1</div><div class="line">agent.sinks = k1 k2 k3</div><div class="line">#set gruop</div><div class="line">agent.sinkgroups = g1</div><div class="line">#set channel</div><div class="line">agent.channels.c1.type = memory</div><div class="line">agent.channels.c1.capacity = 102400</div><div class="line">agent.channels.c1.transactionCapacity = 1000</div><div class="line">agent.channels.c1.byteCapacity=134217728</div><div class="line">agent.channels.c1.byteCapacityBufferPercentage=80</div><div class="line"></div><div class="line">agent.sources.r1.channels = c1</div><div class="line"></div><div class="line">######## source相关配置 ########</div><div class="line"># source类型</div><div class="line">agent.sources.r1.type = TAILDIR</div><div class="line"># 元数据位置</div><div class="line">agent.sources.r1.positionFile = /root/taildir_position.json</div><div class="line"># 监控的目录</div><div class="line">agent.sources.r1.filegroups = f1</div><div class="line">agent.sources.r1.filegroups.f1=/root/.*log</div><div class="line">agent.sources.r1.fileHeader = true</div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"># set sink1</div><div class="line">agent.sinks.k1.channel = c1</div><div class="line">agent.sinks.k1.type = avro</div><div class="line">agent.sinks.k1.hostname = &#123;node1&#125;</div><div class="line">agent.sinks.k1.port = 52020</div><div class="line"># set sink2</div><div class="line">agent.sinks.k2.channel = c1</div><div class="line">agent.sinks.k2.type = avro</div><div class="line">agent.sinks.k2.hostname = &#123;node2&#125;</div><div class="line">agent.sinks.k2.port = 52020</div><div class="line"># set sink3</div><div class="line">agent.sinks.k3.channel = c1</div><div class="line">agent.sinks.k3.type = avro</div><div class="line">agent.sinks.k3.hostname = &#123;node3&#125;</div><div class="line">agent.sinks.k3.port = 52020</div><div class="line">#set sink group</div><div class="line">agent.sinkgroups.g1.sinks = k1 k2 k3</div><div class="line">#set failover</div><div class="line">agent.sinkgroups.g1.processor.type = failover</div><div class="line">agent.sinkgroups.g1.processor.backoff=true   # 这个里面是个惩罚机制</div><div class="line">agent.sinkgroups.g1.processor.selector=round_robin</div><div class="line">agent.sinkgroups.g1.processor.priority.k1 = 30</div><div class="line">agent.sinkgroups.g1.processor.priority.k2 = 20</div><div class="line">agent.sinkgroups.g1.processor.priority.k3 = 10</div><div class="line">agent.sinkgroups.g1.processor.maxpenalty = 10000</div></pre></td></tr></table></figure></p>
-<p>区别在于负载均衡，每台机器都会受到数据处理数据，但是有时候业务需求可能需要一台机器为主要一条业务的数据接收器，另一个台在挂掉后才会被启用，这时候这个就有用了。</p>
-<p>还有一种玩法可以在多个flume前面加个nginx<br><img src="/2020/04/25/build-flume-ha/flume-ha2.png" alt="flume-nginx" title="flume-nginx"></p>
-<p>ng配置如下:<br>首先在nginx.conf中加入:</p>
-<p>include       flume.conf;</p>
-<p>加入后配置如下:<br><figure class="highlight plain"><figcaption><span>shell config</span></figcaption><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">#user  nobody;</div><div class="line">worker_processes  1;</div><div class="line"></div><div class="line">#error_log  logs/error.log;</div><div class="line">#error_log  logs/error.log  notice;</div><div class="line">#error_log  logs/error.log  info;</div><div class="line"></div><div class="line">#pid        logs/nginx.pid;</div><div class="line"></div><div class="line"></div><div class="line">events &#123;</div><div class="line">    worker_connections  1024;</div><div class="line">&#125;</div><div class="line">include       flume.conf;</div><div class="line"></div><div class="line"></div><div class="line">http &#123;</div><div class="line"></div><div class="line"></div><div class="line">...</div><div class="line">&#125;</div><div class="line"></div></pre></td></tr></table></figure></p>
-<p>新建flume.conf</p>
-<p>配置如下:<br><figure class="highlight plain"><figcaption><span>shell config</span></figcaption><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">stream &#123;</div><div class="line">      upstream abcdocker &#123;</div><div class="line">        server node1:52020  weight=5 max_fails=3 fail_timeout=30s;</div><div class="line">        server node2:52020  weight=5 max_fails=3 fail_timeout=30s;</div><div class="line">        server node3:52020  weight=5 max_fails=3 fail_timeout=30s;</div><div class="line"></div><div class="line">     &#125;</div><div class="line"></div><div class="line">     server &#123;</div><div class="line">            listen 52021;</div><div class="line">            proxy_pass abcdocker;</div><div class="line">            proxy_connect_timeout 10s;</div><div class="line">            proxy_timeout 24h;</div><div class="line">              &#125;</div><div class="line">  &#125;</div><div class="line"></div></pre></td></tr></table></figure></p>
-<p>flume发送端如下:<br><figure class="highlight plain"><figcaption><span>shell config</span></figcaption><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">#agent1 name</div><div class="line">agent.channels = c1</div><div class="line">agent.sources = r1</div><div class="line">agent.sinks = k1</div><div class="line">#set channel</div><div class="line">agent.channels.c1.type = memory</div><div class="line">agent.channels.c1.capacity = 102400</div><div class="line">agent.channels.c1.transactionCapacity = 1000</div><div class="line">agent.channels.c1.byteCapacity=134217728</div><div class="line">agent.channels.c1.byteCapacityBufferPercentage=80</div><div class="line"></div><div class="line">agent.sources.r1.channels = c1</div><div class="line"></div><div class="line">######## source相关配置 ########</div><div class="line"># source类型</div><div class="line">agent.sources.r1.type = TAILDIR</div><div class="line"># 元数据位置</div><div class="line">agent.sources.r1.positionFile = /root/taildir_position.json</div><div class="line"># 监控的目录</div><div class="line">agent.sources.r1.filegroups = f1</div><div class="line">agent.sources.r1.filegroups.f1=/root/.*log</div><div class="line">agent.sources.r1.fileHeader = true</div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"># set sink1</div><div class="line">agent.sinks.k1.channel = c1</div><div class="line">agent.sinks.k1.type = avro</div><div class="line">agent.sinks.k1.hostname = &#123;nginx&#125;</div><div class="line">agent.sinks.k1.port = 52021</div><div class="line"></div></pre></td></tr></table></figure></p>
-<p>如果要造数据的话可以这样建个sh文件<br><figure class="highlight plain"><figcaption><span>shell config</span></figcaption><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">#!/bin/bash</div><div class="line">while true</div><div class="line">do</div><div class="line">        date &gt;&gt; test.log</div><div class="line">        sleep 0.5</div><div class="line">done</div></pre></td></tr></table></figure></p>
-<p>执行即可</p>
-<p>最后兵无常势水无常形,多思考用最适合自己的方案即可.</p>
-<p>参考资料:<br><a href="https://blog.csdn.net/zengxianglei/article/details/89290050" target="_blank" rel="external">https://blog.csdn.net/zengxianglei/article/details/89290050</a><br><a href="https://www.cnblogs.com/chushiyaoyue/articles/6211599.html" target="_blank" rel="external">https://www.cnblogs.com/chushiyaoyue/articles/6211599.html</a></p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2020/04/25/build-flume-ha/" data-id="clz12wrzg0006qv79g82zckxs" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/flume/">flume</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
 
 
   <nav id="page-nav">
-    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><a class="extend next" rel="next" href="/page/2/">__('next') &raquo;</a>
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><a class="page-number" href="/page/4/">4</a><a class="extend next" rel="next" href="/page/2/">__('next') &raquo;</a>
   </nav>
 </section>
         
@@ -586,7 +574,11 @@
       <ul>
         
           <li>
-            <a href="/2024/07/25/hello-world/">如何搭建新版本hexo</a>
+            <a href="/2024/07/27/hello-world/">如何搭建新版本hexo</a>
+          </li>
+        
+          <li>
+            <a href="/2024/07/27/zero-copy/">零拷贝技术</a>
           </li>
         
           <li>
@@ -599,10 +591,6 @@
         
           <li>
             <a href="/2024/07/22/unbuntu20-with-vbox7/">virtualbox7安装ubuntu20</a>
-          </li>
-        
-          <li>
-            <a href="/2024/07/21/how-to-install-k8s-with-rke/">用RKE安装k8s</a>
           </li>
         
       </ul>

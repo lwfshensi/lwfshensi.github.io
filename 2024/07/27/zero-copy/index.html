@@ -3,14 +3,27 @@
 <head>
   <meta charset="utf-8">
   
-  <title>Archives: 2021 | 肆叔的酱油</title>
+  <title>零拷贝技术 | 肆叔的酱油</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="website">
-<meta property="og:title" content="肆叔的酱油">
-<meta property="og:url" content="http://yoursite.com/archives/2021/index.html">
+  <meta name="description" content="程序执行一次的调用流程如下：   
+  1、用户进程发起read系统调用，进入内核态发起DMA复制，从输入设备复制到内核态。  2、调用cpu将数据从内核态复制到用户态。  3、用户态再分配给线程上线文数据地址。  4、程序执行。  5、将处理后的结果发起系统调用通过cpu拷贝从用户态复制到内核态。  6、然后通过DMA技术将内核态缓冲区中的数据刷到硬件输出设备中，内核态回到用户态  7、硬件">
+<meta property="og:type" content="article">
+<meta property="og:title" content="零拷贝技术">
+<meta property="og:url" content="http://yoursite.com/2024/07/27/zero-copy/index.html">
 <meta property="og:site_name" content="肆叔的酱油">
+<meta property="og:description" content="程序执行一次的调用流程如下：   
+  1、用户进程发起read系统调用，进入内核态发起DMA复制，从输入设备复制到内核态。  2、调用cpu将数据从内核态复制到用户态。  3、用户态再分配给线程上线文数据地址。  4、程序执行。  5、将处理后的结果发起系统调用通过cpu拷贝从用户态复制到内核态。  6、然后通过DMA技术将内核态缓冲区中的数据刷到硬件输出设备中，内核态回到用户态  7、硬件">
+<meta property="og:image" content="http://yoursite.com/2024/07/27/zero-copy/zerocopy1.png">
+<meta property="og:image" content="http://yoursite.com/2024/07/27/zero-copy/dma.png">
+<meta property="og:image" content="http://yoursite.com/2024/07/27/zero-copy/mmap.png">
+<meta property="og:image" content="http://yoursite.com/2024/07/27/zero-copy/sendfile.png">
+<meta property="og:image" content="http://yoursite.com/2024/07/27/zero-copy/dma-gather.png">
+<meta property="og:updated_time" content="2024-07-27T04:35:20.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="肆叔的酱油">
+<meta name="twitter:title" content="零拷贝技术">
+<meta name="twitter:description" content="程序执行一次的调用流程如下：   
+  1、用户进程发起read系统调用，进入内核态发起DMA复制，从输入设备复制到内核态。  2、调用cpu将数据从内核态复制到用户态。  3、用户态再分配给线程上线文数据地址。  4、程序执行。  5、将处理后的结果发起系统调用通过cpu拷贝从用户态复制到内核态。  6、然后通过DMA技术将内核态缓冲区中的数据刷到硬件输出设备中，内核态回到用户态  7、硬件">
+<meta name="twitter:image" content="http://yoursite.com/2024/07/27/zero-copy/zerocopy1.png">
   
     <link rel="alternate" href="/atom.xml" title="肆叔的酱油" type="application/atom+xml">
   
@@ -59,39 +72,68 @@
   </div>
 </header>
       <div class="outer">
-        <section id="main">
-  
-  
-    
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2021" class="archive-year">2021</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/2021/05/28/influx-proxy-problemlist/" class="archive-article-date">
-  <time datetime="2021-05-27T17:08:42.000Z" itemprop="datePublished">May 28</time>
+        <section id="main"><article id="post-zero-copy" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2024/07/27/zero-copy/" class="article-date">
+  <time datetime="2024-07-27T03:16:02.000Z" itemprop="datePublished">2024-07-27</time>
 </a>
-      
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2021/05/28/influx-proxy-problemlist/">influx-proxy部署遇到的问题</a>
+    <h1 class="article-title" itemprop="name">
+      零拷贝技术
     </h1>
   
 
-    </header>
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>  程序执行一次的调用流程如下：<br>  <img src="/2024/07/27/zero-copy/zerocopy1.png" alt="zero" title="zero"> </p>
+<p>  1、用户进程发起read系统调用，进入内核态发起DMA复制，从输入设备复制到内核态。<br>  2、调用cpu将数据从内核态复制到用户态。<br>  3、用户态再分配给线程上线文数据地址。<br>  4、程序执行。<br>  5、将处理后的结果发起系统调用通过cpu拷贝从用户态复制到内核态。<br>  6、然后通过DMA技术将内核态缓冲区中的数据刷到硬件输出设备中，内核态回到用户态<br>  7、硬件输出设备输出结束</p>
+<p>  这里一次调用至少需要四次复制。零拷贝技术就是减少数据的io次数，优化吞吐量的技术手段，常用的技术手段有DMA、mmap、sendfile，和direct IO等</p>
+<h1 id="DMA技术"><a href="#DMA技术" class="headerlink" title="DMA技术"></a>DMA技术</h1><p>  无论是设备到内核态还是内核态到用户态的数据复制，都需要CPU的参与，当遇到大文件的时候就会浪费cpu资源。<br>  DMA也就是直接内存访问，是设备到内核态的数据复制过程不需要cpu参与，只需要给dma发送指令，避免了cpu资源浪费。<br>  <img src="/2024/07/27/zero-copy/dma.png" alt="dma" title="dma"><br>  DMA优化了cpu调度，没有减少复制</p>
+<h1 id="mmap"><a href="#mmap" class="headerlink" title="mmap"></a>mmap</h1><p>  memory map，用户态和内核态之间复制是为了安全性和缓存，那么给用户态和内存态共同开辟一块共享的缓存就是mmap技术。<br>  内核态和用户态可以一起读写一块区域<br>  使用mmap后的流程如下：<br>  <img src="/2024/07/27/zero-copy/mmap.png" alt="mmap" title="mmap"><br>  复制变成3次，上下文切换为4次<br>  使用mmap的缺点：<br>  1、使用mmap必须指定块大小，所以处理的文件不能太大<br>  2、使用mmap自动将脏页回写到磁盘，效率不一定比缓冲区快<br>  3、基于第一条，尤其不要在32位机器上执行大文件</p>
+<h1 id="sendfile"><a href="#sendfile" class="headerlink" title="sendfile"></a>sendfile</h1><p>  如果是静态资源，每次http访问都要这么复制4次，确实浪费资源，所以就有了sendfile<br>  <img src="/2024/07/27/zero-copy/sendfile.png" alt="sendfile" title="sendfile"><br>  在sendfile中，复制仍为3次，但是用户态不参与上下文切换，都是内核态和设备在切换，上下文的切换次数变成2次</p>
+<h1 id="sendfile-dma-scather-gather"><a href="#sendfile-dma-scather-gather" class="headerlink" title="sendfile+dma scather/gather"></a>sendfile+dma scather/gather</h1><p>  DMA gather是linux2.4中引入的新功能，他读取page cache中的数据描述信息（内存地址和偏移量）记录到socket cache中，由dma根据这些将数据复制到输出设备中，又减少了一次复制。<br>  <img src="/2024/07/27/zero-copy/dma-gather.png" alt="dms-gather" title="dms-gather"></p>
+<p>  direct io<br>  就是不经过内核态，用户态和硬件设备直接公用一个内存来提高效率，类似mysql就是这么做的。通过direct io可以直接写入从磁盘，写完后仍然需要fsync缓存到内核空间中。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2024/07/27/zero-copy/" data-id="clz3n37tr001gjs79ym0rbc78" class="article-share-link">Share</a>
+      
+      
+    </footer>
   </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2024/07/27/hello-world/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          如何搭建新版本hexo
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2024/07/25/install-emqx-cluster/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">服务器高可用负载均衡集群</div>
+    </a>
+  
+</nav>
+
+  
 </article>
-  
-  
-    </div></section>
-  
 
 </section>
         

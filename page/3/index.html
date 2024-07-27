@@ -61,6 +61,58 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-spark-sql-count-as-issue" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/12/13/spark-sql-count-as-issue/" class="article-date">
+  <time datetime="2018-12-13T15:25:33.000Z" itemprop="datePublished">2018-12-13</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/12/13/spark-sql-count-as-issue/">spark-sql-count-as-issue</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>今天遇到了一个奇怪的问题，就是用as的时候，如果别名全部为数字，那么会报错，具体说明如下：<br>准备的数据如下：<br><img src="/2018/12/13/spark-sql-count-as-issue/4.png" alt="data" title="data"><br>如果设置成2或者2-2，那么会报如下错误。如果是’2’效果一样<br><img src="/2018/12/13/spark-sql-count-as-issue/2.png" alt="wrong" title="wrong"><br><img src="/2018/12/13/spark-sql-count-as-issue/3.png" alt="exception" title="exception"><br>如果设置成2_2，则查询正常<br><img src="/2018/12/13/spark-sql-count-as-issue/1.png" alt="right" title="right"></p>
+<p>用的spark和spark sql为2.3.1，pom如下：</p>
+<pre><code>&lt;dependency&gt;
+    &lt;groupId&gt;org.apache.spark&lt;/groupId&gt;
+    &lt;artifactId&gt;spark-core_2.11&lt;/artifactId&gt;
+    &lt;version&gt;2.3.1&lt;/version&gt;
+    &lt;scope&gt;${spark.scope}&lt;/scope&gt;
+&lt;/dependency&gt;
+
+&lt;dependency&gt;
+    &lt;groupId&gt;org.apache.spark&lt;/groupId&gt;
+    &lt;artifactId&gt;spark-sql_2.11&lt;/artifactId&gt;
+    &lt;version&gt;2.3.1&lt;/version&gt;
+    &lt;scope&gt;${spark.scope}&lt;/scope&gt;
+&lt;/dependency&gt;
+</code></pre><p>暂时先用’_’，还没有具体的解决办法</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/12/13/spark-sql-count-as-issue/" data-id="clz3n37ta0019js79csrlq8r9" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
     <article id="post-spark-classloader-cannot-find-classdef-in-the-jar" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2018/12/13/spark-classloader-cannot-find-classdef-in-the-jar/" class="article-date">
@@ -88,7 +140,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/12/13/spark-classloader-cannot-find-classdef-in-the-jar/" data-id="clz12ws1b0016qv79867ss87m" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/12/13/spark-classloader-cannot-find-classdef-in-the-jar/" data-id="clz3n37t90016js79n1m5zf8v" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spark-classload-ClassNotFound/">spark classload ClassNotFound</a></li></ul>
@@ -133,7 +185,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/12/04/ali-emr-presto/" data-id="clz12wrzd0003qv79r1t1yft1" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/12/04/ali-emr-presto/" data-id="clz3n37rt0003js79nfxu3ds7" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/阿里云-sgoop-presto/">阿里云 sgoop presto</a></li></ul>
@@ -189,7 +241,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/10/30/tensorflow介绍/" data-id="clz12ws39001dqv79iaqu7fon" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/10/30/tensorflow介绍/" data-id="clz3n37tq001djs79kn0uxsi8" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/tensroflow/">tensroflow</a></li></ul>
@@ -229,7 +281,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/09/05/openstack简介/" data-id="clz12ws0v0011qv790ujlii8l" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/09/05/openstack简介/" data-id="clz3n37ss0011js79882t93kj" class="article-share-link">Share</a>
       
       
     </footer>
@@ -281,7 +333,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/05/01/openstack-neutron/" data-id="clz12ws0t000xqv79fb6fkhj4" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/05/01/openstack-neutron/" data-id="clz3n37sq000xjs79esmk5tx5" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/openstack-neutron/">openstack neutron</a></li></ul>
@@ -320,7 +372,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/05/01/spring-cloud/" data-id="clz12ws1f001aqv79x2ypa6dq" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/05/01/spring-cloud/" data-id="clz3n37tb001ajs79i39fnggq" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spring/">spring</a></li></ul>
@@ -359,7 +411,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/05/01/frame/" data-id="clz12wrzo000aqv797xanpjc5" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/05/01/frame/" data-id="clz3n37s1000ajs79m4hpc892" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spring/">spring</a></li></ul>
@@ -399,7 +451,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2016/12/12/openstack-newton-mysql-config/" data-id="clz12ws0u0010qv79qkc11ai9" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2016/12/12/openstack-newton-mysql-config/" data-id="clz3n37sr0010js79vfgx6j0p" class="article-share-link">Share</a>
       
       
     </footer>
@@ -437,44 +489,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2016/11/29/如何在virtualbox中安装ubuntu16/" data-id="clz12ws57001pqv7988qgu5fk" class="article-share-link">Share</a>
-      
-      
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="to-me-写给自己" class="article article-type-to-me" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2016/11/24/写给自己/" class="article-date">
-  <time datetime="2016-11-24T13:06:10.000Z" itemprop="datePublished">2016-11-24</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2016/11/24/写给自己/">写给自己</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>  大学有云：物有本末事有终始，知所先后，则近道矣。接触云计算行业已经有2、3年了，始终无法沉淀下来，或者说心静不下来，太浮躁。无法做到心如明镜，视万物如明镜现诸色相。如今已近而立之年，回首审视自觉髀里肉生，却无半点建树。<br>  思来想去不若开个blog，把自己想要学的东西系统的总结起来。</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2016/11/24/写给自己/" data-id="clz12ws56001oqv79w2fkgxur" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2016/11/29/如何在virtualbox中安装ubuntu16/" data-id="clz3n37v6001qjs79s1aa4k8v" class="article-share-link">Share</a>
       
       
     </footer>
@@ -487,7 +502,7 @@
 
 
   <nav id="page-nav">
-    <a class="extend prev" rel="prev" href="/page/2/">&laquo; __('prev')</a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span>
+    <a class="extend prev" rel="prev" href="/page/2/">&laquo; __('prev')</a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><a class="extend next" rel="next" href="/page/4/">__('next') &raquo;</a>
   </nav>
 </section>
         
@@ -532,7 +547,11 @@
       <ul>
         
           <li>
-            <a href="/2024/07/25/hello-world/">如何搭建新版本hexo</a>
+            <a href="/2024/07/27/hello-world/">如何搭建新版本hexo</a>
+          </li>
+        
+          <li>
+            <a href="/2024/07/27/zero-copy/">零拷贝技术</a>
           </li>
         
           <li>
@@ -545,10 +564,6 @@
         
           <li>
             <a href="/2024/07/22/unbuntu20-with-vbox7/">virtualbox7安装ubuntu20</a>
-          </li>
-        
-          <li>
-            <a href="/2024/07/21/how-to-install-k8s-with-rke/">用RKE安装k8s</a>
           </li>
         
       </ul>
